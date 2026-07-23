@@ -1,0 +1,10 @@
+interface:
+  display_name: "New Plugin"
+  short_description: "Design and scaffold Codex plugins"
+  default_prompt: "Use $new-plugin to design, scaffold, and validate a Codex plugin for this repository."
+
+policy:
+  allow_implicit_invocation: true
+
+dependencies:
+  tools: []

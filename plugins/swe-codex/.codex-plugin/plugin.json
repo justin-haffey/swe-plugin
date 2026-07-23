@@ -1,0 +1,27 @@
+{
+  "name": "swe-codex",
+  "version": "0.9.0",
+  "description": "Codex-native workflows for creating plugins, skills, agents, and coordinated engineering solutions.",
+  "author": {
+    "name": "SWE Codex"
+  },
+  "keywords": ["codex", "plugins", "skills", "agents", "orchestration"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "SWE Codex",
+    "shortDescription": "Build governed Codex solutions",
+    "longDescription": "Creates and evolves Codex plugins, reusable skills, native custom agents, and coordinated Codex engineering workflows. REQUIRES a local installation of LocalRag.",
+    "developerName": "SWE Codex",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Use $new-plugin to design and scaffold a new Codex plugin.",
+      "Use $new-skill to create or improve a reusable Codex skill.",
+      "Use $new-agent to create or improve a project-scoped Codex agent.",
+      "Use $orchestrate to coordinate a multi-step Codex solution."
+    ],
+    "brandColor": "#2563EB",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png"
+  }
+}

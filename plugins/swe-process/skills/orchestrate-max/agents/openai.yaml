@@ -1,0 +1,10 @@
+interface:
+  display_name: "Orchestrate Max"
+  short_description: "Run maximum-depth specialist orchestration"
+  default_prompt: "Use $orchestrate-max to execute this complex task with every relevant subagent, staged validation, and one integrated result."
+
+policy:
+  allow_implicit_invocation: false
+
+dependencies:
+  tools: []
