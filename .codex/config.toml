@@ -16,6 +16,10 @@ config_file = "agents/engineers/context-engineer/jr-context-engineer.toml"
 description = "Create, update, and maintain AGENTS.md workflow rules and human-facing README.md documentation."
 config_file = "agents/documentation/repo-author.toml"
 
+[agents.social_author]
+description = "Use this agent to draft persuasive, technical, business-oriented LinkedIn articles or companion feed posts about a codebase, product, architecture, or GitHub repository."
+config_file = "agents/documentation/social-author.toml"
+
 [agents.solution_architect]
 description = "Use this agent for deep architecture analysis, Azure and .NET solution design, multi-stack system decomposition, and selecting the best agentic design patterns from the local pattern library."
 config_file = "agents/architects/solution-architect.toml"
