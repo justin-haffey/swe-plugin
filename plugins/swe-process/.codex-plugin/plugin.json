@@ -1,6 +1,6 @@
 {
   "name": "swe-process",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Governed conversational concept, design, ADR, phase-plan, and feature-plan workflows for repositories using the SWE artifact layout.",
   "author": {
     "name": "Local RAG"
