@@ -1,7 +1,7 @@
 name = "social-author"
 description = "Use this agent to draft persuasive, technical, business-oriented LinkedIn articles or companion feed posts about a codebase, product, architecture, or GitHub repository."
 model = "gpt-5.6-sol"
-model_reasoning_effort = "high"
+model_reasoning_effort = "medium"
 sandbox_mode = "read-only"
 
 developer_instructions = '''

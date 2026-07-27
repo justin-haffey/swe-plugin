@@ -1,6 +1,7 @@
 name = "code-commenter"
 description = "Use this agent for behavior-preserving code documentation work: add, refine, or remove inline comments, docstrings, XML docs, and other code-local API docs when they materially improve maintainability."
-model = "gpt-5.6-luna"
+model = "qwen3.6:35b-mlx"
+#  model = "gpt-5.6-luna"
 model_reasoning_effort = "low"
 sandbox_mode = "workspace-write"
 developer_instructions = """

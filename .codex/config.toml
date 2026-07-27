@@ -1,4 +1,4 @@
-# AGENTS
+﻿# AGENTS
 [agents]
 # Note: using new multi-agent-v2
 # max_threads = 8
@@ -38,7 +38,7 @@ config_file = "agents/swe/developers/csharp-developer.toml"
 
 [agents.azure_db_developer]
 description = "Use this agent for Azure SQL and Azure Cosmos DB data design, schema and container modeling, database scripting, and database-focused implementation guidance."
-config_file = "agents/swe/database/azure-db-developer.toml"
+config_file = "agents/swe/database/database-developer.toml"
 
 [agents.full_stack_developer]
 description = "Use this agent for senior-level full-stack work that spans understanding complex systems, scaffolding new solution areas, and implementing advanced cross-layer code with strong attention to structure, integrations, and long-term maintainability."
@@ -55,6 +55,11 @@ config_file = "agents/swe/developers/ui-designer.toml"
 [agents.codex_engineer]
 description = "Use this agent to create, migrate, and validate Codex-native plugins, skills, agents, and coordinated project customizations."
 config_file = "agents/swe/engineers/codex-engineer.toml"
+
+[agents.developer]
+description = "Use this agent as a powerful, language-agnostic general-purpose developer for any implementation task: feature code, refactoring, bug fixes, tests, tooling, scripts, and infrastructure across any stack or framework."
+config_file = "agents/swe/developers/developer.toml"
+
 
 # PROJECT TRUST
 

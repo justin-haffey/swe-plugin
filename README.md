@@ -2,12 +2,13 @@
 
 ## Overview
 
-This repository packages a practical software-engineering toolkit for Codex. It combines governed planning workflows, reusable Codex-authoring workflows, local RAG research helpers, and project-scoped custom agents. Together, these components help a team move from an engineering concept to reviewable design and implementation work while keeping decisions, plans, and evidence in the repository.
+This repository packages a practical software-engineering toolkit for Codex. It combines governed planning workflows, reusable Codex-authoring workflows, local RAG research helpers, and project-scoped custom agents. Together, these components help a team move from an engineering concept to reviewable design and implementation work while keeping decisions, plans, and evidence in the repository. The `swe-process` plugin begins with `$swe-brainstorm`, a voice-friendly conversational skill for shaping an early software idea into a complete concept before design work begins.
 
 The repository is a local Codex marketplace: [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json) exposes the three plugin packages under [`plugins/`](plugins/).
 
 ## Features
 
+- **Voice-friendly concept discovery:** `$swe-brainstorm` develops and reviews a complete concept through a natural conversation, creating the concept artifact only after explicit approval.
 - **Governed SWE process** — `swe-process` provides concept-to-design, ADR, phase-plan, feature-plan, and implementation orchestration workflows using the repository's `.swe/` layout.
 - **Codex solution authoring** — `swe-codex` provides focused workflows for creating or evolving Codex plugins, skills, and native custom agents.
 - **Local RAG research helpers** — `local-rag-skills` supplies read-only skills for source discovery, status checks, indexing verification, and evidence retrieval through a [Local RAG MCP Server](https://github.com/justin-haffey/local-rag).
@@ -24,26 +25,27 @@ plugins/
   swe-process/                     Governed SWE planning and execution skills
   swe-codex/                       Codex plugin, skill, and agent authoring skills
   local-rag-skills/                Read-only Local RAG research skills and MCP configuration
+  local-rag-mgmt/                  Explicitly invoked Local RAG index-management skills
 ```
 
 Each plugin has a `.codex-plugin/plugin.json` manifest and a `skills/` directory. The marketplace currently makes these packages available:
 
 | Plugin                                           | Purpose                                                                     | Included skills                                                                                                       |
 | ------------------------------------------------ | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| [`swe-process`](plugins/swe-process/)           | Create governed design, ADR, planning, feature, and execution artifacts.    | `swe-design`, `swe-plan`, `swe-feature`, `swe-code`, `orchestrate`, `orchestrate-max`                     |
+| [`swe-process`](plugins/swe-process/)           | Shape concepts conversationally, then create governed design, ADR, planning, feature, and execution artifacts. | `swe-brainstorm`, `swe-design`, `swe-plan`, `swe-feature`, `swe-code`, `orchestrate`, `orchestrate-max` |
 | [`swe-codex`](plugins/swe-codex/)               | Create and maintain Codex-native plugins, skills, and agents.               | `new-plugin`, `new-skill`, `new-agent`                                                                          |
 | [`local-rag-skills`](plugins/local-rag-skills/) | Research indexed local sources through the configured Local RAG MCP server. | `local-rag-search`, `local-rag-evidence-retrieval`, source/status/indexing helpers, and repository reconnaissance |
 
 ## Custom agents
 
-The repository's `.codex` configuration is a first-class part of the solution. Its specialist agents support architecture, implementation, infrastructure, agent/skill design, and documentation work. Choose the narrowest agent that fits the task; their definitive scope and instructions live in [`.codex/agents/core/`](.codex/agents/).
+The repository's `.codex` configuration is a first-class part of the solution. Its specialist agents support architecture, implementation, infrastructure, agent/skill design, and documentation work. Choose the narrowest agent that fits the task; their definitive scope and instructions live in [`.codex/agents/swe/`](.codex/agents/swe/).
 
 | Agent area                    | Agents                                                                                                                                                                                                                                                                                                                                                                                                                        | Primary responsibility                                                                                                            |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture and context      | [`solution-architect`](.codex/agents/architects/solution-architect.toml), [`context-engineer`](.codex/agents/engineers/context-engineer/context-engineer.toml), [`jr-context-engineer`](.codex/agents/engineers/context-engineer/jr-context-engineer.toml)                                                                                                                                                                 | System architecture and context, prompt, workflow, and Codex-instruction design.                                                  |
-| Codex solution engineering    | [`codex-engineer`](.codex/agents/engineers/codex-engineer.toml)                                                                                                                                                                                                                                                                                                                                                              | Builds and validates project-scoped Codex plugins, skills, agents, and related configuration.                                     |
-| Application and platform work | [`csharp-developer`](.codex/agents/developers/csharp-developer.toml), [`full-stack-developer`](.codex/agents/developers/full-stack-developer.toml), [`maf-developer`](.codex/agents/developers/maf-developer.toml), [`ui-designer`](.codex/agents/developers/ui-designer.toml), [`azure-engineer`](.codex/agents/engineers/azure-engineer.toml), [`azure-db-developer`](.codex/agents/database/database-developer.toml) | Application, UI, Microsoft Agent Framework, Azure infrastructure, and Azure data work.                                            |
-| Documentation                 | [`code-commenter`](.codex/agents/developers/code-commentor.toml), [`repo-author`](.codex/agents/writers/repo-author.toml), <br />`social-author`                                                                                                                                                                                                                                                                          | Code-local comments and documentation; repository`AGENTS.md` workflow rules and human-facing `README.md` files, respectively. |
+| Architecture and context      | [`solution-architect`](.codex/agents/swe/architects/solution-architect.toml), [`context-engineer`](.codex/agents/swe/engineers/context-engineer/context-engineer.toml), [`jr-context-engineer`](.codex/agents/swe/engineers/context-engineer/jr-context-engineer.toml)                                                                                                                                                                 | System architecture and context, prompt, workflow, and Codex-instruction design.                                                  |
+| Codex solution engineering    | [`codex-engineer`](.codex/agents/swe/engineers/codex-engineer.toml)                                                                                                                                                                                                                                                                                                                                                              | Builds and validates project-scoped Codex plugins, skills, agents, and related configuration.                                     |
+| Application and platform work | [`csharp-developer`](.codex/agents/swe/developers/csharp-developer.toml), [`full-stack-developer`](.codex/agents/swe/developers/full-stack-developer.toml), [`maf-developer`](.codex/agents/swe/developers/maf-developer.toml), [`ui-designer`](.codex/agents/swe/developers/ui-designer.toml), [`azure-engineer`](.codex/agents/swe/engineers/azure-engineer.toml), [`azure-db-developer`](.codex/agents/swe/database/database-developer.toml) | Application, UI, Microsoft Agent Framework, Azure infrastructure, and Azure data work.                                            |
+| Documentation                 | [`code-commenter`](.codex/agents/swe/documentation/code-commentor.toml), [`repo-author`](.codex/agents/swe/documentation/repo-author.toml), <br />`social-author`                                                                                                                                                                                                                                                                          | Code-local comments and documentation; repository`AGENTS.md` workflow rules and human-facing `README.md` files, respectively. |
 
 ## Setup and use
 
@@ -64,6 +66,7 @@ The repository does not define a package-manager install, build, or test command
 
 ### Common starting points
 
+- Use `$swe-brainstorm` to explore and shape an early software idea through a natural, voice-friendly conversation. It prepares a complete concept for review and creates a concept artifact in `.swe/00-CONCEPT/` only after explicit approval; it does not create design or implementation artifacts.
 - Use `$swe-design` when concept artifacts in `.swe/00-CONCEPT/` are ready to become a reviewable design and associated ADRs.
 - Use `$swe-plan` to turn an approved design into a phase plan and implementation-ready feature work.
 - Use `$swe-feature` to prepare one independently verifiable feature plan.
