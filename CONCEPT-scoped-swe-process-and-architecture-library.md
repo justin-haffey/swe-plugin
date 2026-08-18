@@ -1,12 +1,12 @@
 # Scoped SWE Process and Architecture Library
 
-> **Status:** Draft — review candidate, not an approved governed Concept artifact.
+> **Status:** Approved — review candidate, not an approved governed Concept artifact.
 >
 > **Purpose:** Record the decisions from the process-upgrade discussion so they can be reviewed before any migration of repository governance, skills, templates, or documentation.
 >
 > **Created:** 2026-08-18
 >
-> **Target governed Concept:** `.swe/00-concept/CONCEPT-scoped-swe-process-and-architecture-library.md` (only after review and explicit approval).
+> **Target governed Concept:** `.swe/01-concept/CONCEPT-scoped-swe-process-and-architecture-library.md` (only after review and explicit approval).
 
 ## 1. Executive summary
 
@@ -43,15 +43,26 @@ One plugin and reusable project template can give portfolio and solution reposit
 The canonical architecture hierarchy is:
 
 ```text
-System → Solution → Workload → Package → Module
+System → Solution → [Workload, when present] → Package → Module
 ```
 
 - **System** is the cross-solution platform or portfolio architecture boundary.
-- **Solution** is a cohesive deployable or operational product/system boundary.
-- **Workload** is an operational application role within a Solution. It may span packages and modules and may later deploy independently without changing architectural identity.
+- **Solution** is a cohesive deployable or operational product/system boundary. A Solution may be a server-backed application, a library, an SDK, or another cohesive technical product.
+- **Workload** is an optional operational application role within a host-oriented Solution. It may span packages and modules and may later deploy independently without changing architectural identity. A library or SDK Solution need not have any Workloads.
 - **Package** is a reusable technical distribution or coherent code grouping.
 - **Module** is an internal technical responsibility or unit of implementation.
 - **Feature** is a delivery scope, not an architecture level. It describes a functional outcome and may affect multiple Workloads, Packages, or Modules.
+
+### 3.2.1 Scope reach and ownership
+
+| Scope    | What it owns                                                                     | What it may span                                                  | Key distinction                                                                 |
+| -------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| System   | Platform-wide rules, shared runtime direction, and relationships among solutions | Multiple Solutions, shared Packages, and cross-solution Contracts | The System is the broadest enduring architecture boundary.                      |
+| Solution | One cohesive product or technical boundary, including a library or SDK           | Workloads when relevant, Packages, and Modules                    | A Solution may have no Workloads at all.                                        |
+| Workload | One operational application role in a host-oriented Solution                     | Multiple Packages and Modules                                     | A Workload is broader than a Module and may become independently deployed.      |
+| Package  | A reusable distribution or coherent technical grouping                           | Multiple Modules                                                  | A Package is a technical reuse and distribution boundary.                       |
+| Module   | An internal technical responsibility                                             | Its own components, types, and implementation details             | A Module is not an operational application.                                     |
+| Feature  | A functional delivery outcome                                                    | Any affected Workloads, Packages, and Modules                     | A Feature crosses technical boundaries when the functional outcome requires it. |
 
 ### 3.3 Server-platform example
 
@@ -81,13 +92,14 @@ Research → Concept → Design → ADR → Plan → Feature → Evidence
 
 ### 3.5 Root and direct skills
 
-- `swe-plan` is the conversational front door. It helps a developer narrow scope and routes to the appropriate direct planner.
-- Direct dash-qualified skills are deterministic. They inspect existing upstream evidence and produce their scoped artifact without reopening scope discovery.
-- A direct skill stops and reports a specific gap or conflict when required upstream input is missing or inconsistent; it does not invent evidence.
-- Direct planning skills are required for System, Solution, Workload, Package, Module, and Feature scope.
-- Direct Design skills are required for System, Solution, Workload, Package, and Module scope. Feature design remains embodied in the Feature planning/delivery path.
-- Direct code skills mirror the planning scopes: System, Solution, Workload, Package, Module, and Feature.
-- `swe-code-system` and `swe-code-solution` coordinate and validate child work. Workload, Package, Module, and Feature code skills may make bounded implementation changes when their ready inputs authorize them.
+`swe-plan` is the conversational front door. It helps a developer narrow scope and routes to the appropriate direct planner. Direct dash-qualified skills are deterministic: they inspect existing upstream evidence and produce their scoped artifact without reopening scope discovery. A direct skill stops and reports a specific gap or conflict when required upstream input is missing or inconsistent; it does not invent evidence.
+
+| Skill family           | Proposed skills                                                                                                                    | Responsibility                                                                                                                                                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Conversational routing | `swe-plan`                                                                                                                       | Discuss ambiguous work, identify the applicable scope, and route to a direct planner.                                                                                                                                   |
+| Direct planning        | `swe-plan-system`, `swe-plan-solution`, `swe-plan-workload`, `swe-plan-package`, `swe-plan-module`, `swe-plan-feature` | Read the applicable research, Concept when relevant, parent architecture, decisions, and parent Plan; then create or update the scoped Plan.                                                                            |
+| Direct design          | `swe-design-system`, `swe-design-solution`, `swe-design-workload`, `swe-design-package`, `swe-design-module`             | Produce a change-specific Design that fits the durable architecture and identifies any proposed Target architecture update. Feature design remains embodied in the Feature planning/delivery path.                      |
+| Direct execution       | `swe-code-system`, `swe-code-solution`, `swe-code-workload`, `swe-code-package`, `swe-code-module`, `swe-code-feature` | Execute only ready scoped work and synchronize verification Evidence. System and Solution code coordinate and validate child work; Workload, Package, Module, and Feature code may make bounded implementation changes. |
 
 ### 3.6 Template override model
 
@@ -107,6 +119,78 @@ Design and architecture record different, linked states:
 | `docs/` architecture record | Structural state                           | Current → Target → Implemented |
 
 An approved Design may establish a Target architecture state. After code and verification, the architecture state becomes Implemented, or both records are revised with the reason for divergence.
+
+### 3.8 Definitions and conventions
+
+| Term              | Definition                                                                                              | Rule or implication                                                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Research          | Source material, observations, and evaluated evidence that informs later work.                          | Lives only in`.swe/00-research/`; architecture and delivery artifacts link to it rather than duplicating it.                                 |
+| Concept           | Functional intent, outcomes, scope, and constraints for a proposed change when a Concept is applicable. | A System Plan may begin from portfolio research and context; Solution and Feature work normally uses a local Concept.                          |
+| Architecture      | Durable structural truth: boundaries, responsibilities, contracts, and cross-cutting decisions.         | Lives in`docs/`; it is not copied into local delivery artifacts.                                                                             |
+| Design            | A change-specific technical approach prepared before implementation.                                    | Lives in`.swe/02-design/`, references architecture, and may propose a Target architecture state.                                             |
+| ADR               | An enduring decision with rationale, consequences, and verification.                                    | Connects Design/Plan work to a durable decision record.                                                                                        |
+| Plan              | Delivery and implementation planning derived from Design and ADRs.                                      | Parent Plans register child-scope work and remain living as lower-level facts emerge.                                                          |
+| Feature           | A functional delivery outcome.                                                                          | May cross Workloads, Packages, and Modules; it lists affected technical areas but does not automatically create a Module Plan for every touch. |
+| Evidence          | Verification results and implementation facts.                                                          | Confirms a Design and advances a Target architecture state to Implemented or records the divergence.                                           |
+| Workload          | An optional operational application role inside a host-oriented Solution.                               | May span Packages and Modules; a library or SDK Solution may have no Workloads.                                                                |
+| Parent artifact   | The upstream artifact that authorizes, constrains, or organizes a child artifact.                       | Every scoped artifact records its parent link when one exists.                                                                                 |
+| Direct skill      | A scope-specific operation with known inputs and a defined output.                                      | Fails closed on missing or conflicting upstream evidence.                                                                                      |
+| Template override | A repository-specific replacement for a skill-owned default template.                                   | It applies only on exact filename match and replaces the full template.                                                                        |
+
+### 3.9 Process interaction model
+
+The process is deliberately a chain of evidence and handoffs, not a collection of independent document generators. A later stage reads and constrains itself by the relevant earlier stages; it never silently recreates their decisions.
+
+```mermaid
+flowchart LR
+    R[Research] --> C[Concept when applicable]
+    C --> D[Scoped Design]
+    A[Current Architecture and Contracts] --> D
+    D --> ADR[Architecture Decisions]
+    ADR --> P[Scoped Plan]
+    D --> P
+    P --> F[Feature or Child Scope Work]
+    F --> X[Scoped Code]
+    X --> E[Evidence]
+    E --> T[Target Architecture becomes Implemented]
+    D --> U[Approved Target Architecture]
+    U --> X
+```
+
+| Process step                | Primary inputs                                                                          | Primary output                                                       | Required interaction                                                                                                                        |
+| --------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture context        | `docs/` architecture, Contracts, Decisions, and the current System/Solution hierarchy | Current structural constraints                                       | These records are read by Design and Plan work. They remain durable and are not copied into`.swe/`.                                       |
+| Research and Concept        | `.swe/00-research/` and, when applicable, `.swe/01-concept/`                        | Evidence-backed functional and scope context                         | Research informs Concept, Design, and Plan. A System scope may begin from research and portfolio context without a local Concept.           |
+| Scoped Design               | Research/Concept context plus applicable architecture                                   | A change-specific Design and any proposed Target architecture update | Design precedes implementation planning. It explains fit, boundaries, alternatives, and required architecture promotion.                    |
+| ADR                         | A material enduring decision surfaced by Design                                         | Decision record linked to Design and downstream work                 | ADRs resolve enduring choices before or alongside delivery planning.                                                                        |
+| Conversational routing      | Developer intent plus visible upstream context                                          | Scope selection and a routed direct planner                          | `swe-plan` may discuss ambiguity, but it must not create a Plan before the required Design and ADR inputs exist.                          |
+| Scoped Plan                 | Ready Design, relevant ADRs, parent Plan, research, and Concept when applicable         | Delivery Plan and child-scope registry                               | A parent Plan registers work at the scope that fits. System and Solution Plans coordinate child work; they do not flatten it into Features. |
+| Feature and Module work     | Scoped Plan plus affected architecture                                                  | Functional Feature plan or independently valuable Module Plan        | A Feature lists the Workloads, Packages, and Modules it affects. A Module Plan is required only for standalone or shared technical work.    |
+| Scoped Code and Evidence    | Ready scoped Plan, Design, ADRs, and applicable architecture                            | Bounded implementation plus verification Evidence                    | Direct code skills fail closed on missing readiness. Evidence verifies implementation and resolves the architecture Target state.           |
+| Architecture reconciliation | Evidence, implemented change, and approved Target architecture                          | Implemented architecture or an explicit divergence revision          | The Design is marked Verified; root architecture becomes Implemented only after evidence supports it.                                       |
+
+#### Parent/child scope rules
+
+- A System Plan registers Solution work; a Solution Plan may register Workload, Package, Module, or Feature work as appropriate.
+- Workload, Package, and Module Plans may register lower-scope work, but no item is forced through every scope.
+- A library or SDK Solution may move directly from Solution to Package or Module without creating a Workload.
+- A Feature is owned by one primary Workload or Solution context and may reference additional affected Workloads, Packages, and Modules.
+- System and Solution code skills coordinate and validate child work. They do not become unbounded code generators across every descendant repository.
+
+#### Template and status rules
+
+- Before a direct skill creates an artifact, it resolves an exact-name override in `docs/99-templates/`; if absent, it uses the skill-owned default.
+- Each generated artifact records scope, parent link when applicable, status, and template identity.
+- `.swe` Design status is `Draft → Approved → Verified`; root architecture status is `Current → Target → Implemented`.
+- A root architecture update is proposed and approved during Design, then verified or revised after Code and Evidence.
+
+### 3.10 Ghostworx root-workspace application
+
+Ghostworx is the root solution and collaborative planning workspace for its component repositories. Its root-level `.swe/` and `docs/` directories hold solution-level concepts, delivery governance, and durable architecture records. Detailed implementation remains in the owning child repository beneath `repos/`.
+
+- Child repositories whose names begin with `ghostworx-` are active, simultaneously developed solution repositories and are read/write when the task explicitly targets them.
+- All other child repositories beneath `repos/` are read-only reference checkouts. The root workspace process must not modify their source, configuration, history, or generated files.
+- `swe-plugin` remains the reusable process and template source. Ghostworx is an initial root-workspace application of that process; Ghostworx-specific authorization does not become an unconditional write rule for every repository using the plugin.
 
 ## 4. Proposed shared `.swe` structure
 
@@ -129,52 +213,41 @@ The exact existing casing and numeric compatibility rules remain a migration dec
 
 ## 5. Proposed top-level architecture library
 
-Architecture folders are stable classifications, not lifecycle stages. The current sequential `10` through `13` classification can remain; hierarchy appears inside the artifacts and through links.
+Architecture folders are stable classifications, not lifecycle stages. They begin at `01` because `docs/` is independent of the `.swe/` delivery lifecycle; hierarchy appears inside the artifacts and through links.
 
 ```text
 docs/
   README.md
-  00-research/
-  10-system/
-  11-solution/
+  01-system/
+  02-solution/
     <solution>/
-      workloads/
-  12-package/
-  13-module/
-  14-contracts/
-  15-decisions/
+      workloads/                # Only for host-oriented Solutions
+  03-package/
+  04-module/
+  05-contracts/
+  06-decisions/
   99-templates/
 ```
 
-- `10-system/` contains platform-wide principles, host/shared-SDK context, portfolio map, and system architecture.
-- `11-solution/` contains Solution architecture and its Workload records.
-- `12-package/` and `13-module/` contain reusable technical architecture where a durable record is warranted.
-- `14-contracts/` contains host-workload and cross-solution contract records plus the integration catalog.
-- `15-decisions/` contains enduring architecture decisions.
+- `01-system/` contains platform-wide principles, host/shared-SDK context, portfolio map, and System architecture.
+- `02-solution/` contains Solution architecture and, only when applicable, its Workload records.
+- `03-package/` and `04-module/` contain reusable technical architecture where a durable record is warranted.
+- `05-contracts/` contains host-workload and cross-solution contract records plus the integration catalog.
+- `06-decisions/` contains enduring architecture decisions.
 - `99-templates/` contains exact-name whole-template overrides only.
 
 ## 6. Functional and operational behavior
 
 ### 6.1 Key use cases
 
-| ID    | Use case                                | Outcome                                                                                                                                          |
-| ----- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| UC-01 | A developer starts with ambiguous work  | `swe-plan` discusses scope and routes to the appropriate direct planner.                                                                       |
-| UC-02 | A direct planner receives a ready scope | It reads relevant research, Concept where applicable, parent architecture/design, decisions, and parent plan, then drafts the scoped plan.       |
-| UC-03 | A Feature crosses technical areas       | The Feature Plan identifies affected Workloads, Packages, and Modules; a Module Plan is created only if independent technical work is warranted. |
-| UC-04 | A Design changes enduring architecture  | The Design proposes and links a Target architecture update; verification later makes it Implemented or revises the records.                      |
-| UC-05 | A repository needs tailored output      | A skill uses an exact-name`docs/99-templates/` override if present; otherwise it uses its bundled default.                                     |
-
-### 6.2 Domain vocabulary
-
-| Term         | Definition                                              | Avoid                                                     |
-| ------------ | ------------------------------------------------------- | --------------------------------------------------------- |
-| Architecture | Durable structural truth and cross-cutting contracts    | Calling every change design "architecture"                |
-| Design       | Change-specific solution prepared before implementation | Treating Design as the durable system record              |
-| Workload     | Operational application role within a Solution          | Calling it a Module when it spans components and packages |
-| Module       | Internal technical responsibility                       | Using it for an independently operational application     |
-| Feature      | Functional delivery outcome                             | Treating it as an architecture level                      |
-| Direct skill | Scope-specific deterministic skill                      | Reopening conversational scope discovery                  |
+| ID    | Use case                                          | Outcome                                                                                                                                          |
+| ----- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| UC-01 | A developer starts with ambiguous work            | `swe-plan` discusses scope and routes to the appropriate direct planner.                                                                       |
+| UC-02 | A direct planner receives a ready scope           | It reads relevant research, Concept where applicable, parent architecture/design, decisions, and parent plan, then drafts the scoped plan.       |
+| UC-03 | A Feature crosses technical areas                 | The Feature Plan identifies affected Workloads, Packages, and Modules; a Module Plan is created only if independent technical work is warranted. |
+| UC-04 | A Design changes enduring architecture            | The Design proposes and links a Target architecture update; verification later makes it Implemented or revises the records.                      |
+| UC-05 | A repository needs tailored output                | A skill uses an exact-name`docs/99-templates/` override if present; otherwise it uses its bundled default.                                     |
+| UC-06 | A library Solution has no hosted application role | Its Solution architecture links directly to Packages and Modules; no Workload record is required.                                                |
 
 ## 7. Quality, safety, and governance direction
 
@@ -246,7 +319,7 @@ No implementation work is authorized by this draft.
 | ---- | ------------------------------------------------------------------------------ | ----------------------------------------------------------- | ---------------------------------------------------------------------- | ------ |
 | Q-01 | Exact artifact identifiers, filenames, and status-transition rules             | Required for reliable validation and migration.             | Define a document convention and validator specification.              | Open   |
 | Q-02 | Direct Design and code skill names, inputs, outputs, and ready criteria        | Required to prevent overlap and unauthorized work.          | Draft skill contracts for each scope and review as a family.           | Open   |
-| Q-03 | Contract and decision record schemas                                           | Required for cross-solution interoperability and promotion. | Define`14-contracts` and `15-decisions` templates.                 | Open   |
+| Q-03 | Contract and decision record schemas                                           | Required for cross-solution interoperability and promotion. | Define`05-contracts` and `06-decisions` templates.                 | Open   |
 | Q-04 | System Plan publication and child Solution registration mechanics              | Required for portfolio coordination.                        | Design a minimal parent/child registry with links and status.          | Open   |
 | Q-05 | Compatibility strategy for current`.swe` folder names and existing artifacts | Required to avoid breaking users or references.             | Inventory current artifacts and write an explicit migration plan.      | Open   |
 | Q-06 | Static validator implementation and invocation point                           | Required to make governance enforceable.                    | Select validation approach after current plugin structure is reviewed. | Open   |
@@ -275,13 +348,6 @@ The follow-on Design must resolve, at minimum:
 
 ## 13. Review and approval
 
-This is a root-level review candidate created at the developer’s request. It is **not** the canonical `.swe/00-concept/` Concept artifact and is **not approved** for Design or implementation.
+This root-level review Concept was approved to advance to the Design stage. It remains a review artifact rather than the eventual canonical `.swe/01-concept/` record, because the migration Design must settle compatibility and canonical locations before that migration occurs.
 
-Before creating the governed Concept, the reviewer should:
-
-- confirm the confirmed decisions remain accurate;
-- resolve or explicitly accept the open decisions with owners and dates where required;
-- approve the canonical destination and document status;
-- authorize the next governed artifact separately.
-
-**Recommended next artifact:** an approved governed Concept in `.swe/00-concept/`, followed by the process Design and ADRs. No Design or implementation has been performed.
+**Authorized next artifact:** the companion process Design and its decision records. They may refine the open implementation and migration choices, but do not authorize changing the plugin process itself.
