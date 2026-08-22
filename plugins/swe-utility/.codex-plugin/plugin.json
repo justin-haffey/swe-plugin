@@ -1,0 +1,22 @@
+{
+  "name": "swe-utility",
+  "version": "0.1.0",
+  "description": "SWE Utility Skills",
+  "author": {
+    "name": "Justin Haffey"
+  },
+  "keywords": ["util, utility, utility skills, orchestrate, grill"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "SWE Utilities",
+    "shortDescription": "Software engineering utility skills",
+    "longDescription": "Common software engineering utility skills",
+    "developerName": "Ghostworx.ai LLC",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [],
+    "brandColor": "#2563EB",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png"
+  }
+}

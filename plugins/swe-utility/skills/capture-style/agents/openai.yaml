@@ -1,0 +1,10 @@
+interface:
+  display_name: "Capture Style"
+  short_description: "Extract a reusable STYLE_CARD from a writing sample file, sample path, or pasted content."
+  default_prompt: "$capture-style [samples:<file>|<path>|<content>] -output <dir>"
+
+policy:
+  allow_implicit_invocation: false
+
+dependencies:
+  tools: []

@@ -1,0 +1,10 @@
+interface:
+  display_name: "Deepen"
+  short_description: "Vocabulary for deep-module design"
+  default_prompt: "$deepen the module in <location>"
+
+policy:
+  allow_implicit_invocation: true
+
+dependencies:
+  tools: []

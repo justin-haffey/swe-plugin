@@ -1,24 +1,20 @@
 {
   "name": "swe-process",
-  "version": "0.9.2",
-  "description": "Governed conversational concept, design, ADR, phase-plan, and feature-plan workflows for repositories using the SWE artifact layout.",
+  "version": "0.9.5",
+  "description": "Scope-aware SWE architecture, planning, direct execution, evidence, and task-tracking workflows for portfolio and solution repositories.",
   "author": {
-    "name": "Local RAG"
+    "name": "Justin Haffey"
   },
   "keywords": ["software-engineering", "design", "adr", "planning", "governance"],
   "skills": "./skills/",
   "interface": {
     "displayName": "SWE Process",
     "shortDescription": "Governed engineering artifacts",
-    "longDescription": "Guides conversational concept discovery and creates reviewable concept, design, architecture-decision, phase-plan, and feature-plan artifacts for the repository SWE process.",
-    "developerName": "Local RAG",
+    "longDescription": "Guides conversational scope discovery and routes to deterministic System, Solution, optional Workload, Package, Module, and Feature workflows with exact template resolution and architecture/evidence reconciliation.",
+    "developerName": "Ghostworx.ai, LLC",
     "category": "Productivity",
     "capabilities": ["Read", "Write"],
     "defaultPrompt": [
-      "Use $swe-brainstorm to discuss my software idea and create an approved concept document.",
-      "Use $swe-design to turn my concepts into a governed design.",
-      "Use $swe-plan to plan this phase and its feature work.",
-      "Use $swe-feature to create an implementation-ready feature plan."
     ],
     "brandColor": "#2563EB",
     "composerIcon": "./assets/icon.png",

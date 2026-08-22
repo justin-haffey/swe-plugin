@@ -1,0 +1,7 @@
+interface:
+  display_name: "Version"
+  short_description: "Version, check in, sync, and tag work"
+  default_prompt: "Use $version -update to prepare a reviewed version checkin."
+
+policy:
+  allow_implicit_invocation: false

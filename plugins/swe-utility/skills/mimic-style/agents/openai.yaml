@@ -1,0 +1,10 @@
+interface:
+  display_name: "Mimic Style"
+  short_description: "Turn a STYLE_CARD into reusable Codex agent instructions, optionally creating and registering a narrowly styled project agent. "
+  default_prompt: "$mimic-style [<style_card_path>/] -agent <agent-name>"
+
+policy:
+  allow_implicit_invocation: false
+
+dependencies:
+  tools: []
