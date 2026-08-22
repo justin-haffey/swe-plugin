@@ -1,7 +1,7 @@
 interface:
   display_name: "Grill"
-  short_description: "Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases."
-  default_prompt: "$grill the user on the current of provided plan, decision, or idea."
+  short_description: "Pressure-test plans through focused questions"
+  default_prompt: "Use $grill to pressure-test the current plan, decision, or idea."
 
 policy:
   allow_implicit_invocation: true

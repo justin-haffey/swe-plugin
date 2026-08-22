@@ -1,0 +1,4 @@
+interface:
+  display_name: "Architect SWE Scope"
+  short_description: "Govern canonical federated architecture"
+  default_prompt: "Use $swe-architect to update the applicable canonical architecture for this change."

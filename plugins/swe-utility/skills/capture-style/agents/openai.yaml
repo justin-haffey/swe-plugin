@@ -1,7 +1,7 @@
 interface:
   display_name: "Capture Style"
-  short_description: "Extract a reusable STYLE_CARD from a writing sample file, sample path, or pasted content."
-  default_prompt: "$capture-style [samples:<file>|<path>|<content>] -output <dir>"
+  short_description: "Extract a reusable writing style card"
+  default_prompt: "Use $capture-style to extract a STYLE_CARD from the provided writing samples."
 
 policy:
   allow_implicit_invocation: false

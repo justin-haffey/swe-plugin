@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan SWE Implementation"
+  short_description: "Allocate Features across solution repositories"
+  default_prompt: "Use $swe-plan-implementation to allocate this Feature to its implementing repositories."

@@ -1,20 +1,24 @@
 {
   "name": "swe-utility",
-  "version": "0.1.0",
-  "description": "SWE Utility Skills",
+  "version": "2.0.0",
+  "description": "Reusable utility skills for governed software engineering work.",
   "author": {
-    "name": "Justin Haffey"
+    "name": "Ghostworx.ai, LLC"
   },
-  "keywords": ["util, utility, utility skills, orchestrate, grill"],
+  "keywords": ["utility", "software-engineering", "orchestration", "review", "versioning"],
   "skills": "./skills/",
   "interface": {
     "displayName": "SWE Utilities",
     "shortDescription": "Software engineering utility skills",
-    "longDescription": "Common software engineering utility skills",
-    "developerName": "Ghostworx.ai LLC",
+    "longDescription": "Provides reusable discovery, review, orchestration, style, domain-modeling, and versioning workflows.",
+    "developerName": "Ghostworx.ai, LLC",
     "category": "Productivity",
     "capabilities": ["Read", "Write"],
-    "defaultPrompt": [],
+    "defaultPrompt": [
+      "Use $grill to pressure-test a plan before implementation.",
+      "Use $orchestrate to coordinate a bounded multi-agent workflow.",
+      "Use $version to version, check in, synchronize, and tag approved work."
+    ],
     "brandColor": "#2563EB",
     "composerIcon": "./assets/icon.png",
     "logo": "./assets/icon.png"

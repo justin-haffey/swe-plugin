@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research SWE Epic"
+  short_description: "Produce traceable engineering research"
+  default_prompt: "Use $swe-research to investigate this Epic question and record the evidence."

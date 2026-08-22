@@ -1,60 +1,38 @@
-# CONTEXT.md Format
+---
+title: "[CONTEXT_NAME] Context Vocabulary"
+artifact_type: "context_vocabulary"
+id: "[CONTEXT_ID]"
+status: "Current"
+authority: "[PORTFOLIO_OR_SOLUTION]"
+scope: "[PLATFORM_OR_SOLUTION_OR_PACKAGE_OR_MODULE]"
+parent: "[PARENT_ARTIFACT_ID_OR_NONE]"
+upstream:
+  repository: "[REPOSITORY_ID_OR_URL]"
+  artifact_id: "[ARTIFACT_ID_OR_NONE]"
+  path: "[REPOSITORY_RELATIVE_PATH_OR_NONE]"
+  revision: "[OPTIONAL_COMMIT_OR_TAG]"
+owners:
+  - "[OWNER]"
+created: "[CREATED_DATE]"
+updated: "[UPDATED_DATE]"
+template_version: "2.0.0"
+---
 
-## Structure
+# [CONTEXT_NAME]
 
-```md
-# {Context Name}
-
-{One or two sentence description of what this context is and why it exists.}
+[ONE_OR_TWO_SENTENCES_DESCRIBING_THIS_DOMAIN_CONTEXT]
 
 ## Language
 
-**Order**:
-{A one or two sentence description of the term}
-_Avoid_: Purchase, transaction
-
-**Invoice**:
-A request for payment sent to a customer after delivery.
-_Avoid_: Bill, payment request
-
-**Customer**:
-A person or organization that places orders.
-_Avoid_: Client, buyer, account
-```
-
-## Rules
-
-- **Be opinionated.** When multiple words exist for the same concept, pick the best one and list the others under `_Avoid_`.
-- **Keep definitions tight.** One or two sentences max. Define what it IS, not what it does.
-- **Only include terms specific to this project's context.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to this context, or a general programming concept? Only the former belongs.
-- **Group terms under subheadings** when natural clusters emerge. If all terms belong to a single cohesive area, a flat list is fine.
-
-## Single vs multi-context repos
-
-**Single context (most repos):** One `CONTEXT.md` at the repo root.
-
-**Multiple contexts:** A `CONTEXT-MAP.md` at the repo root lists the contexts, where they live, and how they relate to each other:
-
-```md
-# Context Map
-
-## Contexts
-
-- [Ordering](./src/ordering/CONTEXT.md): receives and tracks customer orders
-- [Billing](./src/billing/CONTEXT.md): generates invoices and processes payments
-- [Fulfillment](./src/fulfillment/CONTEXT.md): manages warehouse picking and shipping
+**[PREFERRED_TERM]**: [ONE_OR_TWO_SENTENCE_DOMAIN_DEFINITION]
+_Avoid_: [AMBIGUOUS_OR_DEPRECATED_SYNONYMS]
 
 ## Relationships
 
-- **Ordering → Fulfillment**: Ordering emits `OrderPlaced` events; Fulfillment consumes them to start picking
-- **Fulfillment → Billing**: Fulfillment emits `ShipmentDispatched` events; Billing consumes them to generate invoices
-- **Ordering ↔ Billing**: Shared types for `CustomerId` and `Money`
-```
+- **[TERM_OR_CONTEXT] -> [TERM_OR_CONTEXT]**: [DOMAIN_RELATIONSHIP_OR_CONTRACT]
 
-The skill infers which structure applies:
+## Rules
 
-- If `CONTEXT-MAP.md` exists, read it to find contexts
-- If only a root `CONTEXT.md` exists, single context
-- If neither exists, create a root `CONTEXT.md` lazily when the first term is resolved
-
-When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.
+- Prefer the defined term throughout this context.
+- Define domain meaning, not implementation behavior.
+- For multiple contexts, maintain a root `CONTEXT-MAP.md` linking each context and stating their relationships.

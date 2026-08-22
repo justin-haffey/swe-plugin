@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan SWE Features"
+  short_description: "Define portfolio-owned delivery capabilities"
+  default_prompt: "Use $swe-plan-features to decompose this approved Epic into bounded Features."

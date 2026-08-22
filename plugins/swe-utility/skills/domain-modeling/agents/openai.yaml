@@ -1,0 +1,10 @@
+interface:
+  display_name: "Domain Modeling"
+  short_description: "Clarify domain language and decisions"
+  default_prompt: "Use $domain-modeling to refine the domain context and record material architecture decisions."
+
+policy:
+  allow_implicit_invocation: false
+
+dependencies:
+  tools: []

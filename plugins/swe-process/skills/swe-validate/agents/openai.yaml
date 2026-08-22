@@ -1,0 +1,4 @@
+interface:
+  display_name: "Validate SWE Feature"
+  short_description: "Independently verify Feature correctness"
+  default_prompt: "Use $swe-validate to verify this implementation against its Feature criteria."

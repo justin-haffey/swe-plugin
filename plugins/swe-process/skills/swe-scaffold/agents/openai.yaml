@@ -1,0 +1,10 @@
+interface:
+  display_name: "SWE Scaffold"
+  short_description: "Merge governed portfolio or solution scaffolds"
+  default_prompt: "Use $swe-scaffold -portfolio or -solution to extend the active repository without overwriting existing files."
+
+policy:
+  allow_implicit_invocation: true
+
+dependencies:
+  tools: []

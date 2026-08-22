@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fix SWE Bug"
+  short_description: "Run a governed solution-local bug-fix path"
+  default_prompt: "Use $swe-bugfix to diagnose, fix, and validate this solution-local defect."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Enhance SWE Solution"
+  short_description: "Run a governed local enhancement fast path"
+  default_prompt: "Use $swe-enhancement to refine this existing solution capability and validate it."

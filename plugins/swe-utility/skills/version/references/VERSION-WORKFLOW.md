@@ -17,19 +17,24 @@ $version [-prefix <proto|alpha|beta|rc|release>] [-major|-minor|-update|-build]
 
 1. Run `git rev-parse --show-toplevel` and resolve the current working directory within that worktree.
 2. Treat a root `repo/` directory as the requested platform-workspace signal. Also accept root `repos/` as a compatibility alias because the current platform template uses that spelling; report which signal was found.
-3. Read the applicable live `VERSION.md` before calculating anything. Extract only the inline-code value under `## Current` and require this shape:
+3. Read the applicable live `VERSION.md` before calculating anything. Resolve one governed inline-code version value using this precedence:
+
+   - If `## Current` exists, read the single inline-code value in that section.
+   - Otherwise require `# Version` as the document title and read the single inline-code value in the introductory block before the first `##` heading.
+
+   In either layout, require this shape:
 
    ```text
    [proto-|alpha-|beta-|rc-]MAJOR.MINOR.UPDATE.BUILD
    ```
 
-   All four components must be decimal integers. Stop rather than replacing placeholders such as `#` or guessing a missing component.
+   All four components must be decimal integers. Stop if the selected block contains zero or multiple matching values. Never replace placeholders such as `#` or guess a missing component.
 4. Resolve scope from the requested operation and location:
 
    | Operation | Required scope |
    | --- | --- |
    | `-major` | Platform root and its governing root `VERSION.md`. Stop if not in an unambiguous platform workspace. |
-   | `-minor` | The current solution and its governing solution `VERSION.md`. Resolve the solution root as the nearest ancestor that has a direct `src/` directory, then require a direct `VERSION.md` at that root. Stop if either is absent or ambiguous. |
+   | `-minor` | The current solution and its governing solution `VERSION.md`. Resolve the solution root as the nearest ancestor with a direct `VERSION.md` and either a direct `src/` directory or the governed scaffold markers `architecture/` and `.swe/`. Stop if no candidate exists or multiple candidates at the same authority are plausible. |
    | `-update` or `-build` | The current package/project and its governing package `VERSION.md`. If the invocation is not inside one package, ask the user to run it from the package or supply an unambiguous scope. |
    | `-prefix` only | The unambiguous governing version document for the current scope. |
 
@@ -51,10 +56,10 @@ When the effective prefix is `proto-`, a `-build` request leaves `BUILD` at `0`;
 
 ## Propagation, project versions, and release notes
 
-- For a platform-root major operation, roll the resulting `## Current` value into project `VERSION.md` documents matched by `repo/*/src/**/VERSION.md` or `repos/*/src/**/VERSION.md` under the selected Git top-level.
-- For a solution-level minor operation, roll the resulting `## Current` value into project `VERSION.md` documents matched by `<solution-root>/src/**/VERSION.md`.
-- When a platform-root `-prefix` change is requested, propagate the exact new `## Current` value to the same platform project-document set. Do not propagate package-only updates or builds.
-- Update only the code-formatted `## Current` value in propagated documents; preserve each document's explanatory rules and all unrelated content.
+- For a platform-root major operation, roll the resulting governed version value into project `VERSION.md` documents matched by `repo/*/src/**/VERSION.md` or `repos/*/src/**/VERSION.md` under the selected Git top-level.
+- For a solution-level minor operation, roll the resulting governed version value into project `VERSION.md` documents matched by `<solution-root>/src/**/VERSION.md`.
+- When a platform-root `-prefix` change is requested, propagate the exact new governed version value to the same platform project-document set. Do not propagate package-only updates or builds.
+- Update only the governed code-formatted value selected by the layout rules above in propagated documents; preserve each document's explanatory rules and all unrelated content.
 - Before modifying a propagation target, compare its `git rev-parse --show-toplevel` result to the selected worktree. Modify only targets in that same worktree. If a target belongs to a nested or neighboring Git worktree, stop and report it rather than silently crossing repository boundaries.
 - For every affected package that contains a .NET project or build configuration, locate the authoritative version carrier by inspecting its project and build configuration. Keep `Version`, package version, assembly/file version, or other existing authoritative carriers aligned with the correlated package version. If a .NET project is present but its carrier cannot be identified or safely aligned, stop before checkin; do not add duplicate XML properties to work around it. Record .NET alignment as not applicable only when no .NET project is affected.
 - A major or minor increment whose resulting effective prefix is not `proto-` requires the relevant release notes to be updated with the already-reviewed lower-level features, fixes, and changes. If no release-note location can be identified, stop before checkin. The proto stage does not require release notes.

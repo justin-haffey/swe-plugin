@@ -310,14 +310,11 @@ Do not leak the intended answer. Review whether the agent:
 
 Patch the skill if the forward-test exposes friction.
 
-### 13. Update Corresponding Plugin(s)
+### 13. Update the Owning Plugin When Applicable
 
-**Increment the Plugin Version**
-- If the new or updated skill is part of a Codex Plugin, increment (# + 1) the plugin.json version number 1.0.[#].
-
-**Include the Default Icon**
-1. Copy `././assets/icon.png` to the new Codex Plugins `plugins\<plugin_name>\assets\` directory.
-2. Update the associated `plugin.json` file:
+- If the skill belongs to a Codex plugin, update that plugin's manifest and version according to the repository's release policy. Never invent a version scheme.
+- Reuse an existing plugin icon when present. If the plugin needs an icon, resolve it from a user-provided asset or the owning plugin's established assets; do not assume a machine-local source path.
+- Keep manifest asset paths relative to the plugin root:
 
 ```
     "brandColor": "#2563EB",

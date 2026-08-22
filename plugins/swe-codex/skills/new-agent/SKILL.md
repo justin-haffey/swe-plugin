@@ -49,9 +49,9 @@ If required details are missing, infer safe defaults when possible. Ask at most 
 
 ### 1. Resolve the Agent Root
 
-Determine where the custom agent should live before editing.  Ask **is this a project skill or part of a new codex plugin**.
+Determine whether the custom agent is project-scoped or personal before editing. Infer project scope from the active repository unless the user explicitly requests a personal agent; ask only when the destination is genuinely ambiguous.
 
-Priority (for project skills):
+Priority (for project agents):
 
 1. Use the exact file or directory path requested by the user.
 2. If editing an existing agent, use that agent's current file.
@@ -66,6 +66,7 @@ Project-root guard:
 - Do not create a new agent inside this skill's own folder merely because this skill was invoked by path.
 - Treat the current working directory, user-specified repository path, or discovered repository root as the destination project.
 - If the prompt says "the repo has no existing agent root," choose `<repo>/.codex/agents/`.
+- A Codex plugin does not package native custom-agent TOML. If an agent supports a plugin workflow, store it in the destination project's `.codex/agents/` or the explicitly requested personal agent root, and report that boundary.
 
 ### 2. Inspect Only Immediate Agent Neighbors
 
@@ -230,7 +231,7 @@ Optional fields go above `developer_instructions` in this order when used:
 
 ```toml
 nickname_candidates = ["Name"]
-model = "gpt-5.5"
+model = "<validated-current-model-id>"
 model_reasoning_effort = "medium"
 sandbox_mode = "read-only"
 ```

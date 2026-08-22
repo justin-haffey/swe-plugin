@@ -29,15 +29,15 @@ It must be usable by the mimic-style skill for original writing.
 
 ## Arguments
 
-- <sample_file>|<sample_path>|<content></content>"""direct_pasted_content""": Required source material. Supply one
+- `<sample-file> | <sample-directory> | <pasted-content>`: Required source material. Supply one
   local writing-sample file, one directory containing local writing samples, or
   pasted writing-sample content. Preserve a clear source boundary and label for
   every individual sample. When files or a directory are supplied, read only
   the selected writing samples; do not broaden discovery into unrelated paths.
-- -output <directory></directory>: Optional destination directory for the resulting
+- `-output <directory>`: Optional destination directory for the resulting
   STYLE_CARD.md. Create the directory structure when necessary. If omitted,
-  derive a concise, filesystem-safe <style-name></style> from the captured style and
-  create .style/<style-name></style>/, then write STYLE_CARD.md there. Do not overwrite
+  derive a concise, filesystem-safe `<style-name>` from the captured style and
+  create `.style/<style-name>/`, then write `STYLE_CARD.md` there. Do not overwrite
   an existing STYLE_CARD.md without explicit authorization.
 
 ## Requirements

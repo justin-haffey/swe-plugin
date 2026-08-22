@@ -1,20 +1,23 @@
 {
   "name": "swe-process",
-  "version": "0.9.5",
-  "description": "Scope-aware SWE architecture, planning, direct execution, evidence, and task-tracking workflows for portfolio and solution repositories.",
+  "version": "2.0.0",
+  "description": "Governed end-to-end software engineering workflows for portfolio and solution repositories.",
   "author": {
-    "name": "Justin Haffey"
+    "name": "Ghostworx.ai, LLC"
   },
   "keywords": ["software-engineering", "design", "adr", "planning", "governance"],
   "skills": "./skills/",
   "interface": {
     "displayName": "SWE Process",
     "shortDescription": "Governed engineering artifacts",
-    "longDescription": "Guides conversational scope discovery and routes to deterministic System, Solution, optional Workload, Package, Module, and Feature workflows with exact template resolution and architecture/evidence reconciliation.",
+    "longDescription": "Turns portfolio intent into research, concepts, federated architecture, Features, implementation assignments, solution designs, code, evidence, and independent validation.",
     "developerName": "Ghostworx.ai, LLC",
     "category": "Productivity",
     "capabilities": ["Read", "Write"],
     "defaultPrompt": [
+      "Use $swe-new-epic to begin governed portfolio work.",
+      "Use $swe-architect to create or reconcile architecture at the active repository's maximum authority.",
+      "Use $swe-scaffold -portfolio or -solution to extend an active repository without overwriting files."
     ],
     "brandColor": "#2563EB",
     "composerIcon": "./assets/icon.png",

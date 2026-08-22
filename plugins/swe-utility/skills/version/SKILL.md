@@ -29,7 +29,7 @@ Read [the version workflow reference](references/VERSION-WORKFLOW.md) on every i
 Before asking for confirmation:
 
 1. Establish the Git root, current branch, upstream, remotes, and whether the worktree is a platform workspace.
-2. Identify the governing `VERSION.md`; parse exactly one numeric `## Current` value. Stop on placeholders, malformed values, ambiguous scope, or a missing required version document.
+2. Identify the governing `VERSION.md`; parse exactly one governed version value using the layouts defined in the reference. Stop on placeholders, malformed values, ambiguous scope, or a missing required version document.
 3. Inspect staged and unstaged changes with Git, then read enough of each candidate documentation/configuration/code change to explain it accurately. Use this evidence to form a concise checkin subject and body.
 4. Resolve the version change, files that must change, release-note obligation, .NET version carriers, propagation targets, and the tag requirement. Do not infer an unreviewed file into the checkin.
 5. Stop before mutation when the index or worktree contains a path or hunk outside the approved checkin scope, including a pre-existing unapproved edit to any governed version, propagated version, project-version, or release-note file. Do not unstage, reset, or overwrite user work to make the index clean.

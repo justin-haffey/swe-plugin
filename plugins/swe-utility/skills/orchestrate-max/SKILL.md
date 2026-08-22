@@ -8,7 +8,7 @@ Execute a complex task with as many distinct, relevant subagents as practical wh
 
 ## Core Contract
 
-- Create or update `/goal` with the exact user-visible outcome before delegation.
+- State the exact user-visible outcome before delegation. Create or update a formal goal only when the user explicitly requested goal tracking.
 - Execute the task; do not return only a plan unless the user requested planning only.
 - Maximize useful specialist coverage, not raw agent count. Use every available custom agent whose expertise maps to a material workstream, then fill genuine gaps with `@explorer`, `@worker`, or `@default`.
 - Run independent work concurrently up to the runtime's current capacity. Schedule remaining relevant agents in later waves rather than dropping useful coverage.
@@ -39,7 +39,7 @@ If maximal orchestration is unnecessary, explain briefly and use `$orchestrate` 
 Before spawning, perform a compact routing pass:
 
 1. Read the applicable repository instructions and the minimum relevant task context.
-2. Inspect the configured custom-agent registry when available. Treat names and descriptions as routing evidence, not permission to exceed the user's scope.
+2. Build a hybrid custom-agent catalog from standalone `.codex/agents/**/*.toml` files and any `[agents.*]` registrations in `.codex/config.toml`. Use the standalone file's `name` and `description` as authoritative, merge matching registry routing metadata, include unregistered standalone agents, and exclude stale registry entries. Treat catalog membership as routing evidence, not permission to exceed the user's scope.
 3. Decompose the request into material workstreams such as repository discovery, architecture, security, data, backend, frontend/UX, infrastructure, testing, documentation, current-source research, and independent review.
 4. Build an in-memory coverage map with one primary owner per workstream and reviewers only where independent scrutiny adds value.
 5. Select all relevant specialist agents. Add built-in agents only for uncovered work:
@@ -149,7 +149,7 @@ Do not send the full parent transcript when a smaller context package is suffici
 
 Stop orchestration when:
 
-- the `/goal` success criteria are met and affected validation passes;
+- the stated success criteria are met and affected validation passes;
 - all material workstreams have been integrated and further delegation is redundant;
 - a critical decision, permission, dependency, or fact is missing and cannot be safely inferred;
 - repeated tool or agent failure prevents meaningful progress; or
@@ -161,7 +161,7 @@ When stopped short, preserve completed work and report the exact blocker, affect
 
 Before finalizing, confirm:
 
-- `/goal` represents the user's actual outcome;
+- the tracked objective represents the user's actual outcome;
 - every material workstream had a relevant owner or an explained omission;
 - every subagent received 1-3 tasks, boundaries, skills, output, and stop conditions;
 - parallel write ownership was disjoint;

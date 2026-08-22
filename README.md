@@ -1,87 +1,78 @@
-# Software Engineering Codex Plugins [NEEDS MAJOR UPDATE]
+# SWE Plugin
 
-## Overview
+SWE Plugin is a source repository for Codex customizations that make a software-engineering process portable, reviewable, and usable across a portfolio repository and its child solution repositories. Version 2.0 centers on a governed artifact flow: portfolio intent becomes an Epic, research, accepted architecture and Features; solution repositories turn allocated work into Design, code, evidence, and validation.
 
-This repository packages a practical software-engineering toolkit for Codex. It combines governed planning workflows, reusable Codex-authoring workflows, local RAG research helpers, and project-scoped custom agents. Together, these components help a team move from an engineering concept to reviewable design and implementation work while keeping decisions, plans, and evidence in the repository. The `swe-process` plugin begins with `$swe-brainstorm`, a voice-friendly conversational skill for shaping an early software idea into a complete concept before design work begins.
+The repository contains three plugins. `swe-process` is the primary v2 package. `swe-codex` provides focused authoring workflows for Codex plugins, skills, and agents, while `swe-utility` contains reusable supporting skills such as structured questioning, versioning, orchestration, and style capture.
 
-The repository is a local Codex marketplace: [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json) exposes the plugin packages under [`plugins/`](plugins/). The scoped SWE process separates durable architecture in [`docs/`](docs/) from delivery evidence in [`.swe/`](.swe/).
-
-## Features
-
-- **Voice-friendly concept discovery:** `$swe-brainstorm` develops and reviews a complete concept through a natural conversation, creating the concept artifact only after explicit approval.
-- **Scoped SWE process** — `swe-process` provides conversational routing plus deterministic System, Solution, optional Workload, Package, Module, and Feature workflows. Every scoped Plan has Markdown task tracking.
-- **Bounded corrective work** — `$swe-bugfix` records and verifies one defect correction; `$swe-enhancement` records and verifies one bounded improvement without bypassing the normal escalation gates.
-- **Codex solution authoring** — `swe-codex` provides focused workflows for creating or evolving Codex plugins, skills, and native custom agents.
-- **Local RAG research helpers** — `local-rag-skills` supplies read-only skills for source discovery, status checks, indexing verification, and evidence retrieval through a [Local RAG MCP Server](https://github.com/justin-haffey/local-rag).
-- **Project customizations** — [`.codex/config.toml`](.codex/config.toml) registers specialist custom agents and project-level Codex settings.
-- **Reviewable engineering artifacts** — [`.codex/AGENTS.md`](.codex/AGENTS.md) defines the canonical `.swe/` artifact layout and the progression from concept through implementation evidence.
-
-## Repository organization
+## Repository layout
 
 ```text
-.agents/plugins/marketplace.json   Local marketplace listing
-.codex/                            Codex configuration, custom agents, and workflow governance
-.swe/                              Delivery, planning, fast-path, and evidence artifacts created by SWE Process workflows
 plugins/
-  swe-process/                     Governed SWE planning and execution skills
-  swe-codex/                       Codex plugin, skill, and agent authoring skills
-  local-rag-skills/                Read-only Local RAG research skills and MCP configuration
-  local-rag-mgmt/                  Explicitly invoked Local RAG index-management skills
+  swe-process/        v2 engineering-process skills, templates, validator, and scaffold copier
+  swe-codex/          Codex plugin, skill, and agent authoring skills
+  swe-utility/        reusable supporting skills
+scaffolds/
+  portfolio/          final scaffold for a portfolio/platform authority repository
+  solution/           final scaffold for a child solution repository
+tmp/task-materials/   design inputs used to develop v2; not shipped process authority
 ```
 
-Each plugin has a `.codex-plugin/plugin.json` manifest and a `skills/` directory. The marketplace currently makes these packages available:
+[`scaffolds/_templates/`](scaffolds/_templates/) is a temporary development corpus. The production templates belong with the process skills that create them under [`plugins/swe-process/skills/`](plugins/swe-process/skills/); do not treat the temporary corpus as a runtime override layer.
 
-| Plugin                                           | Purpose                                                                                                                     | Included skills                                                                                                                                                |
-| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`swe-process`](plugins/swe-process/)           | Shape concepts conversationally, then route governed scoped Design, Plan, Feature, execution, Bugfix, and Enhancement work. | Root routers plus direct`swe-design-*`, `swe-plan-*`, and `swe-code-*` skills; `swe-bugfix`, `swe-enhancement`, `orchestrate`, `orchestrate-max` |
-| [`swe-codex`](plugins/swe-codex/)               | Create and maintain Codex-native plugins, skills, and agents.                                                               | `new-plugin`, `new-skill`, `new-agent`                                                                                                                   |
-| [`local-rag-skills`](plugins/local-rag-skills/) | Research indexed local sources through the configured Local RAG MCP server.                                                 | `local-rag-search`, `local-rag-evidence-retrieval`, source/status/indexing helpers, and repository reconnaissance                                          |
+## SWE Process v2
 
-## Custom agents
+`swe-process` deliberately has a clean, 13-skill roster:
 
-The repository's `.codex` configuration is a first-class part of the solution. Its specialist agents support architecture, implementation, infrastructure, agent/skill design, and documentation work. Choose the narrowest agent that fits the task; their definitive scope and instructions live in [`.codex/agents/swe/`](.codex/agents/swe/).
+| Phase | Skill | Outcome |
+| --- | --- | --- |
+| Portfolio work | `$swe-new-epic` | Creates a governed Epic container. |
+| Discovery | `$swe-research` | Records bounded, traceable research. |
+| Intent | `$swe-conceptualize` | Produces an Epic-local Concept. |
+| Impact | `$swe-assess-architecture` | Determines architecture impact and next authority. |
+| Architecture | `$swe-architect` | Authors or reconciles Platform, Solution, Package, or Module architecture, ADRs, contracts, and system views. |
+| Definition | `$swe-plan-features` | Defines canonical portfolio Features and acceptance criteria. |
+| Allocation | `$swe-plan-implementation` | Creates the portfolio-owned implementation handoff beside a Feature. |
+| Solution design | `$swe-design` | Creates local Design for an allocated implementation. |
+| Delivery | `$swe-implement` | Implements approved Design and records Evidence. |
+| Verification | `$swe-validate` | Produces local validation and reconciliation evidence. |
+| Fast path | `$swe-bugfix` | Records a bounded solution-local defect correction. |
+| Fast path | `$swe-enhancement` | Records a bounded solution-local improvement. |
+| Initialization | `$swe-scaffold` | Additively extends an existing repository with a portfolio or solution scaffold. |
 
-| Agent area                    | Agents                                                                                                                                                                                                                                                                                                                                                                                                                                                | Primary responsibility                                                                                                            |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture and context      | [`solution-architect`](.codex/agents/swe/architects/solution-architect.toml), [`context-engineer`](.codex/agents/swe/engineers/context-engineer/context-engineer.toml), [`jr-context-engineer`](.codex/agents/swe/engineers/context-engineer/jr-context-engineer.toml)                                                                                                                                                                             | System architecture and context, prompt, workflow, and Codex-instruction design.                                                  |
-| Codex solution engineering    | [`codex-engineer`](.codex/agents/swe/engineers/codex-engineer.toml)                                                                                                                                                                                                                                                                                                                                                                                  | Builds and validates project-scoped Codex plugins, skills, agents, and related configuration.                                     |
-| Application and platform work | [`csharp-developer`](.codex/agents/swe/developers/csharp-developer.toml), [`full-stack-developer`](.codex/agents/swe/developers/full-stack-developer.toml), [`maf-developer`](.codex/agents/swe/developers/maf-developer.toml), [`ui-designer`](.codex/agents/swe/developers/ui-designer.toml), [`azure-engineer`](.codex/agents/swe/engineers/azure-engineer.toml), [`azure-db-developer`](.codex/agents/swe/database/database-developer.toml) | Application, UI, Microsoft Agent Framework, Azure infrastructure, and Azure data work.                                            |
-| Documentation                 | [`code-commenter`](.codex/agents/swe/documentation/code-commentor.toml), [`repo-author`](.codex/agents/swe/documentation/repo-author.toml), <br />`social-author`                                                                                                                                                                                                                                                                                 | Code-local comments and documentation; repository`AGENTS.md` workflow rules and human-facing `README.md` files, respectively. |
+Architecture is organized as `Platform -> Solution -> Package -> Module`. Systems are runtime or operational views within platform or solution architecture, rather than a separate architecture level. The portfolio owns Epics, Concepts, platform architecture, cross-solution contracts, canonical Features, and their adjacent Implementation Plans. A solution owns solution/package/module architecture, local Design, source, tests, Evidence, and local Validation.
 
-## Setup and use
+Every cross-repository handoff uses both a stable artifact ID and a repository-relative path, with an optional revision. This dual locator lets a child Solution retain a durable link to the portfolio Feature and Implementation Plan without copying or redefining them.
 
-### Prerequisites
+## Approval and lifecycle
 
-- A Codex environment that supports local plugin marketplaces and project `.codex` configuration.
-- A local checkout of this repository.
-- For `local-rag-skills`, a running Local RAG MCP server at the endpoint configured in [`plugins/local-rag-skills/.mcp.json`](plugins/local-rag-skills/.mcp.json). Its bearer token, when required, is supplied through `LOCALRAG_MCP_TOKEN` rather than committed to the repository.
-- For graph navigation, install the `codebase memory mcp` codex plugin.
+Decision-bearing artifacts default to named human approval. `-auto-approve` delegates review only to an independent, appropriate agent; the author cannot approve its own work, and two repair-and-review cycles are the maximum before human escalation. `-force` requires explicit human authorization and records the bypass; it does not invent acceptance, validation, or evidence.
 
-### Add the marketplace
+Work artifacts move through `Draft -> InReview -> Accepted -> Superseded`. Architecture moves through `Target -> Implemented -> Current -> Superseded`, with implementation Evidence required for the first promotion and validation plus reconciliation required for the second. See the full rules in the [artifact contract](plugins/swe-process/references/ARTIFACT-CONTRACT.md) and in the generated scaffold governance files.
 
-1. In your Codex environment, add this checkout's [local marketplace descriptor](.agents/plugins/marketplace.json).
-2. Install or enable the plugin package needed for the task: `swe-process`, `swe-codex`, or `local-rag-skills`.
-3. Open the repository as a trusted project so Codex can load its [project configuration](.codex/config.toml) and custom agents.
+## Using a scaffold
 
-The repository does not define a package-manager install, build, or test command. Plugin metadata, skill instructions, and project configuration are the distributable artifacts.
+Use the final skill only after choosing the repository’s authority:
 
-### Common starting points
+```text
+$swe-scaffold -portfolio
+$swe-scaffold -solution
+```
 
-- Use `$swe-brainstorm` to explore and shape an early software idea through a natural, voice-friendly conversation. It creates one lowercase Concept under `.swe/01-concept/` only after explicit approval.
-- Use `$swe-design` to select System, Solution, optional Workload, Package, or Module scope from research, Concepts, and durable architecture, then invoke the matching direct Design skill.
-- Use `$swe-plan` to select the correct planning scope after approved Design and ADRs. Every scoped Plan includes Markdown task tracking and sign-off gates.
-- Use `$swe-feature` as the compatibility entry point for one Feature; `swe-plan-feature` is the sole producer of `.swe/05-feature/feature-<id>-<slug>.md`.
-- Use `$swe-code` to route one approved scoped target. Passing Evidence verifies its Design and moves linked durable architecture from `Target` to `Implemented`; divergence remains explicit and blocks that transition.
-- Use `$swe-bugfix` or `$swe-enhancement` for small tracked work that does not warrant a separate Plan, Feature, Package, or Module artifact.
-- Use `$new-plugin`, `$new-skill`, or `$new-agent` when extending a Codex solution.
-- Use the `local-rag-*` skills to discover and gather bounded evidence from an indexed local source before making a code decision.
+The skill copies from its own `references/portfolio/` or `references/solution/` tree into the active repository (or an explicit destination). It creates missing files and merges folders, but never overwrites, truncates, deletes, renames, or relocates an existing destination file. Its report distinguishes created files from skipped existing files.
+
+The portfolio scaffold includes platform-focused Codex agents and governance. The solution scaffold includes solution, package, and module architecture/development agents along with implementation specialists. Both install a repository-local `.codex` configuration, starter README/AGENTS guidance, version source, and governed artifact directories.
 
 ## Development and validation
 
-When changing this repository, read [`.codex/AGENTS.md`](.codex/AGENTS.md) first. It governs the required SWE artifact lifecycle, canonical output paths, evidence expectations, and authorization boundaries.
+No package-manager build is required; the distributable surface is plugin metadata, Markdown skills/templates, scaffold files, PowerShell, and TOML configuration. Work from the repository root and validate v2 process changes with:
 
-For plugin changes, validate the affected manifest, skill front matter, referenced paths, and marketplace entry. Run `powershell -ExecutionPolicy Bypass -File scripts/Test-SweProcess.ps1` after scoped-process changes. For custom-agent changes, validate the TOML configuration and confirm the corresponding entry in [`.codex/config.toml`](.codex/config.toml). Keep marketplace paths relative to the repository and keep credentials out of tracked files.
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swe-process\scripts\Test-SweProcess.ps1
+git diff --check
+```
 
-## Contributing
+The first command validates the exact process-skill roster, required resources, template metadata and traceability contracts, the scaffold references, and their agent registrations. Run it again after changing a process template, scaffold, or `swe-scaffold` reference. For all packages, validate JSON manifests, SKILL front matter, relative links, and affected TOML registrations before handing off changes.
 
-Keep changes scoped to the plugin, skill, or agent being improved. Skill-local references are defaults; a repository may replace a Design, Plan, Bugfix, or Enhancement default only with an exact same-name whole-file override under `docs/templates/`. Do not merge template fragments or invent Code overrides. Treat resulting Designs, ADRs, Plans, and Features as review candidates until a reviewer explicitly accepts them.
+## Extending the plugins
+
+Read [AGENTS.md](AGENTS.md) before modifying this repository. It defines the source-of-truth order, the package and scaffold boundaries, plugin/skill conventions, validation expectations, and safe Git practices. In particular, process templates must remain owned by the skill that creates them, scaffold references must match their top-level sources, and `swe-scaffold` is created or refreshed last after both scaffolds are final.

@@ -37,8 +37,8 @@ Keep skills declarative where possible. Put credentials in approved environment 
 ## Resource Routing
 
 - Use `$new-skill` for every new or materially revised skill.
-- Use `$new-agent` when the plugin needs a native Codex custom agent to consume its skills.
-- Use `$orchestrate` when the work needs scoped subagents or multi-stage implementation.
+- Use `$new-agent` when the surrounding project needs a native Codex custom agent to consume plugin skills. Store that TOML under the project or personal `.codex/agents/` root; native custom agents are not packaged inside the plugin.
+- When `$orchestrate` is available and delegation is authorized, use it for scoped subagents or multi-stage implementation. Otherwise coordinate available native subagents directly or execute the work without that optional skill.
 - Read `references/plugin-architecture.md` before adding MCP servers, apps, persistent state, or external write actions.
 
 ## Validation

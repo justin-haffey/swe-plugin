@@ -1,6 +1,6 @@
 # Agent Authoring Reference
 
-This repository uses the current Codex custom-agent schema from the official Codex docs, plus the local registry pattern already established in `.codex/config.toml`.
+Use the current Codex custom-agent schema and the destination repository's local conventions. Do not assume this source repository's registry or folder layout exists in the destination.
 
 ## Official Sources
 
@@ -9,12 +9,12 @@ This repository uses the current Codex custom-agent schema from the official Cod
 - https://developers.openai.com/codex/config-reference
 - https://developers.openai.com/codex/skills
 
-## Repository Pattern
+## Repository Pattern Discovery
 
-- `.codex/agents/swe/` is for coding agents.
-- `.codex/agents/` is for application domain agents.
-- `.codex/config.toml` is the root registry for agent entries and shared MCP inventory.
-- `.codex/agents/copilot/AGENTS.override.md` routes the Copilot collection.
+- Prefer a user-specified target path.
+- Otherwise inspect the destination repository's `.codex/agents/` and `.codex/config.toml` narrowly.
+- Preserve established subfolders when they exist; do not invent a collection name.
+- A standalone `.codex/agents/<agent-name>.toml` file is sufficient unless the destination config or instructions require registry wiring.
 
 ## Standard Custom-Agent Schema
 
@@ -55,9 +55,6 @@ Use this order unless a local sample in the same folder clearly diverges:
 name = "agent-name"
 description = "Use this agent for ..."
 nickname_candidates = ["Display Name", "Alt Name"] # optional
-model = "gpt-5.4" # use gpt-5.5 when the role needs deeper reasoning than the repo default
-model_reasoning_effort = "medium"
-sandbox_mode = "workspace-write"
 developer_instructions = """
 You are a focused <role> agent for Codex subagent workflows.
 
@@ -84,13 +81,13 @@ url = "https://learn.microsoft.com/api/mcp"
 
 # Optional skills dependencies only when this agent truly needs them.
 [[skills.config]]
-path = ".codex/skills/copilot-architecture-playbook/SKILL.md"
+path = ".agents/skills/repository-review/SKILL.md"
 enabled = true
 ```
 
-## Registry Entry Template
+## Optional Registry Entry Template
 
-Add a matching root registry entry for the new agent:
+When the destination repository registers agents in `.codex/config.toml`, add a matching entry using a path relative to that `.codex/` directory:
 
 ```toml
 [agents.my_agent]
@@ -98,17 +95,15 @@ description = "Use this agent for ..."
 config_file = "agents/swe/my-agent.toml"
 ```
 
-Use `agents/copilot/...` in `config_file` for agents that live in the Copilot collection. If the agent is in `.codex/agents/copilot/`, also update `.codex/agents/copilot/AGENTS.override.md`.
+Use the actual destination subfolder in `config_file`. Update a nearby `AGENTS.override.md` only when that destination already uses one for agent routing.
 
 ## MCP Server Rules
 
 Start with the smallest working set.
 
-- `microsoft_learn` for current Microsoft, OpenAI, and Copilot guidance.
-- `azure_services` and `azure` for Azure infrastructure and operational work.
-- `azure_databases` for Azure SQL and Cosmos DB work.
-- `playwright` for browser validation and UI testing.
-- `codebase-memory-mcp` for repo discovery and graph search when it is configured for the project and materially helpful.
+- Discover exact server names and configuration from the destination repository or current runtime; do not invent a familiar-looking name.
+- Use an agent-local server only for a capability the role actually requires, such as current documentation, repository discovery, browser validation, or a bounded external system.
+- Preserve an active shared server instead of duplicating it into the agent file.
 
 Decision rules:
 
@@ -122,9 +117,8 @@ Decision rules:
 - Keep `description` concise, triggerable, and specific enough for implicit invocation.
 - Keep `developer_instructions` imperative and structured by role, objectives, boundaries, tool use, and output expectations.
 - Use `nickname_candidates` only when multiple spawned instances need distinct readable labels.
-- Use `gpt-5.5` for demanding reasoning-heavy agents, `gpt-5.4` when the workflow is intentionally pinned to that model, and `gpt-5.4-mini` for lighter supporting work.
-- Use `high` reasoning for complex or review-heavy agents, `medium` for the balanced default, and `low` only when speed matters more than depth.
-- Use `workspace-write` as the default sandbox posture unless the role truly needs read-only or dangerous access.
+- Omit `model` and `model_reasoning_effort` to inherit the active parent or repository defaults. When an override is intentional, verify the exact model ID and supported effort against the current runtime or official documentation before writing it.
+- Omit `sandbox_mode` to inherit permissions. Use `read-only` for an intentionally stricter agent; grant a write-capable override only when the task, user authorization, and destination repository require it.
 
 ## Validation Checklist
 
@@ -134,7 +128,7 @@ Decision rules:
 - Shared MCP servers are registered where the repo expects them.
 - Agent-local MCP servers are justified and minimal.
 - `skills.config` entries point at real skill paths.
-- Copilot agents also update `AGENTS.override.md`.
+- Collection-specific agents update a nearby `AGENTS.override.md` only when that convention already exists.
 
 ## Reference Links
 

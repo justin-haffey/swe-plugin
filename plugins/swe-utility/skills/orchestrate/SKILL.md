@@ -1,12 +1,12 @@
 ---
 name: orchestrate
-description: Plan and execute simple or complex multi-step tasks by creating an in-memory orchestration that uses /goal, selects the best subagents, assigns each subagent 1-3 scoped tasks, names helpful skills each subagent should invoke, and runs parallel, sequential, review, fan-out, or hybrid workflows. Use when the user invokes $orchestrate, orchestrate, orchestrate -complex, asks to spawn or coordinate subagents, asks for a symbolic planner-like workflow, or wants an intuitive repeatable plan that explicitly references agents with @agent-name. Do not use for trivial one-step answers.
+description: Plan and execute simple or complex multi-step tasks through an in-memory orchestration that selects appropriate subagents, assigns each 1-3 scoped tasks, names helpful skills, and runs parallel, sequential, review, fan-out, or hybrid workflows. Use when the user invokes $orchestrate, asks to spawn or coordinate subagents, or requests a repeatable agent workflow. Do not use for trivial one-step answers.
 ---
 # Orchestrate
 
 ## Purpose
 
-Turn a user request into a compact executable orchestration for Codex. The orchestration must create or update a `/goal`, choose subagents, assign tasks and useful skills, run the workflow, integrate results, and stop cleanly.
+Turn a user request into a compact executable orchestration for Codex. Track a formal goal only when the user explicitly requested goal tracking; otherwise use the task plan. Choose subagents, assign tasks and useful skills, run the workflow, integrate results, and stop cleanly.
 
 This skill is a meta-planner. It must not create task-planning files, scratch plans, task manifests, or orchestration artifacts on disk. Keep the plan in the conversation unless the user's actual task requires file output.
 
@@ -16,14 +16,14 @@ Parse the user's prompt before planning.
 
 - `orchestrate <prompt>`: use simple mode.
 - `orchestrate -complex <prompt>`: use complex mode.
-- If the user asks for subagents, parallel work, delegation, orchestration, or an explicit `/goal`, treat that as an implicit invocation.
+- If the user asks for subagents, parallel work, delegation, orchestration, or explicit goal tracking, treat that as an implicit invocation.
 - If the task is obviously trivial, skip subagents and answer directly with a short note that orchestration is unnecessary.
 
 Simple mode:
 
 - Use at most 1-3 subagent tasks total.
 - Prefer one workflow shape.
-- Prefer a configured custom agent from `.codex/config.toml` when its description clearly fits; otherwise use the appropriate default agent.
+- Prefer a custom agent from `.codex/config.toml` when its description clearly fits; otherwise use the appropriate built-in agent.
 - Keep the visible plan under 12 bullets.
 
 Complex mode:
@@ -31,7 +31,7 @@ Complex mode:
 - Use multiple workflow stages when useful.
 - Combine parallel discovery, sequential implementation, independent worker slices, verification, and synthesis as needed.
 - Spawn no more agents than the work can justify. Prefer 3-6 active subagents. Exceed 6 concurrent agents only for batch-style tasks with independent items and explicit value.
-- Use `/goal` to track the main objective and major phases.
+- Use the available task plan for phases. Create or update a formal goal only when the user explicitly requests it.
 
 ## Operating Rules
 
@@ -59,19 +59,30 @@ Identify:
 - unknowns: critical facts that must be discovered;
 - work types: research, code exploration, implementation, validation, docs, design, data, review, synthesis;
 - required skills: available skills that should be invoked by the parent or subagents;
-- available agents: custom agents configured in `.codex/config.toml`, plus built-in `@default`, `@explorer`, and `@worker` as fallbacks;
+- available agents: standalone `.codex/agents/**/*.toml` files merged with any `[agents.*]` registrations in `.codex/config.toml`, plus built-in `@default`, `@explorer`, and `@worker` as fallbacks;
 - side effects: whether tasks may read, edit, test, browse, call connectors, or only advise.
 
 Ask for clarification only when a missing detail materially changes safety, destination, or output format and no safe assumption exists.
+
+### Hybrid Agent Catalog
+
+Build one in-memory routing catalog from both native discovery surfaces:
+
+1. Inspect project-scoped standalone TOML files under `.codex/agents/`. Use each file's required `name` and `description` as the source of truth.
+2. Inspect `[agents.*]` entries in `.codex/config.toml` when present. Resolve `config_file` paths relative to `.codex/` and merge matching descriptions or aliases with the standalone agent.
+3. Include valid standalone agents even when they have no registry entry. Do not treat registration as an execution or permission requirement.
+4. If a registry entry points to a missing file, exclude it and report the stale entry when it affects routing. If duplicate names conflict, prefer the live standalone file and do not guess between multiple files.
+
+Do not scan personal agents or unrelated repositories unless the user explicitly includes them.
 
 ## Agent Selection
 
 Choose agents by task shape.
 
-- First use a custom agent configured in `.codex/config.toml` when its name or description directly matches the need.
-- If no configured custom agent is a clear fit, use `@explorer` for specific read-only codebase questions, source mapping, dependency tracing, existing behavior, and evidence gathering.
-- If no configured custom agent is a clear fit, use `@worker` for bounded implementation, fixes, test updates, document generation, and production changes.
-- If no configured custom agent is a clear fit, use `@default` for synthesis, broad judgment, ambiguous tasks, and when no specialized role is justified.
+- First use a custom agent from the merged project catalog when its name or description directly matches the need.
+- If no cataloged custom agent is a clear fit, use `@explorer` for specific read-only codebase questions, source mapping, dependency tracing, existing behavior, and evidence gathering.
+- If no cataloged custom agent is a clear fit, use `@worker` for bounded implementation, fixes, test updates, document generation, and production changes.
+- If no cataloged custom agent is a clear fit, use `@default` for synthesis, broad judgment, ambiguous tasks, and when no specialized role is justified.
 - Use the parent agent for orchestration, final integration, user-facing decisions, and conflict resolution.
 
 For each selected subagent define:
@@ -96,7 +107,7 @@ Use when the task is small, low-risk, or mostly conversational.
 
 Process:
 
-1. Create `/goal`.
+1. Record the objective in the task plan; create a formal goal only when explicitly requested.
 2. Execute directly.
 3. Validate.
 4. Report.
@@ -107,7 +118,7 @@ Use when independent facts can be gathered faster in parallel.
 
 Process:
 
-1. Create `/goal`.
+1. Record the objective in the task plan; create a formal goal only when explicitly requested.
 2. Spawn 2-4 `@explorer` or specialist agents with disjoint questions.
 3. Continue parent work that does not depend on them.
 4. Wait when their results block the next phase.
@@ -175,7 +186,7 @@ Process:
 Use this visible structure for non-trivial tasks. Keep it compact.
 
 ```markdown
-/goal [objective]
+Goal: [objective]
 
 Plan:
 - Mode: [simple|complex]
@@ -230,7 +241,7 @@ Stop when [condition].
 Name skills explicitly so subagents can trigger them.
 
 - For document outputs, assign `$documents`, `$pdf`, `$Presentations`, or `$Spreadsheets` as applicable.
-- For frontend apps, websites, prototypes, or games, assign `$frontend-skill`.
+- For frontend apps, websites, prototypes, or games, assign an available UI or site-building skill or specialist; do not invent a skill name.
 - For creating or revising skills, assign `$new-skill`.
 - For OpenAI platform, Codex, Agents SDK, or API behavior, assign `$openai-docs`.
 - For GitHub PRs, issues, CI, publishing, or review comments, assign the relevant GitHub skill if available.
@@ -257,7 +268,7 @@ Optimize for strong outcomes with low overhead.
 
 Before finalizing, verify:
 
-- The `/goal` was created or clearly stated.
+- The objective was clearly stated, and formal goal tracking was used only when explicitly requested.
 - Each spawned or proposed agent was referenced with `@agent-name`.
 - Each subagent had 1-3 concrete tasks.
 - Relevant skills were named with `$skill-name`.

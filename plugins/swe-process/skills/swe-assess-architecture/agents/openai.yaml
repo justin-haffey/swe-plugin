@@ -1,0 +1,4 @@
+interface:
+  display_name: "Assess Architecture Impact"
+  short_description: "Classify architectural impact and ownership"
+  default_prompt: "Use $swe-assess-architecture to assess this Epic before architecture work."

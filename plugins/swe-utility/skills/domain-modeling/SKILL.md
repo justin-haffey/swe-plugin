@@ -1,74 +1,63 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a CONTEXT.md, or recording or editing an ADR.
+description: Refine a repository's domain vocabulary or record a domain architecture decision when explicitly requested. Use for creating or updating CONTEXT.md, CONTEXT-MAP.md, or an ADR with repository-aware authority and approval. Do not use for passive vocabulary reading, ordinary implementation discussion, or unsolicited file changes.
 ---
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline: challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill: that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Sharpen the project's domain language without turning its glossary into a specification. Record only material, durable decisions and respect the active repository's architecture authority.
 
-## File structure
+## Authorization
 
-Most repos have a single context:
+This skill is explicit-only. Invocation authorizes analysis, not arbitrary writes.
 
-```
-/
-├── CONTEXT.md
-├── docs/
-│   └── adr/
-│       ├── 0001-event-sourced-orders.md
-│       └── 0002-postgres-for-write-model.md
-└── src/
-```
+- For discussion-only requests, return proposed terms, scenarios, or decision wording without changing files.
+- Create or update `CONTEXT.md` or `CONTEXT-MAP.md` only when the user asks to capture or refine the vocabulary.
+- Create an ADR only when the user explicitly asks to record the decision or an accepted governed workflow assigns that artifact.
+- Read the live target immediately before editing. Never overwrite, renumber, or relocate an accepted artifact without explicit authorization.
 
-If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
+## Vocabulary Workflow
 
-```
-/
-├── CONTEXT-MAP.md
-├── docs/
-│   └── adr/                          ← system-wide decisions
-├── src/
-│   ├── ordering/
-│   │   ├── CONTEXT.md
-│   │   └── docs/adr/                 ← context-specific decisions
-│   └── billing/
-│       ├── CONTEXT.md
-│       └── docs/adr/
-```
+1. Read the applicable `CONTEXT.md` or use `CONTEXT-MAP.md` to resolve the bounded context.
+2. Challenge conflicting or overloaded terms with a concrete scenario.
+3. Select one preferred term and list misleading synonyms under `_Avoid_`.
+4. Keep each definition to one or two domain-focused sentences. Exclude implementation details, general programming vocabulary, requirements, and transient design notes.
+5. When a write is authorized, use [the Context template](references/CONTEXT-TEMPLATE.md). Preserve established content and add only the resolved vocabulary.
 
-Create files lazily: only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+For a single context, use root `CONTEXT.md`. For multiple contexts, keep a root `CONTEXT-MAP.md` that links each context-local `CONTEXT.md` and states cross-context relationships. If neither exists, propose a root `CONTEXT.md`; create it only with write authorization.
 
-## During the session
+## ADR Workflow
 
-### Challenge against the glossary
+Offer an ADR only when the decision is hard to reverse, surprising without context, and the result of a real trade-off. Otherwise record no ADR.
 
-When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y. Which is it?"
+Resolve the destination from repository governance:
 
-### Sharpen fuzzy language
+- Portfolio decision: `architecture/decisions/ADR-###-short-name.md`.
+- Solution decision: `architecture/decisions/ADR-###-short-name.md`.
+- Package or Module decision: the owning Package's `architecture/packages/[PACKAGE_NAME]/decisions/ADR-###-short-name.md`.
+- A repository with an established non-v2 decision directory may retain that convention when its `AGENTS.md` requires it; do not create a competing tree.
 
-When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account': do you mean the Customer or the User? Those are different things."
+Number ADRs locally within the selected `decisions/` directory. Preserve stable `ADR-###` IDs. Use [the ADR template](references/ADR-TEMPLATE.md) and include a dual locator for upstream authority.
 
-### Discuss concrete scenarios
+Decision-bearing artifacts require approval under the active `AGENTS.md`:
 
-When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
+- Default: a named human approves.
+- `-auto-approve`: an independent appropriate architecture agent reviews; the author cannot self-approve. Allow at most two repair-and-review cycles before requiring a human decision.
+- `-force`: only an explicit human instruction may bypass the gate. Record the human, reason, time, and bypassed gate.
 
-### Cross-reference with code
+Do not mark an ADR accepted before its required approval. Domain vocabulary updates do not approve architecture decisions.
 
-When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?"
+## Validation
 
-### Update CONTEXT.md inline
+Before completion:
 
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up: capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+- confirm the target repository, authority, context, and destination;
+- validate the 12 required YAML fields and dual locator in each created artifact;
+- use only `[UPPER_SNAKE_CASE]` template placeholders;
+- verify IDs, repository-relative links, and referenced artifacts;
+- verify the author and approver are independent when auto-approved; and
+- report discussion-only output as unwritten, and approval or validation not performed as pending.
 
-`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+## Output
 
-### Offer ADRs sparingly
-
-Only offer to create an ADR when all three are true:
-
-1. **Hard to reverse**: the cost of changing your mind later is meaningful
-2. **Surprising without context**: a future reader will wonder "why did they do it this way?"
-3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
-
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+Return the resolved vocabulary or decision first. When files changed, list their paths, authority, ID, approval state, and validation performed.

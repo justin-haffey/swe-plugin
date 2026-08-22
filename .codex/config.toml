@@ -1,8 +1,8 @@
 ﻿# AGENTS
+allow_login_shell = true
+
 [agents]
-# Note: using new multi-agent-v2
-# max_threads = 8
-# max_depth = 3
+max_concurrent_threads_per_session = 8
 
 ## .codex/agents/codex/
 
@@ -48,26 +48,13 @@ config_file = "agents/swe/maf-developer.toml"
 description = "Use this agent to design modern, responsive web and app experiences, refine UX direction, and validate interface behavior through UI-focused testing."
 config_file = "agents/swe/ui-designer.toml"
 
-# PROJECT TRUST
-
-[projects.'C:\Users\justin\Source\codex\swe-plugin']
-trust_level = "trusted"
-
 # FEATURES / FLAGS
 
 [features]
 suppress_unstable_features_warning = true
 
-multi_agent_v2=true
-# multi_agent = true ## DEPRECIATED
-shell_tool = true      
-
-# SYSTEM / ENVIRONMENT
-
-allow_login_shell = true
-
-[windows]
-sandbox = "elevated"
+multi_agent_v2 = true
+shell_tool = true
 
 # MCP
 
@@ -93,14 +80,3 @@ enabled_tools = [
   "export_svg",
   "close_session"
 ]
-
-## Local RAG
-#  [mcp_servers.local_rag]
-#  url = "http://127.0.0.1:5198/mcp"
-#  bearer_token_env_var = "LOCALRAG_MCP_TOKEN"
-#  enabled = true
-#  required = false
-#  startup_timeout_sec = 20.0
-#  tool_timeout_sec = 30.0
-
-#  [mcp_servers.codebase-memory-mcp]

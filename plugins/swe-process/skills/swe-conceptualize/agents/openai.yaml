@@ -1,0 +1,4 @@
+interface:
+  display_name: "Conceptualize SWE Epic"
+  short_description: "Model Epic language and capability boundaries"
+  default_prompt: "Use $swe-conceptualize to create the Epic-local conceptual model."
