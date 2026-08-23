@@ -110,7 +110,7 @@ function Test-ContextLayout {
 }
 
 $expectedSkills = @(
-    'swe-new-epic', 'swe-research', 'swe-conceptualize', 'swe-assess-architecture',
+    'swe-max', 'swe-new-epic', 'swe-research', 'swe-conceptualize', 'swe-assess-architecture',
     'swe-architect', 'swe-plan-features', 'swe-plan-implementation', 'swe-design',
     'swe-implement', 'swe-validate', 'swe-bugfix', 'swe-enhancement', 'swe-scaffold'
 )
@@ -164,6 +164,9 @@ try {
     if ($manifest.author.name -ne 'Ghostworx.ai, LLC' -or $manifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
         Add-Failure "Manifest publisher must be Ghostworx.ai, LLC: $manifestPath"
     }
+    if (($manifest.interface.defaultPrompt -join "`n") -notmatch [regex]::Escape('$swe-max')) {
+        Add-Failure "Manifest defaultPrompt must advertise swe-max: $manifestPath"
+    }
 } catch {
     Add-Failure "Invalid plugin manifest: $($_.Exception.Message)"
 }
@@ -171,7 +174,7 @@ try {
 $skillsRoot = Join-Path $PluginRoot 'skills'
 $actualSkills = @(Get-ChildItem -LiteralPath $skillsRoot -Directory | ForEach-Object Name | Sort-Object)
 if (Compare-Object -ReferenceObject @($expectedSkills | Sort-Object) -DifferenceObject $actualSkills) {
-    Add-Failure 'Skill roster does not exactly match the 13-skill v2 roster.'
+    Add-Failure 'Skill roster does not exactly match the 14-skill v2 roster.'
 }
 
 foreach ($skillName in $expectedSkills) {
@@ -195,6 +198,89 @@ foreach ($skillName in $expectedSkills) {
         if (-not $shortMatch.Success -or $shortMatch.Groups[1].Value.Length -lt 25 -or $shortMatch.Groups[1].Value.Length -gt 64) {
             Add-Failure "short_description must be 25-64 characters: $uiPath"
         }
+    }
+}
+
+$sweMaxRoot = Join-Path $skillsRoot 'swe-max'
+$sweMaxSkillPath = Join-Path $sweMaxRoot 'SKILL.md'
+$sweMaxUiPath = Join-Path $sweMaxRoot 'agents\openai.yaml'
+$sweMaxOrchestrationPath = Join-Path $sweMaxRoot 'references\ORCHESTRATION.md'
+$sweMaxCompletionPath = Join-Path $sweMaxRoot 'references\COMPLETION-CONTRACT.md'
+$sweMaxResourcePaths = @($sweMaxSkillPath, $sweMaxUiPath, $sweMaxOrchestrationPath, $sweMaxCompletionPath)
+foreach ($sweMaxResourcePath in $sweMaxResourcePaths) {
+    if (-not (Test-Path -LiteralPath $sweMaxResourcePath -PathType Leaf)) {
+        Add-Failure "Missing swe-max resource: $sweMaxResourcePath"
+    }
+}
+
+if (-not ($sweMaxResourcePaths | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })) {
+    $sweMaxSkillText = Get-Content -Raw -LiteralPath $sweMaxSkillPath
+    $sweMaxUiText = Get-Content -Raw -LiteralPath $sweMaxUiPath
+    $sweMaxOrchestrationText = Get-Content -Raw -LiteralPath $sweMaxOrchestrationPath
+    $sweMaxCompletionText = Get-Content -Raw -LiteralPath $sweMaxCompletionPath
+    $sweMaxText = @($sweMaxSkillText, $sweMaxUiText, $sweMaxOrchestrationText, $sweMaxCompletionText) -join "`n"
+
+    $frontmatter = [regex]::Match($sweMaxSkillText, '(?ms)^---\s*\r?\n(?<header>.*?)\r?\n---\s*\r?\n')
+    if (-not $frontmatter.Success) {
+        Add-Failure "swe-max SKILL.md lacks bounded frontmatter: $sweMaxSkillPath"
+    } else {
+        $frontmatterKeys = @([regex]::Matches($frontmatter.Groups['header'].Value, '(?m)^([A-Za-z0-9_-]+):') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+        if (Compare-Object -ReferenceObject @('description', 'name') -DifferenceObject $frontmatterKeys) {
+            Add-Failure "swe-max frontmatter must contain only name and description: $sweMaxSkillPath"
+        }
+    }
+
+    foreach ($signature in @('$swe-max -epic <EPIC-ID-or-repository-relative-path>', '$swe-max "<idea-for-an-epic>"')) {
+        if ($sweMaxSkillText -notmatch [regex]::Escape($signature)) { Add-Failure "swe-max signature is missing '$signature'." }
+    }
+    if ($sweMaxText -match '(?i)swe-magic') { Add-Failure 'swe-max resources must not define a swe-magic alias.' }
+    if ($sweMaxUiText -notmatch '(?m)^\s*allow_implicit_invocation:\s*false\s*$') { Add-Failure "swe-max must be explicit-only: $sweMaxUiPath" }
+
+    foreach ($goalRule in @('exactly one formal Goal', '`get_goal`', '`create_goal`', '`update_goal`', 'Do not set a token budget unless', 'Only the primary `swe-max` coordinator')) {
+        if ($sweMaxText -notmatch [regex]::Escape($goalRule)) { Add-Failure "swe-max Goal contract lacks '$goalRule'." }
+    }
+    $goalSuffix = 'and complete the development of "[RESOLVED_IDEA_OR_EPIC_TITLE]".'
+    if ($sweMaxSkillText -notmatch [regex]::Escape($goalSuffix)) { Add-Failure 'swe-max Goal text lacks the required exact suffix pattern.' }
+    if ($sweMaxText -match [regex]::Escape('`stalled`')) { Add-Failure 'swe-max must not invent a stalled Goal state.' }
+    foreach ($goalState in @('`complete`', '`blocked`')) {
+        if ($sweMaxCompletionText -notmatch [regex]::Escape($goalState)) { Add-Failure "swe-max completion contract lacks Goal state $goalState." }
+    }
+
+    $phaseMarkers = @(
+        '| P00 | Preflight |', '| P10 | Epic |', '| P20 | Research |', '| P30 | Concept |',
+        '| P40 | Architecture impact |', '| P50 | Target architecture, ADRs, and contracts |',
+        '| P60 | Feature planning |', '| P70 | Implementation planning |',
+        '| P80 | Child solution delivery |', '| P90 | All-coded gate |',
+        '| P100 | Post-implementation architectural analysis |', '| P110 | Architectural remediation |',
+        '| P120 | Final validation and handoff |'
+    )
+    $phaseIndex = -1
+    foreach ($phaseMarker in $phaseMarkers) {
+        $nextPhaseIndex = $sweMaxOrchestrationText.IndexOf($phaseMarker, $phaseIndex + 1, [System.StringComparison]::Ordinal)
+        if ($nextPhaseIndex -lt 0) {
+            Add-Failure "swe-max sequential state machine lacks or misorders '$phaseMarker'."
+            break
+        }
+        $phaseIndex = $nextPhaseIndex
+    }
+
+    foreach ($orchestrationRule in @('$orchestrate -complex', 'project-scoped custom agents', '1-3 concrete tasks', 'exact repository plus file', 'they are not alone', 'preserve concurrent changes', 'Never let two tasks write the same checkout concurrently', 'Wait for every required handoff', 'must not create, replace, update, complete, or block any Goal')) {
+        if ($sweMaxOrchestrationText -notmatch [regex]::Escape($orchestrationRule)) { Add-Failure "swe-max orchestration lacks '$orchestrationRule'." }
+    }
+    foreach ($approvalRule in @('-auto-approve', 'actual independent agent', 'two author-repair/independent-review cycles', 'Never fabricate a human approval', 'invoke `-force`')) {
+        if ($sweMaxText -notmatch [regex]::Escape($approvalRule)) { Add-Failure "swe-max approval contract lacks '$approvalRule'." }
+    }
+    foreach ($deliveryRule in @('Every Feature or successor', 'implemented in code', 'complete `EVIDENCE.md`', 'Missing or incomplete Evidence', 'independent solution-local `$swe-validate -auto-approve`', 'integrated portfolio `$swe-validate -auto-approve` once for every Feature')) {
+        if ($sweMaxText -notmatch [regex]::Escape($deliveryRule)) { Add-Failure "swe-max delivery contract lacks '$deliveryRule'." }
+    }
+    foreach ($analysisRule in @('$swa-analyze', 'architecture/analysis/<scope-key>/ANALYSIS.md', 'major architectural finding', 'Never make a semantic edit to an `Accepted` artifact', 'Rerun affected `$swa-analyze` coverage into a new collision-free')) {
+        if ($sweMaxText -notmatch [regex]::Escape($analysisRule)) { Add-Failure "swe-max remediation contract lacks '$analysisRule'." }
+    }
+    if ($sweMaxText -match [regex]::Escape('equivalent independent architecture review')) {
+        Add-Failure 'swe-max remediation must rerun affected swa-analyze coverage rather than rely on an undefined equivalent review.'
+    }
+    foreach ($completionRule in @('Partial implementation', 'unavailable required validation', 'at least three consecutive Goal turns', 'same blocking condition', 'safest continuation point', 'record the attempted call and capability failure', 'coordinator-only diagnosis')) {
+        if ($sweMaxCompletionText -notmatch [regex]::Escape($completionRule)) { Add-Failure "swe-max fail-closed contract lacks '$completionRule'." }
     }
 }
 
@@ -366,6 +452,19 @@ foreach ($scaffoldName in @('portfolio', 'solution')) {
 }
 
 $workspaceRoot = Split-Path -Parent (Split-Path -Parent $PluginRoot)
+$repositoryAgentGuidePath = Join-Path $workspaceRoot 'AGENTS.md'
+$repositoryReadmePath = Join-Path $workspaceRoot 'README.md'
+if (-not (Test-Path -LiteralPath $repositoryAgentGuidePath -PathType Leaf) -or (Get-Content -Raw -LiteralPath $repositoryAgentGuidePath) -notmatch [regex]::Escape('swe-max')) {
+    Add-Failure "Repository agent guide does not include swe-max in the authoritative roster: $repositoryAgentGuidePath"
+}
+if (-not (Test-Path -LiteralPath $repositoryReadmePath -PathType Leaf)) {
+    Add-Failure "Repository README is missing: $repositoryReadmePath"
+} else {
+    $repositoryReadmeText = Get-Content -Raw -LiteralPath $repositoryReadmePath
+    if ($repositoryReadmeText -notmatch [regex]::Escape('14-skill roster') -or $repositoryReadmeText -notmatch [regex]::Escape('$swe-max')) {
+        Add-Failure "Repository README does not catalog the 14-skill roster with swe-max: $repositoryReadmePath"
+    }
+}
 $sourceScaffoldsRoot = Join-Path $workspaceRoot 'scaffolds'
 $prototypeSkillRoot = Join-Path $workspaceRoot 'plugins\swe-utility\skills\prototype'
 if (Test-Path -LiteralPath (Split-Path -Parent $prototypeSkillRoot) -PathType Container) {
@@ -632,4 +731,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Output "Validated 13 process skills, 18 canonical templates, Prototype Mode integration, lifecycle/config/role semantics, phase gates, scaffold behavior, agent registries, and available source/reference parity at $PluginRoot"
+Write-Output "Validated 14 process skills, 18 canonical templates, swe-max orchestration, Prototype Mode integration, lifecycle/config/role semantics, phase gates, scaffold behavior, agent registries, and available source/reference parity at $PluginRoot"

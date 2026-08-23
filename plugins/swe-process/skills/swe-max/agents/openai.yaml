@@ -1,0 +1,8 @@
+interface:
+  display_name: "Maximize SWE Epic Delivery"
+  short_description: "Complete one Epic through governed delivery"
+  default_prompt: "Use $swe-max -epic EPIC-001 to complete one governed Epic through implementation and validation."
+
+policy:
+  allow_implicit_invocation: false
+

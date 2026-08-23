@@ -22,10 +22,11 @@ tmp/task-materials/   design inputs used to develop v2; not shipped process auth
 
 ## SWE Process v2
 
-`swe-process` deliberately has a clean, 13-skill roster:
+`swe-process` deliberately has a clean, 14-skill roster:
 
 | Phase | Skill | Outcome |
 | --- | --- | --- |
+| End-to-end | `$swe-max` | Coordinates one Epic through a formal Goal, governed implementation, architectural remediation, and independent validation. |
 | Portfolio work | `$swe-new-epic` | Creates a governed Epic container. |
 | Discovery | `$swe-research` | Records bounded, traceable research. |
 | Intent | `$swe-conceptualize` | Produces an Epic-local Concept. |

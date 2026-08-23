@@ -15,6 +15,7 @@
     "category": "Productivity",
     "capabilities": ["Read", "Write"],
     "defaultPrompt": [
+      "Use $swe-max with an Epic or idea to coordinate complete governed delivery.",
       "Use $swe-new-epic to begin governed portfolio work.",
       "Use $swe-architect to create or reconcile architecture at the active repository's maximum authority.",
       "Use $swe-scaffold -portfolio or -solution to extend an active repository without overwriting files."

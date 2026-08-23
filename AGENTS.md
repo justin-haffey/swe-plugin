@@ -28,13 +28,13 @@ The repository has exactly four v2 packages: `swe-process`, `swe-codex`, `swe-ut
 `swe-process` is the primary package. Its exact skill roster is:
 
 ```text
-swe-new-epic                 swe-research
-swe-conceptualize            swe-assess-architecture
-swe-architect                swe-plan-features
-swe-plan-implementation      swe-design
-swe-implement                swe-validate
-swe-bugfix                   swe-enhancement
-swe-scaffold
+swe-max                      swe-new-epic
+swe-research                 swe-conceptualize
+swe-assess-architecture      swe-architect
+swe-plan-features            swe-plan-implementation
+swe-design                   swe-implement
+swe-validate                 swe-bugfix
+swe-enhancement              swe-scaffold
 ```
 
 `swa-analyze` is the portfolio-focused strategic software-analysis package. Its exact skill roster is:
