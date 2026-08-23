@@ -1,0 +1,7 @@
+interface:
+  display_name: "Lines of Code"
+  short_description: "Estimate repository lines by file type"
+  default_prompt: "Use $loc to estimate lines of code."
+
+policy:
+  allow_implicit_invocation: true

@@ -30,6 +30,31 @@ template_version: "2.0.0"
 |---|---|---|
 | [MODULE] | [RESPONSIBILITY] | [PUBLIC_SURFACE] |
 
+### Module and Dependency View
+
+Use this view to show the Package boundary, Module responsibilities, and allowed dependency direction. Keep classes and method calls in Module-level documentation.
+
+```mermaid
+flowchart LR
+    Consumer["[PACKAGE_CONSUMER]"]
+    Dependency["[EXTERNAL_DEPENDENCY]"]
+
+    subgraph Package["[PACKAGE_NAME]"]
+        Public["[PUBLIC_API_MODULE]"]
+        Core["[CORE_MODULE]"]
+        Adapter["[ADAPTER_MODULE]"]
+    end
+
+    Consumer -->|"[PUBLIC_CONTRACT]"| Public
+    Public -->|"[ALLOWED_DEPENDENCY]"| Core
+    Adapter -->|"[IMPLEMENTS_PORT]"| Core
+    Adapter -->|"[USES]"| Dependency
+```
+
+- Relationship meaning: [ARROW_SEMANTICS]
+- Key dependency rule: [DEPENDENCY_RULE]
+- Scope and omissions: [DIAGRAM_SCOPE_AND_OMISSIONS]
+
 ## Dependencies and Data
 
 - [DEPENDENCY_OR_DATA_OWNERSHIP]

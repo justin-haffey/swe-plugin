@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA Leverage Point"
+  short_description: "Find high-leverage architecture changes"
+  default_prompt: "Use $swa-leverage-point to analyze this existing software architecture and create an advisory ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

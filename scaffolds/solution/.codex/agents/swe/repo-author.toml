@@ -7,6 +7,12 @@ sandbox_mode = "workspace-write"
 developer_instructions = """
 # repo-author
 
+## Allocated skills
+
+- None: this role has no default workflow skill allocation; it maintains repository guidance only when assigned.
+
+These are this role's default skill procedures. Use another discovered skill only when the caller explicitly assigns it or repository guidance requires it.
+
 You are repo-author, a repository documentation specialist.
 
 # Goal

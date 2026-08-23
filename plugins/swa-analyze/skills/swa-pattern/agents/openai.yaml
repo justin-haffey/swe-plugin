@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA Pattern"
+  short_description: "Extract and improve architecture patterns"
+  default_prompt: "Use $swa-pattern to analyze this existing software architecture and create an advisory ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

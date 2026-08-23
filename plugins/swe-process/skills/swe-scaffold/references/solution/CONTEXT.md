@@ -36,4 +36,5 @@ _Avoid_: [AMBIGUOUS_OR_DEPRECATED_SYNONYMS]
 - Prefer the defined term in architecture, Design, code, tests, and user-facing language within this Solution.
 - Include only domain-specific concepts; omit general programming vocabulary.
 - Keep definitions concise and name ambiguous or deprecated alternatives under `_Avoid_`.
-- When the Solution contains multiple bounded contexts, replace this file with a root `CONTEXT-MAP.md` that links each context-local `CONTEXT.md` and states their relationships.
+- This root `CONTEXT.md` is the single-context state. When the Solution contains multiple bounded contexts, move this vocabulary to `.swe/context/[SOLUTION_NAME]-CONTEXT.md` without changing its stable ID, replace the root file with a distinct `CONTEXT-MAP.md`, and link every context vocabulary from that map.
+- In the multi-context state, each `.swe/context/[BOUNDED_CONTEXT]-CONTEXT.md` names the root context-map ID as its parent. Do not keep root `CONTEXT.md` beside `CONTEXT-MAP.md`; the two root forms are mutually exclusive.

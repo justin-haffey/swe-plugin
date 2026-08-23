@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA Interface"
+  short_description: "Redesign module and component interfaces"
+  default_prompt: "Use $swa-interface to analyze this existing software architecture and create an advisory ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

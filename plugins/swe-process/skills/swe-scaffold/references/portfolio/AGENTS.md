@@ -4,7 +4,7 @@ This repository is the authority for platform intent, portfolio work, and cross-
 
 ## Read Before Acting
 
-1. Read `CONTEXT-MAP.md` and the Work, Structural, and Engineering contexts it routes.
+1. Read `CONTEXT-MAP.md`, then follow its links to the Work, Structural, and Engineering contexts under `.swe/context/`.
 2. Read the active Epic and its accepted Concept.
 3. Read applicable platform architecture, ADRs, contracts, Feature definitions, and Implementation Plans.
 4. Follow upstream links using both the stable artifact ID and repository-relative path. Treat the revision as the evidence anchor when one is recorded.
@@ -30,13 +30,15 @@ Systems are runtime or operational views within platform or solution architectur
 ```text
 .codex/                         Codex configuration and specialized agents
 CONTEXT-MAP.md                  Routes the repository vocabulary contexts
-WORK-CONTEXT.md                 Epic and Feature vocabulary
-STRUCTURAL-CONTEXT.md           Platform-to-Module vocabulary
-ENGINEERING-CONTEXT.md          Research-to-Validation vocabulary
 .swe/
+  context/
+    WORK-CONTEXT.md             Epic and Feature vocabulary
+    STRUCTURAL-CONTEXT.md       Platform-to-Module vocabulary
+    ENGINEERING-CONTEXT.md      Research-to-Validation vocabulary
   epics/                        EPIC-### work, RESEARCH, Concepts, Features, Plans
 architecture/
   PLATFORM-ARCHITECTURE.md      Current and target platform architecture
+  analysis/<scope>/ANALYSIS.md  Advisory strategic architecture analysis
   contracts/                    Cross-solution contracts
   decisions/                    Platform ADRs
   views/systems/                Runtime and operational system views
@@ -46,7 +48,9 @@ README.md                       Portfolio orientation
 VERSION.md                      Portfolio version source
 ```
 
-Use repository-relative forward-slash links. Stable IDs use `EPIC-###`, `FEATURE-###`, and `ADR-###`. Epic directories use `.swe/epics/###-short-name/`; Feature numbering is local to its Epic. Never renumber an accepted artifact.
+Use repository-relative forward-slash links. `.swe/context/` contains durable portfolio vocabularies routed by the root context map; `.swe/epics/` contains lifecycle-bound work. Stable IDs use `EPIC-###`, `FEATURE-###`, and `ADR-###`. Epic directories use `.swe/epics/###-short-name/`; Feature numbering is local to its Epic. Never renumber an accepted artifact.
+
+`architecture/analysis/` contains advisory reports from strategic analysis skills. An `ANALYSIS.md` may recommend changes, but it is not an approved architecture artifact and cannot modify or supersede Concepts, architecture, ADRs, contracts, Features, plans, code, tests, or evidence.
 
 ## Approval Policy
 

@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA Scenario"
+  short_description: "Stress architecture for resilience and change"
+  default_prompt: "Use $swa-scenario to analyze this existing software architecture and create an advisory ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

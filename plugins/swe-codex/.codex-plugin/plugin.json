@@ -1,6 +1,6 @@
 {
   "name": "swe-codex",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Codex-native workflows for creating plugins, skills, agents, and coordinated engineering solutions.",
   "author": {
     "name": "Ghostworx.ai, LLC"

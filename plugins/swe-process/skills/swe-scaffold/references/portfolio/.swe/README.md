@@ -1,8 +1,12 @@
 # Portfolio Engineering Work
 
-`.swe/epics/` contains portfolio work records. Each Epic directory uses `###-short-name` and owns its `RESEARCH`, Concept, architecture-impact assessment, and locally numbered Features.
+`.swe/context/` contains durable portfolio vocabularies routed by the root `CONTEXT-MAP.md`. `.swe/epics/` contains lifecycle-bound portfolio work records. Each Epic directory uses `###-short-name` and owns its `RESEARCH`, Concept, architecture-impact assessment, and locally numbered Features.
 
 ```text
+context/
+  WORK-CONTEXT.md
+  STRUCTURAL-CONTEXT.md
+  ENGINEERING-CONTEXT.md
 epics/
   001-short-name/
     EPIC.md

@@ -30,9 +30,55 @@ template_version: "2.0.0"
 |---|---|---|
 | [PACKAGE] | [RESPONSIBILITY] | [DEPENDENCIES] |
 
+### Container and Package View
+
+Use this view to show the Solution's major runtime or deployable units and the Packages that implement them. Do not expand Packages into Modules here.
+
+```mermaid
+flowchart LR
+    Actor["[PRIMARY_ACTOR_OR_CALLER]"]
+    External["[EXTERNAL_SYSTEM]"]
+
+    subgraph Solution["[SOLUTION_NAME]"]
+        Entry["[ENTRY_POINT_OR_CONTAINER]"]
+        Service["[SERVICE_OR_WORKER]"]
+        Data[("[OWNED_DATA_STORE]")]
+    end
+
+    Actor -->|"[REQUEST_OR_TRIGGER]"| Entry
+    Entry -->|"[INTERNAL_CONTRACT]"| Service
+    Service -->|"[READS_OR_WRITES]"| Data
+    Service -->|"[EXTERNAL_CONTRACT]"| External
+```
+
+- Element-to-Package mapping: [ELEMENT_TO_PACKAGE_MAPPING]
+- Relationship meaning: [ARROW_SEMANTICS]
+- Scope and omissions: [DIAGRAM_SCOPE_AND_OMISSIONS]
+
 ## Runtime and Integration Views
 
 [COMPONENTS_FLOWS_AND_CONTRACTS]
+
+### Key Runtime Interaction
+
+Use this sequence for the most architecturally significant end-to-end interaction. Add another sequence only when it explains a materially different collaboration or failure path.
+
+```mermaid
+sequenceDiagram
+    actor Actor as [PRIMARY_ACTOR]
+    participant Entry as [ENTRY_POINT]
+    participant Service as [INTERNAL_SERVICE]
+    participant External as [EXTERNAL_COLLABORATOR]
+
+    Actor->>Entry: [REQUEST_OR_TRIGGER]
+    Entry->>Service: [VALIDATED_COMMAND_OR_QUERY]
+    Service->>External: [CONTRACT_OPERATION]
+    External-->>Service: [RESULT_OR_EVENT]
+    Service-->>Actor: [OUTCOME]
+```
+
+- Scenario and architectural significance: [SCENARIO_AND_SIGNIFICANCE]
+- Failure or asynchronous behavior omitted: [RUNTIME_OMISSIONS]
 
 ## Data, Security, Qualities, and Operations
 

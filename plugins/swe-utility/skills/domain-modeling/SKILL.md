@@ -24,7 +24,7 @@ This skill is explicit-only. Invocation authorizes analysis, not arbitrary write
 4. Keep each definition to one or two domain-focused sentences. Exclude implementation details, general programming vocabulary, requirements, and transient design notes.
 5. When a write is authorized, use [the Context template](references/CONTEXT-TEMPLATE.md). Preserve established content and add only the resolved vocabulary.
 
-For a single context, use root `CONTEXT.md`. For multiple contexts, keep a root `CONTEXT-MAP.md` that links each context-local `CONTEXT.md` and states cross-context relationships. If neither exists, propose a root `CONTEXT.md`; create it only with write authorization.
+For a single context, use root `CONTEXT.md`. For multiple contexts, use a root `CONTEXT-MAP.md` that links `.swe/context/[BOUNDED_CONTEXT]-CONTEXT.md` artifacts and states cross-context relationships. These are mutually exclusive root states. When expanding a single-context repository, move the existing vocabulary under `.swe/context/` without changing its stable ID, give the new map a distinct ID, and set each context vocabulary's parent to that map. If neither root form exists, propose `CONTEXT.md`; create or migrate artifacts only with write authorization.
 
 ## ADR Workflow
 

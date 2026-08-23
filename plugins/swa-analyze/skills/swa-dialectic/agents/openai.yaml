@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA Dialectic"
+  short_description: "Synthesize competing architecture forces"
+  default_prompt: "Use $swa-dialectic to analyze this existing software architecture and create an advisory ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

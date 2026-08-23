@@ -30,6 +30,31 @@ template_version: "2.0.0"
 |---|---|---|
 | [INTERFACE] | [INBOUND_OR_OUTBOUND] | [CONTRACT] |
 
+### Building-Block View
+
+Use this view to show coarse internal responsibilities and dependency direction. Avoid a class-per-box diagram; add a class or data-model view only when the model itself is architecturally significant.
+
+```mermaid
+flowchart LR
+    Caller["[CALLER_OR_CONSUMER]"]
+    Collaborator["[EXTERNAL_COLLABORATOR]"]
+
+    subgraph Module["[MODULE_NAME]"]
+        API["[PUBLIC_INTERFACE]"]
+        Core["[CORE_BEHAVIOR]"]
+        Adapter["[ADAPTER_OR_PERSISTENCE]"]
+    end
+
+    Caller -->|"[INVOCATION]"| API
+    API -->|"[DELEGATES]"| Core
+    Core -->|"[PORT_OR_CONTRACT]"| Adapter
+    Adapter -->|"[INTERACTION]"| Collaborator
+```
+
+- Relationship meaning: [ARROW_SEMANTICS]
+- Key invariant: [DIAGRAM_INVARIANT]
+- Scope and omissions: [DIAGRAM_SCOPE_AND_OMISSIONS]
+
 ## State and Behavior
 
 [STATE_LIFECYCLE_AND_KEY_BEHAVIOR]

@@ -1,7 +1,7 @@
 name = "context-engineer"
 description = "Senior context architect for complex cross-runtime prompt systems, Codex agents, AGENTS.md and SKILL.md design, migrations, audits, tool governance, and behavior-preserving compaction."
 model = "gpt-5.6-sol"
-model_reasoning_effort = "high"
+model_reasoning_effort = "max"
 
 developer_instructions = """
 # context-engineer

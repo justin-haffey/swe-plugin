@@ -9,7 +9,7 @@ This repository implements one Solution within a portfolio. The upstream portfol
 - [Agent governance](./AGENTS.md)
 - [Solution architecture](./architecture/README.md)
 - [Implementation work](./.swe/README.md)
-- [Context vocabulary](./CONTEXT.md)
+- [Context vocabulary](./CONTEXT.md) (replace with a root `CONTEXT-MAP.md` only when the Solution expands to multiple bounded contexts)
 - [Version](./VERSION.md)
 
 ## Delivery Model
@@ -27,4 +27,4 @@ Every implementation scope retains dual locators for the upstream Feature and it
 
 ## Extending This Scaffold
 
-Replace bracketed placeholders in [CONTEXT.md](./CONTEXT.md) and repository documentation, then register the upstream portfolio Feature and Plan in implementation artifacts. Preserve the layout and approval rules in [AGENTS.md](./AGENTS.md); add narrower `AGENTS.md` files only when a subtree needs durable additional governance.
+Replace bracketed placeholders in [CONTEXT.md](./CONTEXT.md) and repository documentation, then register the upstream portfolio Feature and Plan in implementation artifacts. If the Solution later expands to multiple bounded contexts, follow the migration contract in `CONTEXT.md`: preserve its stable ID under `.swe/context/`, create a distinct root `CONTEXT-MAP.md`, and use the map as the sole root entry point. Preserve the layout and approval rules in [AGENTS.md](./AGENTS.md); add narrower `AGENTS.md` files only when a subtree needs durable additional governance.

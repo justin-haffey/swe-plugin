@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA Abstraction"
+  short_description: "Align architecture across abstraction levels"
+  default_prompt: "Use $swa-abstraction to analyze this existing software architecture and create an advisory ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

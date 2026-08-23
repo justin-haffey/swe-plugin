@@ -24,9 +24,9 @@ This repository uses three independent vocabularies so delivery intent, software
 
 ## Contexts
 
-- [Work](./WORK-CONTEXT.md): Epic, Feature, and implementation-allocation vocabulary.
-- [Structural](./STRUCTURAL-CONTEXT.md): Platform, Solution, Package, Module, and System-view vocabulary.
-- [Engineering](./ENGINEERING-CONTEXT.md): Research, Concept, Architecture, Design, Evidence, and Validation vocabulary.
+- [Work](./.swe/context/WORK-CONTEXT.md): Epic, Feature, and implementation-allocation vocabulary.
+- [Structural](./.swe/context/STRUCTURAL-CONTEXT.md): Platform, Solution, Package, Module, and System-view vocabulary.
+- [Engineering](./.swe/context/ENGINEERING-CONTEXT.md): Research, Concept, Architecture, Design, Evidence, and Validation vocabulary.
 
 ## Relationships
 

@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA Analyze"
+  short_description: "Route strategic software architecture analysis"
+  default_prompt: "Use $swa-analyze to select strategic lenses and create an evidence-backed ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

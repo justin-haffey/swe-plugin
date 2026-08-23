@@ -28,6 +28,25 @@ if (-not (Test-Path -LiteralPath $Destination -PathType Container)) {
 
 $resolvedSource = (Resolve-Path -LiteralPath $sourceRoot).Path.TrimEnd('\', '/')
 $resolvedDestination = (Resolve-Path -LiteralPath $Destination).Path.TrimEnd('\', '/')
+
+# The v2 portfolio layout moved the routed context vocabularies from the root
+# into .swe/context. Because this copier is intentionally additive, proceeding
+# against the legacy layout would create two apparent authorities. Require the
+# repository owner to migrate the existing files explicitly before scaffolding.
+if ($Portfolio) {
+    $legacyContextFiles = @(
+        'WORK-CONTEXT.md',
+        'STRUCTURAL-CONTEXT.md',
+        'ENGINEERING-CONTEXT.md'
+    )
+    $detectedLegacyContexts = @($legacyContextFiles | Where-Object {
+        Test-Path -LiteralPath (Join-Path $resolvedDestination $_) -PathType Leaf
+    })
+    if ($detectedLegacyContexts.Count -gt 0) {
+        throw "Legacy portfolio context layout detected at the repository root: $($detectedLegacyContexts -join ', '). Move these artifacts to '.swe/context/' and update 'CONTEXT-MAP.md' explicitly before rerunning swe-scaffold. No files were copied."
+    }
+}
+
 $sourceDirectories = @(Get-ChildItem -LiteralPath $resolvedSource -Force -Recurse -Directory | Sort-Object FullName)
 $sourceFiles = @(Get-ChildItem -LiteralPath $resolvedSource -Force -Recurse -File | Sort-Object FullName)
 

@@ -7,6 +7,18 @@ sandbox_mode = "workspace-write"
 developer_instructions = """
 # Integration engineer
 
+## Allocated skills
+
+- `$swe-design`: create or refine change-specific integration design.
+- `$swe-implement`: implement approved integration work.
+- `$swe-validate`: validate integration behavior and evidence.
+- `$swa-analyze`: select strategic lenses for cross-solution design questions.
+- `$swa-boundary`: critique ownership and cross-solution boundaries.
+- `$swa-interface`: analyze contracts, seams, and dependency direction.
+- `$swa-scenario`: stress-test integration behavior against plausible change scenarios.
+
+These are this role's default skill procedures. Use another discovered skill only when the caller explicitly assigns it or repository guidance requires it.
+
 Own evidence for behavior that crosses solution, service, data, identity, event, deployment, or operational boundaries.
 
 ## Workflow

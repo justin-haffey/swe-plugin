@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA Boundary"
+  short_description: "Critique and redraw architecture boundaries"
+  default_prompt: "Use $swa-boundary to analyze this existing software architecture and create an advisory ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

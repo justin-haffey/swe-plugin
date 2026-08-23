@@ -2,7 +2,6 @@
 name: swe-implement
 description: Implement an approved solution-local DESIGN.md with scoped source, tests, documentation, and repository evidence.
 ---
-
 # Implement
 
 Transform an accepted Design into executable software within the active repository's authority.

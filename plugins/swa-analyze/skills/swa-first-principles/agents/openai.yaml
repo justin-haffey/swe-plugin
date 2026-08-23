@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA First Principles"
+  short_description: "Reconstruct architecture from fundamentals"
+  default_prompt: "Use $swa-first-principles to analyze this existing software architecture and create an advisory ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

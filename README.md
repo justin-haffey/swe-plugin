@@ -1,8 +1,8 @@
 # SWE Plugin
 
-SWE Plugin is a source repository for Codex customizations that make a software-engineering process portable, reviewable, and usable across a portfolio repository and its child solution repositories. Version 2.0 centers on a governed artifact flow: portfolio intent becomes an Epic, research, accepted architecture and Features; solution repositories turn allocated work into Design, code, evidence, and validation.
+SWE Plugin is a source repository for Codex customizations that make a software-engineering process portable, reviewable, and usable across a portfolio repository and its child solution repositories. Version 2.0.1 centers on a governed artifact flow: portfolio intent becomes an Epic, research, accepted architecture and Features; solution repositories turn allocated work into Design, code, evidence, and validation.
 
-The repository contains three plugins. `swe-process` is the primary v2 package. `swe-codex` provides focused authoring workflows for Codex plugins, skills, and agents, while `swe-utility` contains reusable supporting skills such as structured questioning, versioning, orchestration, and style capture.
+The repository contains four plugins. `swe-process` is the primary v2 package. `swe-codex` provides focused authoring workflows for Codex plugins, skills, and agents, `swe-utility` contains reusable supporting skills, and `swa-analyze` provides portfolio-focused strategic architecture analysis.
 
 ## Repository layout
 
@@ -11,6 +11,7 @@ plugins/
   swe-process/        v2 engineering-process skills, templates, validator, and scaffold copier
   swe-codex/          Codex plugin, skill, and agent authoring skills
   swe-utility/        reusable supporting skills
+  swa-analyze/        strategic software-architecture analysis router and lenses
 scaffolds/
   portfolio/          final scaffold for a portfolio/platform authority repository
   solution/           final scaffold for a child solution repository
@@ -43,6 +44,12 @@ Architecture is organized as `Platform -> Solution -> Package -> Module`. System
 
 Every cross-repository handoff uses both a stable artifact ID and a repository-relative path, with an optional revision. This dual locator lets a child Solution retain a durable link to the portfolio Feature and Implementation Plan without copying or redefining them.
 
+## SWA Analyze
+
+`swa-analyze` contains a routing skill and twelve focused strategic lenses: leverage points, boundaries, metaphors, abstraction, first principles, inversion, interfaces, patterns, dialectics, constraints, perspectives, and scenarios. `$swa-analyze [<developer_input>]` inspects the requested scope, selects the smallest useful set of lenses, and produces one evidence-backed report at `architecture/analysis/<scope-key>/ANALYSIS.md`.
+
+The analysis is advisory. It reviews existing SWE artifacts and source evidence, uses Codebase Memory graph discovery with direct-source confirmation, and recommends governed follow-up work without modifying the architecture, lifecycle artifacts, contracts, code, tests, or evidence it examines. Portfolio analysis roles receive explicit `$swa-*` allocations; every portfolio and solution agent TOML explicitly declares its own default skill allocation.
+
 ## Approval and lifecycle
 
 Decision-bearing artifacts default to named human approval. `-auto-approve` delegates review only to an independent, appropriate agent; the author cannot approve its own work, and two repair-and-review cycles are the maximum before human escalation. `-force` requires explicit human authorization and records the bypass; it does not invent acceptance, validation, or evidence.
@@ -68,6 +75,7 @@ No package-manager build is required; the distributable surface is plugin metada
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swe-process\scripts\Test-SweProcess.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swa-analyze\scripts\Test-SwaAnalyze.ps1
 git diff --check
 ```
 

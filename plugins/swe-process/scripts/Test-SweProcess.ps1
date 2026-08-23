@@ -69,6 +69,46 @@ function Test-AgentRegistry {
     }
 }
 
+function Test-ContextLayout {
+    param(
+        [Parameter(Mandatory = $true)][string]$ScaffoldRoot,
+        [Parameter(Mandatory = $true)][ValidateSet('portfolio', 'solution')][string]$ScaffoldName
+    )
+
+    if ($ScaffoldName -eq 'portfolio') {
+        $mapPath = Join-Path $ScaffoldRoot 'CONTEXT-MAP.md'
+        if (-not (Test-Path -LiteralPath $mapPath -PathType Leaf)) {
+            Add-Failure "Portfolio scaffold lacks root context map: $mapPath"
+            return
+        }
+        $mapText = Get-Content -Raw -LiteralPath $mapPath
+        foreach ($contextName in @('WORK-CONTEXT.md', 'STRUCTURAL-CONTEXT.md', 'ENGINEERING-CONTEXT.md')) {
+            $contextPath = Join-Path $ScaffoldRoot ('.swe\context\' + $contextName)
+            if (-not (Test-Path -LiteralPath $contextPath -PathType Leaf)) {
+                Add-Failure "Portfolio context vocabulary is missing: $contextPath"
+            }
+            $legacyPath = Join-Path $ScaffoldRoot $contextName
+            if (Test-Path -LiteralPath $legacyPath) {
+                Add-Failure "Portfolio context vocabulary must not remain at the root: $legacyPath"
+            }
+            $expectedLink = './.swe/context/' + $contextName
+            if ($mapText -notmatch [regex]::Escape($expectedLink)) {
+                Add-Failure "Portfolio context map does not link '$expectedLink': $mapPath"
+            }
+        }
+        return
+    }
+
+    $singleContextPath = Join-Path $ScaffoldRoot 'CONTEXT.md'
+    $mapPath = Join-Path $ScaffoldRoot 'CONTEXT-MAP.md'
+    if (-not (Test-Path -LiteralPath $singleContextPath -PathType Leaf)) {
+        Add-Failure "Initial solution scaffold lacks root single-context vocabulary: $singleContextPath"
+    }
+    if (Test-Path -LiteralPath $mapPath) {
+        Add-Failure "Initial solution scaffold must not contain both root context forms: $mapPath"
+    }
+}
+
 $expectedSkills = @(
     'swe-new-epic', 'swe-research', 'swe-conceptualize', 'swe-assess-architecture',
     'swe-architect', 'swe-plan-features', 'swe-plan-implementation', 'swe-design',
@@ -83,6 +123,7 @@ $templateContract = [ordered]@{
     'skills\swe-architect\references\SOLUTION-ARCHITECTURE-TEMPLATE.md' = @('solution_architecture', 'Target')
     'skills\swe-architect\references\PACKAGE-ARCHITECTURE-TEMPLATE.md' = @('package_architecture', 'Target')
     'skills\swe-architect\references\MODULE-ARCHITECTURE-TEMPLATE.md' = @('module_architecture', 'Target')
+    'skills\swe-architect\references\SYSTEM-VIEW-TEMPLATE.md' = @('system_view', 'Target')
     'skills\swe-architect\references\ADR-TEMPLATE.md' = @('architecture_decision', 'Proposed')
     'skills\swe-architect\references\CONTRACT-TEMPLATE.md' = @('architecture_contract', 'Proposed')
     'skills\swe-plan-features\references\FEATURE-TEMPLATE.md' = @('feature', 'Draft')
@@ -96,7 +137,7 @@ $templateContract = [ordered]@{
 $decisionTemplates = @(
     'EPIC-TEMPLATE.md', 'CONCEPT-TEMPLATE.md', 'ARCHITECTURE-IMPACT-TEMPLATE.md',
     'PLATFORM-ARCHITECTURE-TEMPLATE.md', 'SOLUTION-ARCHITECTURE-TEMPLATE.md',
-    'PACKAGE-ARCHITECTURE-TEMPLATE.md', 'MODULE-ARCHITECTURE-TEMPLATE.md',
+    'PACKAGE-ARCHITECTURE-TEMPLATE.md', 'MODULE-ARCHITECTURE-TEMPLATE.md', 'SYSTEM-VIEW-TEMPLATE.md',
     'ADR-TEMPLATE.md', 'CONTRACT-TEMPLATE.md', 'FEATURE-TEMPLATE.md',
     'IMPLEMENTATION-PLAN-TEMPLATE.md', 'DESIGN-TEMPLATE.md', 'VALIDATION-TEMPLATE.md'
 )
@@ -107,12 +148,19 @@ $traceabilityContract = [ordered]@{
     'EVIDENCE-TEMPLATE.md' = @('epic', 'feature', 'implementation_plan', 'design')
     'VALIDATION-TEMPLATE.md' = @('epic', 'feature', 'implementation_plan', 'design', 'evidence')
 }
+$diagramContract = [ordered]@{
+    'PLATFORM-ARCHITECTURE-TEMPLATE.md' = @('flowchart')
+    'SOLUTION-ARCHITECTURE-TEMPLATE.md' = @('flowchart', 'sequenceDiagram')
+    'PACKAGE-ARCHITECTURE-TEMPLATE.md' = @('flowchart')
+    'MODULE-ARCHITECTURE-TEMPLATE.md' = @('flowchart')
+    'SYSTEM-VIEW-TEMPLATE.md' = @('flowchart', 'sequenceDiagram')
+}
 
 $manifestPath = Join-Path $PluginRoot '.codex-plugin\plugin.json'
 try {
     $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
     if ($manifest.name -ne 'swe-process') { Add-Failure "Manifest name must be swe-process: $manifestPath" }
-    if ($manifest.version -ne '2.0.0') { Add-Failure "Manifest version must be 2.0.0: $manifestPath" }
+    if ($manifest.version -ne '2.0.1') { Add-Failure "Manifest version must be 2.0.1: $manifestPath" }
     if ($manifest.author.name -ne 'Ghostworx.ai, LLC' -or $manifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
         Add-Failure "Manifest publisher must be Ghostworx.ai, LLC: $manifestPath"
     }
@@ -156,7 +204,7 @@ $actualTemplates = @(Get-ChildItem -LiteralPath $skillsRoot -Recurse -File -Filt
     ForEach-Object { $_.FullName.Substring($PluginRoot.Length).TrimStart('\', '/') -replace '/', '\' } | Sort-Object)
 $expectedTemplates = @($templateContract.Keys | Sort-Object)
 if (Compare-Object -ReferenceObject $expectedTemplates -DifferenceObject $actualTemplates) {
-    Add-Failure 'Canonical process template set must contain exactly the 17 v2 templates.'
+    Add-Failure 'Canonical process template set must contain exactly the 18 v2 templates.'
 }
 
 $commonFields = @('title', 'artifact_type', 'id', 'status', 'authority', 'scope', 'parent', 'upstream', 'owners', 'created', 'updated', 'template_version')
@@ -202,6 +250,22 @@ foreach ($relativeTemplate in $templateContract.Keys) {
         }
     }
     $leaf = Split-Path -Leaf $templatePath
+    if ($diagramContract.Contains($leaf)) {
+        $mermaidBlocks = @([regex]::Matches($templateText, '(?ms)```mermaid\s*\r?\n(?<body>.*?)\r?\n```'))
+        if ($mermaidBlocks.Count -lt $diagramContract[$leaf].Count) {
+            Add-Failure "Architecture template lacks its core Mermaid views: $templatePath"
+        }
+        foreach ($mermaidBlock in $mermaidBlocks) {
+            if ($mermaidBlock.Groups['body'].Value -notmatch '\[[A-Z0-9_]+\]') {
+                Add-Failure "Architecture Mermaid view lacks a replaceable sample placeholder: $templatePath"
+            }
+        }
+        foreach ($diagramType in $diagramContract[$leaf]) {
+            if (-not ($mermaidBlocks | Where-Object { $_.Groups['body'].Value -match "(?m)^$([regex]::Escape($diagramType))(?:\s|$)" })) {
+                Add-Failure "Architecture template lacks a '$diagramType' Mermaid view: $templatePath"
+            }
+        }
+    }
     if ($traceabilityContract.Contains($leaf)) {
         if ($header -notmatch '(?m)^traceability:\s*$') { Add-Failure "Template lacks traceability map: $templatePath" }
         foreach ($locatorName in $traceabilityContract[$leaf]) {
@@ -238,6 +302,7 @@ foreach ($scaffoldName in @('portfolio', 'solution')) {
     $referenceRoot = Join-Path $scaffoldReferences $scaffoldName
     $roster = if ($scaffoldName -eq 'portfolio') { $portfolioRoster } else { $solutionRoster }
     Test-AgentRegistry -ScaffoldRoot $referenceRoot -ExpectedRoster $roster
+    Test-ContextLayout -ScaffoldRoot $referenceRoot -ScaffoldName $scaffoldName
 }
 
 $workspaceRoot = Split-Path -Parent (Split-Path -Parent $PluginRoot)
@@ -252,6 +317,7 @@ if (Test-Path -LiteralPath $sourceScaffoldsRoot -PathType Container) {
         }
         $roster = if ($scaffoldName -eq 'portfolio') { $portfolioRoster } else { $solutionRoster }
         Test-AgentRegistry -ScaffoldRoot $sourceRoot -ExpectedRoster $roster
+        Test-ContextLayout -ScaffoldRoot $sourceRoot -ScaffoldName $scaffoldName
         $sourceRecords = @(Get-RelativeFileRecords -Root $sourceRoot | Sort-Object Relative)
         $referenceRecords = @(Get-RelativeFileRecords -Root $referenceRoot | Sort-Object Relative)
         if (Compare-Object -ReferenceObject $sourceRecords -DifferenceObject $referenceRecords -Property Relative, Hash) {
@@ -283,6 +349,27 @@ if (-not (Test-Path -LiteralPath $scaffoldScript -PathType Leaf)) {
         $jsonReport = (& $scaffoldScript -Solution -Destination $mergeDestination -AsJson) | Out-String | ConvertFrom-Json
         if ($jsonReport.SchemaVersion -ne '2.0' -or $jsonReport.Counts.TotalSourceFiles -ne $secondReport.Counts.TotalSourceFiles) { Add-Failure 'Scaffold JSON report is invalid.' }
 
+        $portfolioDestination = Join-Path $tempRoot 'portfolio'
+        New-Item -ItemType Directory -Path $portfolioDestination | Out-Null
+        $portfolioReport = & $scaffoldScript -Portfolio -Destination $portfolioDestination
+        if ($portfolioReport.SchemaVersion -ne '2.0' -or $portfolioReport.Scaffold -ne 'portfolio') { Add-Failure 'Portfolio scaffold report schema is not programmatically stable.' }
+        Test-ContextLayout -ScaffoldRoot $portfolioDestination -ScaffoldName 'portfolio'
+
+        $legacyDestination = Join-Path $tempRoot 'legacy-portfolio'
+        New-Item -ItemType Directory -Path $legacyDestination | Out-Null
+        $legacyContextPath = Join-Path $legacyDestination 'WORK-CONTEXT.md'
+        [System.IO.File]::WriteAllText($legacyContextPath, 'legacy-context')
+        $legacyFailed = $false
+        $legacyFailureMessage = ''
+        try { $null = & $scaffoldScript -Portfolio -Destination $legacyDestination } catch {
+            $legacyFailed = $true
+            $legacyFailureMessage = $_.Exception.Message
+        }
+        if (-not $legacyFailed -or $legacyFailureMessage -notmatch 'Legacy portfolio context layout') { Add-Failure 'Portfolio scaffold did not clearly reject the legacy root context layout.' }
+        if ((Get-ChildItem -LiteralPath $legacyDestination -Force).Count -ne 1 -or (Get-Content -Raw -LiteralPath $legacyContextPath) -ne 'legacy-context') {
+            Add-Failure 'Legacy portfolio context preflight changed the destination or left partial output.'
+        }
+
         $collisionDestination = Join-Path $tempRoot 'collision'
         New-Item -ItemType Directory -Path $collisionDestination | Out-Null
         [System.IO.File]::WriteAllText((Join-Path $collisionDestination '.codex'), 'file-collision')
@@ -303,4 +390,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Output "Validated 13 skills, 17 canonical templates, scaffold behavior, agent registries, and available source/reference parity at $PluginRoot"
+Write-Output "Validated 13 skills, 18 canonical templates, architecture diagram contracts, scaffold behavior, agent registries, and available source/reference parity at $PluginRoot"

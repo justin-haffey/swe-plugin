@@ -6,7 +6,7 @@ This repository is the authority for one Solution and its Package and Module arc
 
 1. Resolve the allocated upstream Feature by stable ID and repository-relative path. Use the recorded revision when present.
 2. Resolve the portfolio-owned `IMPLEMENTATION-PLAN.md` beside that Feature; do not create a local copy.
-3. Read `CONTEXT.md`, the accepted Feature and Plan, applicable platform contracts and ADRs, and current local architecture.
+3. Read root `CONTEXT.md` when present; otherwise read `CONTEXT-MAP.md` and every linked vocabulary under `.swe/context/`. Then read the accepted Feature and Plan, applicable platform contracts and ADRs, and current local architecture.
 4. Inspect the exact target before writing. Create missing folders and files, but never overwrite an existing artifact without explicit authorization.
 5. Keep the Feature and Plan upstream. Record implementation decisions, Design, evidence, and validation here.
 
@@ -30,8 +30,9 @@ Systems are runtime or operational views within Platform or Solution architectur
 
 ```text
 .codex/                               Codex configuration and specialized agents
-CONTEXT.md                            Solution domain vocabulary
+CONTEXT.md | CONTEXT-MAP.md           Single vocabulary or multi-context router
 .swe/
+  context/                            Context vocabularies after map expansion
   implementations/EPIC-###/FEATURE-###/
     DESIGN.md
     EVIDENCE.md
@@ -48,12 +49,11 @@ architecture/
     modules/[MODULE_NAME]/MODULE-ARCHITECTURE.md
   views/systems/
 AGENTS.md
-CONTEXT.md
 README.md
 VERSION.md
 ```
 
-Use repository-relative forward-slash links. Stable IDs use `EPIC-###`, `FEATURE-###`, `ADR-###`, `BUG-###`, and `ENH-###`. ADR numbering is local to its `decisions/` directory. Never renumber an accepted artifact.
+Use exactly one root context form: `CONTEXT.md` for a single Solution context, or `CONTEXT-MAP.md` for multiple contexts whose vocabularies live under `.swe/context/`. When expanding, preserve the original context artifact's stable ID at its new path and give the map a distinct ID. Use repository-relative forward-slash links. Stable IDs use `EPIC-###`, `FEATURE-###`, `ADR-###`, `BUG-###`, and `ENH-###`. ADR numbering is local to its `decisions/` directory. Never renumber an accepted artifact.
 
 ## Approval Policy
 

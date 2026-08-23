@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA Constraint"
+  short_description: "Reframe and selectively restore constraints"
+  default_prompt: "Use $swa-constraint to analyze this existing software architecture and create an advisory ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

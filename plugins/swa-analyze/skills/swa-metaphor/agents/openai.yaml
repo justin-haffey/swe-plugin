@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA Metaphor"
+  short_description: "Replace limiting architecture mental models"
+  default_prompt: "Use $swa-metaphor to analyze this existing software architecture and create an advisory ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

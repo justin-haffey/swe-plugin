@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA Inversion"
+  short_description: "Reverse assumptions to reveal alternatives"
+  default_prompt: "Use $swa-inversion to analyze this existing software architecture and create an advisory ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

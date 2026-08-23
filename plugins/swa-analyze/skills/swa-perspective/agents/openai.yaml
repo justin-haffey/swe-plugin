@@ -1,0 +1,7 @@
+interface:
+  display_name: "SWA Perspective"
+  short_description: "Shift views to expose hidden design options"
+  default_prompt: "Use $swa-perspective to analyze this existing software architecture and create an advisory ANALYSIS.md."
+
+policy:
+  allow_implicit_invocation: true

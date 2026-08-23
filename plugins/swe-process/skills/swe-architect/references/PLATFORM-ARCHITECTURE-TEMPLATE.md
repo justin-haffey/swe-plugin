@@ -28,6 +28,28 @@ template_version: "2.0.0"
 
 [PLATFORM_BOUNDARY_AND_EXTERNAL_CONTEXT]
 
+### Platform Context and Solution Landscape
+
+Use this view to show who depends on the Platform, its owned Solutions, and the most important external relationships. Keep Solution internals in their own architecture documents.
+
+```mermaid
+flowchart LR
+    Stakeholder["[PRIMARY_STAKEHOLDER]"]
+    External["[EXTERNAL_SYSTEM]"]
+
+    subgraph Platform["[PLATFORM_NAME]"]
+        SolutionA["[SOLUTION_A]"]
+        SolutionB["[SOLUTION_B]"]
+    end
+
+    Stakeholder -->|"[USES]"| SolutionA
+    SolutionA -->|"[CONTRACT_OR_FLOW]"| SolutionB
+    SolutionB -->|"[INTEGRATES_WITH]"| External
+```
+
+- Relationship meaning: [ARROW_SEMANTICS]
+- Scope and omissions: [DIAGRAM_SCOPE_AND_OMISSIONS]
+
 ## Solution Decomposition
 
 | Solution | Responsibility | Owned Data | Interfaces |
@@ -36,7 +58,7 @@ template_version: "2.0.0"
 
 ## System and Runtime Views
 
-[IMPORTANT_RUNTIME_INTERACTIONS]
+[IMPORTANT_RUNTIME_INTERACTIONS_AND_SYSTEM_VIEW_LINKS]
 
 ## Qualities, Security, and Operations
 

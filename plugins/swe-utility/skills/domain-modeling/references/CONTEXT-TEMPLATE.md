@@ -35,4 +35,6 @@ _Avoid_: [AMBIGUOUS_OR_DEPRECATED_SYNONYMS]
 
 - Prefer the defined term throughout this context.
 - Define domain meaning, not implementation behavior.
-- For multiple contexts, maintain a root `CONTEXT-MAP.md` linking each context and stating their relationships.
+- Use root `CONTEXT.md` only for the single-context state.
+- For multiple contexts, use a distinct root `CONTEXT-MAP.md` linking `.swe/context/[BOUNDED_CONTEXT]-CONTEXT.md` artifacts and stating their relationships.
+- When expanding, preserve this vocabulary's stable ID at its new path and set its parent to the new map. Do not retain both root forms.
