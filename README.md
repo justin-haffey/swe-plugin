@@ -46,6 +46,10 @@ Architecture is organized as `Platform -> Solution -> Package -> Module`. System
 
 Every cross-repository handoff uses both a stable artifact ID and a repository-relative path, with an optional revision. This dual locator lets a child Solution retain a durable link to the portfolio Feature and Implementation Plan without copying or redefining them. Implementation roles run checks and produce Evidence; independent `solution-validator` and `feature-validator` roles author formal Validation. Architecture reviewers use `$swe-architect -review`, not Feature validation.
 
+## SWE Utility
+
+`swe-utility` provides supporting workflows used by the process without expanding lifecycle authority. Its internal [`$swe-bridge`](plugins/swe-utility/skills/swe-bridge/SKILL.md) skill is invoked only by `$swe-max` after the complete Implementation Plan stage is accepted. It uses `/fork` or the host's exact thread-fork equivalent to send a self-contained assignment prompt into the exact child solution, then dynamically enters at `$swe-design` or an already-authorized `$swe-implement` handoff. It is not a direct user workflow, and dispatch alone never counts as delivery.
+
 ## SWA Analyze
 
 `swa-analyze` contains a routing skill and twelve focused strategic lenses: leverage points, boundaries, metaphors, abstraction, first principles, inversion, interfaces, patterns, dialectics, constraints, perspectives, and scenarios. `$swa-analyze [<developer_input>]` inspects the requested scope, selects the smallest useful set of lenses, and produces one evidence-backed report at `architecture/analysis/<scope-key>/ANALYSIS.md`.
@@ -90,7 +94,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swa-analyze\script
 git diff --check
 ```
 
-The process command validates the exact process-skill roster, required resources, template metadata and traceability contracts, Prototype Mode integration, lifecycle and phase-gate semantics, the current multi-agent feature plus the repository-required v2 workflow selector, role/skill authority, scaffold references, and agent registrations. The SWE Codex command validates the goal-completion hook, handler behavior, plugin registration, and `$repo-wrap-up` bundle. Run the process command again after changing a process template, scaffold, or `swe-scaffold` reference. For all packages, validate JSON manifests, SKILL front matter, relative links, and affected TOML registrations before handing off changes.
+The process command validates the exact process-skill roster, required resources, template metadata and traceability contracts, the `$swe-max` to `$swe-bridge` transition, Prototype Mode integration, lifecycle and phase-gate semantics, the current multi-agent feature plus the repository-required v2 workflow selector, role/skill authority, scaffold references, and agent registrations. The SWE Codex command validates the goal-completion hook, handler behavior, plugin registration, and `$repo-wrap-up` bundle. Run the process command again after changing a process template, scaffold, or `swe-scaffold` reference. For all packages, validate JSON manifests, SKILL front matter, relative links, and affected TOML registrations before handing off changes.
 
 ## Extending the plugins
 

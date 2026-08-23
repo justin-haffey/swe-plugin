@@ -9,6 +9,7 @@ if ([string]::IsNullOrWhiteSpace($PluginRoot)) {
     $PluginRoot = Split-Path -Parent $PSScriptRoot
 }
 $PluginRoot = (Resolve-Path -LiteralPath $PluginRoot).Path
+$workspaceRoot = Split-Path -Parent (Split-Path -Parent $PluginRoot)
 $failures = [System.Collections.Generic.List[string]]::new()
 
 function Add-Failure {
@@ -302,6 +303,51 @@ if (-not ($sweMaxResourcePaths | Where-Object { -not (Test-Path -LiteralPath $_ 
     foreach ($completionRule in @('Partial implementation', 'unavailable required validation', 'at least three consecutive Goal turns', 'same blocking condition', 'safest continuation point', 'record the attempted call and capability failure', 'coordinator-only diagnosis')) {
         if ($sweMaxCompletionText -notmatch [regex]::Escape($completionRule)) { Add-Failure "swe-max fail-closed contract lacks '$completionRule'." }
     }
+
+    foreach ($bridgeIntegrationRule in @('$swe-bridge', 'P70-to-P80 boundary', 'complete Implementation Plan stage', '/fork', 'exact thread-fork equivalent', 'dispatch alone')) {
+        if ($sweMaxText -notmatch [regex]::Escape($bridgeIntegrationRule)) { Add-Failure "swe-max bridge integration lacks '$bridgeIntegrationRule'." }
+    }
+}
+
+$sweBridgeRoot = Join-Path $workspaceRoot 'plugins\swe-utility\skills\swe-bridge'
+$sweBridgeSkillPath = Join-Path $sweBridgeRoot 'SKILL.md'
+$sweBridgeUiPath = Join-Path $sweBridgeRoot 'agents\openai.yaml'
+$sweBridgePromptPath = Join-Path $sweBridgeRoot 'references\BRIDGE-PROMPT.md'
+$sweBridgeResourcePaths = @($sweBridgeSkillPath, $sweBridgeUiPath, $sweBridgePromptPath)
+foreach ($sweBridgeResourcePath in $sweBridgeResourcePaths) {
+    if (-not (Test-Path -LiteralPath $sweBridgeResourcePath -PathType Leaf)) {
+        Add-Failure "Missing swe-bridge resource: $sweBridgeResourcePath"
+    }
+}
+
+if (-not ($sweBridgeResourcePaths | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })) {
+    $sweBridgeSkillText = Get-Content -Raw -LiteralPath $sweBridgeSkillPath
+    $sweBridgeUiText = Get-Content -Raw -LiteralPath $sweBridgeUiPath
+    $sweBridgePromptText = Get-Content -Raw -LiteralPath $sweBridgePromptPath
+
+    $sweBridgeFrontmatter = [regex]::Match($sweBridgeSkillText, '(?ms)^---\s*\r?\n(?<header>.*?)\r?\n---\s*\r?\n')
+    if (-not $sweBridgeFrontmatter.Success) {
+        Add-Failure "swe-bridge SKILL.md lacks bounded frontmatter: $sweBridgeSkillPath"
+    } else {
+        $sweBridgeFrontmatterKeys = @([regex]::Matches($sweBridgeFrontmatter.Groups['header'].Value, '(?m)^([A-Za-z0-9_-]+):') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+        if (Compare-Object -ReferenceObject @('description', 'name') -DifferenceObject $sweBridgeFrontmatterKeys) {
+            Add-Failure "swe-bridge frontmatter must contain only name and description: $sweBridgeSkillPath"
+        }
+    }
+
+    $sweBridgeSignature = '$swe-bridge -portfolio "<EXACT_PORTFOLIO_REPOSITORY_PATH>" -feature <FEATURE_ID> -plan "<PORTFOLIO_RELATIVE_IMPLEMENTATION_PLAN_PATH>" -solution "<EXACT_CHILD_SOLUTION_REPOSITORY_PATH>" -assignment "<ASSIGNMENT_KEY>"'
+    foreach ($bridgeRule in @($sweBridgeSignature, 'complete P70 exit gate', 'Never accept a direct user invocation', '/fork', 'exact thread-fork equivalent', 'fork may omit the active turn', '$swe-design -auto-approve', '$swe-implement', '$swe-validate -auto-approve', 'must not create, replace, update, complete, or block any Goal', 'Dispatch alone')) {
+        if ($sweBridgeSkillText -notmatch [regex]::Escape($bridgeRule)) { Add-Failure "swe-bridge contract lacks '$bridgeRule'." }
+    }
+    if ($sweBridgeUiText -notmatch [regex]::Escape('$swe-bridge') -or $sweBridgeUiText -notmatch '(?m)^\s*allow_implicit_invocation:\s*false\s*$') {
+        Add-Failure "swe-bridge must be explicit-only and identify itself in UI metadata: $sweBridgeUiPath"
+    }
+    foreach ($promptRule in @('[ROOT_GOAL_ID_AND_OBJECTIVE]', '[EXACT_CHILD_SOLUTION_REPOSITORY_PATH]', '[SELECTED_ENTRY]', 'P70 complete', '$swe-design -auto-approve', '$swe-implement', '$swe-validate -auto-approve', 'Do not create, replace, update, complete, or block any Goal', 'Dispatch alone is never completion')) {
+        if ($sweBridgePromptText -notmatch [regex]::Escape($promptRule)) { Add-Failure "swe-bridge prompt contract lacks '$promptRule'." }
+    }
+    if ($sweBridgePromptText -match '\[[A-Z0-9_]+\]' -and $sweBridgePromptText -notmatch 'Replace every bracketed placeholder') {
+        Add-Failure "swe-bridge prompt placeholders lack explicit rendering instructions: $sweBridgePromptPath"
+    }
 }
 
 $scaffoldReferences = Join-Path $skillsRoot 'swe-scaffold\references'
@@ -471,7 +517,6 @@ foreach ($scaffoldName in @('portfolio', 'solution')) {
     Test-ContextLayout -ScaffoldRoot $referenceRoot -ScaffoldName $scaffoldName
 }
 
-$workspaceRoot = Split-Path -Parent (Split-Path -Parent $PluginRoot)
 $repositoryAgentGuidePath = Join-Path $workspaceRoot 'AGENTS.md'
 $repositoryReadmePath = Join-Path $workspaceRoot 'README.md'
 if (-not (Test-Path -LiteralPath $repositoryAgentGuidePath -PathType Leaf)) {
@@ -569,6 +614,9 @@ if (Test-Path -LiteralPath (Split-Path -Parent $prototypeSkillRoot) -PathType Co
             }
             if (($utilityManifest.interface.defaultPrompt -join "`n") -notmatch [regex]::Escape('$prototype -on')) {
                 Add-Failure "SWE Utility manifest does not advertise prototype mode: $utilityManifestPath"
+            }
+            if (($utilityManifest.interface.defaultPrompt -join "`n") -match [regex]::Escape('$swe-bridge')) {
+                Add-Failure "SWE Utility manifest must not advertise internal-only swe-bridge: $utilityManifestPath"
             }
         } catch {
             Add-Failure "Invalid SWE Utility manifest: $($_.Exception.Message)"
@@ -756,4 +804,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Output "Validated 15 process skills, 18 canonical templates, swe-max orchestration, swe-comment delegation, Prototype Mode integration, lifecycle/config/role semantics, phase gates, scaffold behavior, agent registries, and available source/reference parity at $PluginRoot"
+Write-Output "Validated 15 process skills, 18 canonical templates, swe-max orchestration and swe-bridge handoff, swe-comment delegation, Prototype Mode integration, lifecycle/config/role semantics, phase gates, scaffold behavior, agent registries, and available source/reference parity at $PluginRoot"

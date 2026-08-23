@@ -5,12 +5,12 @@
   "author": {
     "name": "Ghostworx.ai, LLC"
   },
-  "keywords": ["utility", "software-engineering", "orchestration", "prototype", "review", "versioning"],
+  "keywords": ["utility", "software-engineering", "orchestration", "handoff", "fork", "prototype", "review", "versioning"],
   "skills": "./skills/",
   "interface": {
     "displayName": "SWE Utilities",
     "shortDescription": "Software engineering utility skills",
-    "longDescription": "Provides reusable discovery, review, orchestration, prototype-first delivery, style, domain-modeling, and versioning workflows.",
+    "longDescription": "Provides reusable discovery, review, orchestration, cross-repository delivery handoff, prototype-first delivery, style, domain-modeling, and versioning workflows.",
     "developerName": "Ghostworx.ai, LLC",
     "category": "Productivity",
     "capabilities": ["Read", "Write"],

@@ -20,7 +20,7 @@ $swe-max "<idea-for-an-epic>"
 - The quoted idea form preserves the trimmed idea as the resolved Goal title, then creates one new Epic through `$swe-new-epic`.
 - Do not accept any alias, infer this skill from an ordinary lifecycle request, or silently reinterpret one mode as the other.
 
-An explicit invocation authorizes ordinary reversible repository-local authoring, implementation, testing, validation, bounded subagent delegation, and supported dedicated child-solution tasks within the resolved repositories. It does not authorize deployment, publishing, releases, dependency upgrades, credentials, destructive operations, external mutations, Git history changes, or work outside the current sandbox and approval mode.
+An explicit invocation authorizes ordinary reversible repository-local authoring, implementation, testing, validation, bounded subagent delegation, supported session forks, and dedicated child-solution tasks within the resolved repositories. It does not authorize deployment, publishing, releases, dependency upgrades, credentials, destructive operations, external mutations, Git history changes, or work outside the current sandbox and approval mode.
 
 ## Formal Goal Bootstrap
 
@@ -47,6 +47,7 @@ Only the primary `swe-max` coordinator owns this root Goal. Nested orchestration
 - Read [the orchestration state machine](references/ORCHESTRATION.md) after Goal creation and before Preflight. Execute it in strict order, resuming at the earliest incomplete lawful state when prior work is valid.
 - Apply [the artifact contract](../../references/ARTIFACT-CONTRACT.md) and the invoked skill's own contract at every phase. The narrower contract wins when it imposes an additional entry gate or repository boundary.
 - Invoke `$orchestrate -complex` only for bounded sub-orchestrations inside the primary sequence. Never delegate the entire lifecycle to one orchestration.
+- After the complete P70 exit gate passes, invoke `$swe-bridge` once for each child assignment to fork a self-contained handoff into the exact assigned solution. Do not handwrite or bypass the bridge prompt contract.
 - In `-epic` mode, the delivery set includes every non-superseded unfinished Feature required by the Epic outcomes, not only Features created during this run. Reuse completed delivery only after verifying its artifacts, evidence, checks, and decisions.
 - Every Feature or successor added to the delivery set must be concrete, accepted, fully implemented in code, evidenced, locally validated for every assignment, and independently validated at portfolio scope.
 - Preserve exact criteria as `(Epic ID, Feature ID, AC-NNN)` while carrying the literal Feature-local `AC-NNN` value unchanged through Plan, Design, Evidence, and Validation.
@@ -65,7 +66,7 @@ Advance only when the current state's artifacts and exit gate are verified:
 6. Approved Target architecture, ADRs, and contracts at every required scope through `$swe-architect -auto-approve` and an independent agent invoking `$swe-architect -review [ARTIFACT_PATH] -auto-approve`.
 7. Accepted concrete Features through `$swe-plan-features -auto-approve`.
 8. Accepted portfolio Implementation Plans for every Feature through `$swe-plan-implementation -auto-approve`.
-9. Child delivery in the exact assigned repository: `$swe-design -auto-approve`, independent Design decision, `$swe-implement`, complete `EVIDENCE.md`, then independent local `$swe-validate -auto-approve`.
+9. At the P70-to-P80 boundary, invoke `$swe-bridge` for each assignment. The fork dynamically enters at `$swe-design -auto-approve` or, when a current independently accepted Design already exists, `$swe-implement`; it must complete `EVIDENCE.md` and independent local `$swe-validate -auto-approve` in the exact child repository.
 10. All-coded inventory gate.
 11. Post-implementation `$swa-analyze` over portfolio and child evidence.
 12. Governed remediation of every major finding, including successor artifacts and fully delivered remediation Features when required.
@@ -84,8 +85,9 @@ Before concluding that progress cannot continue, attempt one bounded `$orchestra
 ## Resource Routing
 
 - Always read [references/ORCHESTRATION.md](references/ORCHESTRATION.md) before routing agents or entering Preflight.
+- Invoke `$swe-bridge` only through the exact internal signature in the orchestration reference and only after the complete Implementation Plan stage exits P70.
 - Read [references/COMPLETION-CONTRACT.md](references/COMPLETION-CONTRACT.md) at the all-coded gate, on any failed approval or unavailable required capability, when Evidence is missing, before and after architectural remediation, and before any Goal update.
 
 ## Final Handoff
 
-Report the Epic and Goal identity, final state, Feature and assignment inventory, durable artifact locators, approval identities and decisions, exact validation results, architectural analysis and remediation status, child-task disposition, and residual blockers. Mark the root Goal `complete` only after every completion invariant is verified. Mark it `blocked` only when the active Goal mechanism's recurrence threshold is satisfied; otherwise preserve the active Goal and the safest continuation point.
+Report the Epic and Goal identity, final state, Feature and assignment inventory, durable artifact locators, approval identities and decisions, exact validation results, architectural analysis and remediation status, bridge and child-task disposition, and residual blockers. Mark the root Goal `complete` only after every completion invariant is verified. Mark it `blocked` only when the active Goal mechanism's recurrence threshold is satisfied; otherwise preserve the active Goal and the safest continuation point.

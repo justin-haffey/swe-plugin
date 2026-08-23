@@ -1,0 +1,8 @@
+interface:
+  display_name: "Bridge SWE Delivery"
+  short_description: "Fork portfolio context into child delivery"
+  default_prompt: "Use $swe-bridge only from an active $swe-max run to fork an accepted portfolio assignment into its exact child solution."
+
+policy:
+  allow_implicit_invocation: false
+
