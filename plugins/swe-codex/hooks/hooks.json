@@ -1,0 +1,20 @@
+{
+  "description": "Request a governed repository wrap-up after a Codex goal completes.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "^update_goal$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$PLUGIN_ROOT/hooks/goal-complete.mjs\"",
+            "commandWindows": "node \"%PLUGIN_ROOT%\\hooks\\goal-complete.mjs\"",
+            "timeout": 10,
+            "statusMessage": "Preparing repository wrap-up",
+            "additionalContextLimit": 1200
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Comment Changed Code"
+  short_description: "Document changed code from Git context"
+  default_prompt: "Use $swe-comment to document the new or modified code in my current Git changes."
+
+policy:
+  allow_implicit_invocation: true

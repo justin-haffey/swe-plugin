@@ -1,15 +1,15 @@
 # SWE Plugin
 
-SWE Plugin is a source repository for Codex customizations that make a software-engineering process portable, reviewable, and usable across a portfolio repository and its child solution repositories. Version 2.0.1 centers on a governed artifact flow: portfolio intent becomes an Epic, research, accepted architecture and Features; solution repositories turn allocated work into Design, code, evidence, and validation.
+SWE Plugin is a source repository for Codex customizations that make a software-engineering process portable, reviewable, and usable across a portfolio repository and its child solution repositories. Version 2.0.2 centers on a governed artifact flow: portfolio intent becomes an Epic, research, accepted architecture and Features; solution repositories turn allocated work into Design, code, evidence, and validation.
 
-The repository contains four plugins. `swe-process` is the primary v2 package. `swe-codex` provides focused authoring workflows for Codex plugins, skills, and agents, `swe-utility` contains reusable supporting skills, and `swa-analyze` provides portfolio-focused strategic architecture analysis.
+The repository contains four plugins. `swe-process` is the primary v2 package. `swe-codex` provides focused authoring workflows for Codex plugins, skills, and agents plus a goal-completion repository wrap-up hook, `swe-utility` contains reusable supporting skills, and `swa-analyze` provides portfolio-focused strategic architecture analysis.
 
 ## Repository layout
 
 ```text
 plugins/
   swe-process/        v2 engineering-process skills, templates, validator, and scaffold copier
-  swe-codex/          Codex plugin, skill, and agent authoring skills
+  swe-codex/          Codex authoring skills and goal-completion wrap-up hook
   swe-utility/        reusable supporting skills
   swa-analyze/        strategic software-architecture analysis router and lenses
 scaffolds/
@@ -22,7 +22,7 @@ tmp/task-materials/   design inputs used to develop v2; not shipped process auth
 
 ## SWE Process v2
 
-`swe-process` deliberately has a clean, 14-skill roster:
+`swe-process` deliberately has a clean, 15-skill roster:
 
 | Phase | Skill | Outcome |
 | --- | --- | --- |
@@ -36,6 +36,7 @@ tmp/task-materials/   design inputs used to develop v2; not shipped process auth
 | Allocation | `$swe-plan-implementation` | Creates the portfolio-owned implementation handoff beside a Feature. |
 | Solution design | `$swe-design` | Creates local Design for an allocated implementation. |
 | Delivery | `$swe-implement` | Implements approved Design and records Evidence. |
+| Code documentation | `$swe-comment` | Documents changed source using Git context and behavior-preserving comments. |
 | Verification | `$swe-validate` | Independently validates local delivery or integrated portfolio acceptance evidence. |
 | Fast path | `$swe-bugfix` | Records a bounded solution-local defect correction. |
 | Fast path | `$swe-enhancement` | Records a bounded solution-local improvement. |
@@ -72,17 +73,24 @@ The skill copies from its own `references/portfolio/` or `references/solution/` 
 
 The portfolio scaffold includes platform-focused Codex agents and governance. The solution scaffold includes solution, package, and module architecture/development agents, implementation specialists, and an independent solution validator. Both install a repository-local `.codex` configuration, starter README/AGENTS guidance, version source, and governed artifact directories.
 
+## Goal completion wrap-up
+
+When the installed `swe-codex` plugin observes a successful goal completion, its trusted `PostToolUse` hook requests `$repo-wrap-up` before the final response. The skill attempts the repository's `repo-author` agent first and falls back to a built-in `worker` subagent when that role is unavailable. The wrap-up inspects the attributable Git diff and relevant lifecycle artifacts, reconciles human-facing README files, changes AGENTS files only for durable governance changes, runs repository-native checks, and pauses with an exact user-review handoff.
+
+Hook trust remains explicit in Codex. The wrap-up never stages, commits, pushes, tags, releases, deploys, changes versions, rewrites history, or absorbs ambiguous unrelated worktree changes.
+
 ## Development and validation
 
 No package-manager build is required; the distributable surface is plugin metadata, Markdown skills/templates, scaffold files, PowerShell, and TOML configuration. Work from the repository root and validate v2 process changes with:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swe-process\scripts\Test-SweProcess.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swe-codex\scripts\Test-SweCodex.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swa-analyze\scripts\Test-SwaAnalyze.ps1
 git diff --check
 ```
 
-The first command validates the exact process-skill roster, required resources, template metadata and traceability contracts, Prototype Mode integration, lifecycle and phase-gate semantics, the current multi-agent feature plus the repository-required v2 workflow selector, role/skill authority, scaffold references, and agent registrations. Run it again after changing a process template, scaffold, or `swe-scaffold` reference. For all packages, validate JSON manifests, SKILL front matter, relative links, and affected TOML registrations before handing off changes.
+The process command validates the exact process-skill roster, required resources, template metadata and traceability contracts, Prototype Mode integration, lifecycle and phase-gate semantics, the current multi-agent feature plus the repository-required v2 workflow selector, role/skill authority, scaffold references, and agent registrations. The SWE Codex command validates the goal-completion hook, handler behavior, plugin registration, and `$repo-wrap-up` bundle. Run the process command again after changing a process template, scaffold, or `swe-scaffold` reference. For all packages, validate JSON manifests, SKILL front matter, relative links, and affected TOML registrations before handing off changes.
 
 ## Extending the plugins
 

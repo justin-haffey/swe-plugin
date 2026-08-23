@@ -122,6 +122,12 @@ upstream:
 
 Use a fast path only for a bounded local change. Escalate a bugfix or enhancement into the main flow if it changes Feature intent, a cross-solution contract, or accepted architecture.
 
+## Goal Completion Wrap-Up
+
+When the trusted goal-completion hook assigns `$repo-wrap-up`, attempt `repo-author` first and use a built-in `worker` subagent only if that role is unavailable. The hook grants bounded repository documentation edits and validation only. It does not grant staging, commit, version, tag, push, release, deployment, history-rewrite, or unrelated-change authority.
+
+The wrap-up must inspect the live status and staged/unstaged diff, read relevant local Design, Evidence, Validation, fast-path, and architecture artifacts, update `README.md` when human-facing guidance changed, and edit this `AGENTS.md` only when a durable governance, ownership, workflow, validation, or safety requirement changed. It must not stage or commit. Report the exact review paths, checks, preserved unrelated changes, or the blocker, then pause for user review.
+
 ## Safety and Validation
 
 - Do not deploy, publish, release, alter production data, expose credentials, force-push, or delete user work without separate explicit authorization.

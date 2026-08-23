@@ -112,7 +112,7 @@ function Test-ContextLayout {
 $expectedSkills = @(
     'swe-max', 'swe-new-epic', 'swe-research', 'swe-conceptualize', 'swe-assess-architecture',
     'swe-architect', 'swe-plan-features', 'swe-plan-implementation', 'swe-design',
-    'swe-implement', 'swe-validate', 'swe-bugfix', 'swe-enhancement', 'swe-scaffold'
+    'swe-implement', 'swe-comment', 'swe-validate', 'swe-bugfix', 'swe-enhancement', 'swe-scaffold'
 )
 $templateContract = [ordered]@{
     'skills\swe-new-epic\references\EPIC-TEMPLATE.md' = @('epic', 'Draft')
@@ -160,12 +160,15 @@ $manifestPath = Join-Path $PluginRoot '.codex-plugin\plugin.json'
 try {
     $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
     if ($manifest.name -ne 'swe-process') { Add-Failure "Manifest name must be swe-process: $manifestPath" }
-    if ($manifest.version -ne '2.0.1') { Add-Failure "Manifest version must be 2.0.1: $manifestPath" }
+    if ($manifest.version -ne '2.0.2') { Add-Failure "Manifest version must be 2.0.2: $manifestPath" }
     if ($manifest.author.name -ne 'Ghostworx.ai, LLC' -or $manifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
         Add-Failure "Manifest publisher must be Ghostworx.ai, LLC: $manifestPath"
     }
     if (($manifest.interface.defaultPrompt -join "`n") -notmatch [regex]::Escape('$swe-max')) {
         Add-Failure "Manifest defaultPrompt must advertise swe-max: $manifestPath"
+    }
+    if (($manifest.interface.defaultPrompt -join "`n") -notmatch [regex]::Escape('$swe-comment')) {
+        Add-Failure "Manifest defaultPrompt must advertise swe-comment: $manifestPath"
     }
 } catch {
     Add-Failure "Invalid plugin manifest: $($_.Exception.Message)"
@@ -174,7 +177,7 @@ try {
 $skillsRoot = Join-Path $PluginRoot 'skills'
 $actualSkills = @(Get-ChildItem -LiteralPath $skillsRoot -Directory | ForEach-Object Name | Sort-Object)
 if (Compare-Object -ReferenceObject @($expectedSkills | Sort-Object) -DifferenceObject $actualSkills) {
-    Add-Failure 'Skill roster does not exactly match the 14-skill v2 roster.'
+    Add-Failure 'Skill roster does not exactly match the 15-skill v2 roster.'
 }
 
 foreach ($skillName in $expectedSkills) {
@@ -198,6 +201,23 @@ foreach ($skillName in $expectedSkills) {
         if (-not $shortMatch.Success -or $shortMatch.Groups[1].Value.Length -lt 25 -or $shortMatch.Groups[1].Value.Length -gt 64) {
             Add-Failure "short_description must be 25-64 characters: $uiPath"
         }
+    }
+}
+
+$sweCommentRoot = Join-Path $skillsRoot 'swe-comment'
+$sweCommentSkillPath = Join-Path $sweCommentRoot 'SKILL.md'
+$sweCommentGuidePath = Join-Path $sweCommentRoot 'references\COMMENTING-GUIDE.md'
+if (Test-Path -LiteralPath $sweCommentSkillPath -PathType Leaf) {
+    $sweCommentText = Get-Content -Raw -LiteralPath $sweCommentSkillPath
+    foreach ($commentRule in @('$swe-comment', 'git status --short', 'git diff --name-status -M', 'git log -n 5 --follow', '`spawn_agent` operation', '`code-commenter` role', 'built-in `worker` subagent', 'behavior-preserving')) {
+        if ($sweCommentText -notmatch [regex]::Escape($commentRule)) { Add-Failure "swe-comment contract lacks '$commentRule'." }
+    }
+    if ($sweCommentText -notmatch [regex]::Escape('references/COMMENTING-GUIDE.md')) { Add-Failure 'swe-comment does not route to its commenting guide.' }
+}
+if (Test-Path -LiteralPath $sweCommentGuidePath -PathType Leaf) {
+    $sweCommentGuideText = Get-Content -Raw -LiteralPath $sweCommentGuidePath
+    foreach ($guideRule in @('public APIs', 'current implementation', 'do not guess', 'only comments, doc comments, or docstrings')) {
+        if ($sweCommentGuideText -notmatch [regex]::Escape($guideRule)) { Add-Failure "swe-comment guide lacks '$guideRule'." }
     }
 }
 
@@ -454,15 +474,20 @@ foreach ($scaffoldName in @('portfolio', 'solution')) {
 $workspaceRoot = Split-Path -Parent (Split-Path -Parent $PluginRoot)
 $repositoryAgentGuidePath = Join-Path $workspaceRoot 'AGENTS.md'
 $repositoryReadmePath = Join-Path $workspaceRoot 'README.md'
-if (-not (Test-Path -LiteralPath $repositoryAgentGuidePath -PathType Leaf) -or (Get-Content -Raw -LiteralPath $repositoryAgentGuidePath) -notmatch [regex]::Escape('swe-max')) {
-    Add-Failure "Repository agent guide does not include swe-max in the authoritative roster: $repositoryAgentGuidePath"
+if (-not (Test-Path -LiteralPath $repositoryAgentGuidePath -PathType Leaf)) {
+    Add-Failure "Repository agent guide is missing: $repositoryAgentGuidePath"
+} else {
+    $repositoryAgentGuideText = Get-Content -Raw -LiteralPath $repositoryAgentGuidePath
+    if ($repositoryAgentGuideText -notmatch [regex]::Escape('swe-max') -or $repositoryAgentGuideText -notmatch [regex]::Escape('swe-comment')) {
+        Add-Failure "Repository agent guide does not include swe-max and swe-comment in the authoritative roster: $repositoryAgentGuidePath"
+    }
 }
 if (-not (Test-Path -LiteralPath $repositoryReadmePath -PathType Leaf)) {
     Add-Failure "Repository README is missing: $repositoryReadmePath"
 } else {
     $repositoryReadmeText = Get-Content -Raw -LiteralPath $repositoryReadmePath
-    if ($repositoryReadmeText -notmatch [regex]::Escape('14-skill roster') -or $repositoryReadmeText -notmatch [regex]::Escape('$swe-max')) {
-        Add-Failure "Repository README does not catalog the 14-skill roster with swe-max: $repositoryReadmePath"
+    if ($repositoryReadmeText -notmatch [regex]::Escape('15-skill roster') -or $repositoryReadmeText -notmatch [regex]::Escape('$swe-max') -or $repositoryReadmeText -notmatch [regex]::Escape('$swe-comment')) {
+        Add-Failure "Repository README does not catalog the 15-skill roster with swe-max and swe-comment: $repositoryReadmePath"
     }
 }
 $sourceScaffoldsRoot = Join-Path $workspaceRoot 'scaffolds'
@@ -539,7 +564,7 @@ if (Test-Path -LiteralPath (Split-Path -Parent $prototypeSkillRoot) -PathType Co
     if (Test-Path -LiteralPath $utilityManifestPath -PathType Leaf) {
         try {
             $utilityManifest = Get-Content -Raw -LiteralPath $utilityManifestPath | ConvertFrom-Json
-            if ($utilityManifest.version -ne '2.0.1' -or $utilityManifest.author.name -ne 'Ghostworx.ai, LLC' -or $utilityManifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
+            if ($utilityManifest.version -ne '2.0.2' -or $utilityManifest.author.name -ne 'Ghostworx.ai, LLC' -or $utilityManifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
                 Add-Failure "SWE Utility manifest version or publisher is invalid: $utilityManifestPath"
             }
             if (($utilityManifest.interface.defaultPrompt -join "`n") -notmatch [regex]::Escape('$prototype -on')) {
@@ -731,4 +756,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Output "Validated 14 process skills, 18 canonical templates, swe-max orchestration, Prototype Mode integration, lifecycle/config/role semantics, phase gates, scaffold behavior, agent registries, and available source/reference parity at $PluginRoot"
+Write-Output "Validated 15 process skills, 18 canonical templates, swe-max orchestration, swe-comment delegation, Prototype Mode integration, lifecycle/config/role semantics, phase gates, scaffold behavior, agent registries, and available source/reference parity at $PluginRoot"

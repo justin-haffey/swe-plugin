@@ -1,6 +1,6 @@
 {
   "name": "swa-analyze",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Strategic software-architecture analysis of existing engineering artifacts and codebases.",
   "author": {
     "name": "Ghostworx.ai, LLC"
