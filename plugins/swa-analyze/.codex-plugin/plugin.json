@@ -18,6 +18,8 @@
       "Use $swa-analyze to select the best strategic lenses for this architecture question.",
       "Use a specific $swa-* strategy when the desired analysis lens is already known."
     ],
-    "brandColor": "#6D28D9"
+    "brandColor": "#6D28D9",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png"
   }
 }
