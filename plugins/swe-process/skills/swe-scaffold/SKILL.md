@@ -38,7 +38,7 @@ Exactly one scaffold switch is required. Do not infer portfolio versus solution 
 
 - The script exits successfully and reports a summary.
 - Every source file is either created or reported as an existing skipped file.
-- Portfolio runs contain the 8-agent portfolio catalog; solution runs contain the 17-agent solution catalog.
+- Portfolio runs contain the 8-agent portfolio catalog; solution runs contain the 18-agent solution catalog, including an independent `solution-validator`.
 - Portfolio runs keep `CONTEXT-MAP.md` at the root, place its three routed vocabularies under `.swe/context/`, and never leave legacy root duplicates.
 - No source file is silently omitted and no existing destination file changes.
 

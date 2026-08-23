@@ -11,7 +11,7 @@ Apply the lifecycle, approval, locator, and acceptance-ID rules in [the artifact
 
 ## Workflow
 
-1. Resolve the approved `FEATURE.md`, platform architecture, affected solution architecture locators, and contracts.
+1. Resolve the `Accepted` `FEATURE.md`, platform architecture, affected solution architecture locators, and contracts. Require every applicable architecture artifact to have an `Accepted` Approval Record before allocating implementation.
 2. For each implementing repository, define the assigned outcome, boundaries, package/module hints, dependencies, contract obligations, sequencing, and evidence expected back. Preserve every covered `AC-NNN` ID verbatim.
 3. Write `IMPLEMENTATION-PLAN.md` beside the Feature using [references/IMPLEMENTATION-PLAN-TEMPLATE.md](references/IMPLEMENTATION-PLAN-TEMPLATE.md).
 4. Use dual locators for every assignment: repository identifier or URL, artifact ID, repository-relative path, and optional revision. Add a Markdown link when the target is reachable.

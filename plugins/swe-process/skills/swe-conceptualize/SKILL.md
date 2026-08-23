@@ -11,7 +11,7 @@ Apply the lifecycle, approval, and locator rules in [the artifact contract](../.
 
 ## Workflow
 
-1. Resolve the portfolio Epic and read its `EPIC.md` plus relevant `RESEARCH/` artifacts.
+1. Resolve the portfolio Epic and require its `EPIC.md` to be `Accepted`; then read relevant `RESEARCH/` artifacts. Stop before authoring when the Epic is not accepted.
 2. Create `.swe/epics/NNN-short-name/CONCEPT.md` from [references/CONCEPT-TEMPLATE.md](references/CONCEPT-TEMPLATE.md).
 3. Define shared language, actors, domain boundaries, capabilities, relationships, invariants, scenarios, and open questions.
 4. Link every material claim to its Epic or research source. Keep technology and implementation choices out unless they are explicit constraints.

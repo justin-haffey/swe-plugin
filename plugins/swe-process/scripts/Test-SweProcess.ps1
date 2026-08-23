@@ -284,6 +284,65 @@ if (-not (Test-Path -LiteralPath $contractPath -PathType Leaf)) {
     foreach ($requiredText in @('Draft -> InReview -> Accepted -> Superseded', 'Target -> Implemented -> Current -> Superseded', 'Proposed -> Accepted -> Superseded', 'auto-approve', 'force')) {
         if ($contractText -notmatch [regex]::Escape($requiredText)) { Add-Failure "Artifact contract missing semantic rule '$requiredText'." }
     }
+    foreach ($requiredText in @('EO-001', 'Active -> Implemented -> Validated -> Closed', 'Decision: Waived', 'named independent validator')) {
+        if ($contractText -notmatch [regex]::Escape($requiredText)) { Add-Failure "Artifact contract missing fast-path or identifier rule '$requiredText'." }
+    }
+}
+
+$epicTemplatePath = Join-Path $skillsRoot 'swe-new-epic\references\EPIC-TEMPLATE.md'
+if (Test-Path -LiteralPath $epicTemplatePath -PathType Leaf) {
+    $epicTemplateText = Get-Content -Raw -LiteralPath $epicTemplatePath
+    if ($epicTemplateText -notmatch 'EO-001') { Add-Failure "Epic template must use stable Epic-local EO-001 outcomes: $epicTemplatePath" }
+    if ($epicTemplateText -match 'AC-001') { Add-Failure "Epic template must reserve AC-001 for Feature-local criteria: $epicTemplatePath" }
+}
+
+$lifecycleSkills = [ordered]@{
+    'swe-architect\SKILL.md' = @('Target', 'Implemented', 'Current')
+    'swe-validate\SKILL.md' = @('Accepted', 'Rejected', 'Blocked', 'Target', 'Implemented', 'Current')
+}
+foreach ($relativeSkill in $lifecycleSkills.Keys) {
+    $skillPath = Join-Path $skillsRoot $relativeSkill
+    if (-not (Test-Path -LiteralPath $skillPath -PathType Leaf)) { continue }
+    $skillText = Get-Content -Raw -LiteralPath $skillPath
+    foreach ($requiredToken in $lifecycleSkills[$relativeSkill]) {
+        if ($skillText -notmatch [regex]::Escape('`' + $requiredToken + '`')) {
+            Add-Failure "Lifecycle skill lacks canonical token '$requiredToken': $skillPath"
+        }
+        $illegalToken = '`' + $requiredToken.ToLowerInvariant() + '`'
+        if ($skillText -cmatch [regex]::Escape($illegalToken)) {
+            Add-Failure "Lifecycle skill contains illegal lowercase token '$illegalToken': $skillPath"
+        }
+    }
+}
+
+$fastPathTemplates = @(
+    (Join-Path $skillsRoot 'swe-bugfix\references\BUGFIX-TEMPLATE.md'),
+    (Join-Path $skillsRoot 'swe-enhancement\references\ENHANCEMENT-TEMPLATE.md')
+)
+foreach ($fastPathTemplate in $fastPathTemplates) {
+    if (-not (Test-Path -LiteralPath $fastPathTemplate -PathType Leaf)) { continue }
+    $fastPathText = Get-Content -Raw -LiteralPath $fastPathTemplate
+    foreach ($requiredField in @('Validation and Closure', 'Independent validation required', 'Implemented recorded', 'Validator', 'Independence', 'Decision', 'Validation recorded', 'Evidence', 'Closure owner', 'Closure recorded', 'Waiver rationale')) {
+        if ($fastPathText -notmatch [regex]::Escape($requiredField)) { Add-Failure "Fast-path template lacks '$requiredField': $fastPathTemplate" }
+    }
+}
+
+$phaseGateContract = [ordered]@{
+    'swe-conceptualize\SKILL.md' = @('EPIC.md', 'Accepted')
+    'swe-assess-architecture\SKILL.md' = @('Epic and Concept', 'Accepted')
+    'swe-architect\SKILL.md' = @('Accepted` Concept', 'Accepted` architecture-impact assessment')
+    'swe-plan-features\SKILL.md' = @('Accepted` `EPIC.md`', 'Accepted` `CONCEPT.md`', 'Accepted` Approval Record')
+    'swe-plan-implementation\SKILL.md' = @('Accepted` `FEATURE.md`', 'Accepted` Approval Record')
+    'swe-design\SKILL.md' = @('Feature and Implementation Plan to be `Accepted`', 'Accepted` Approval Record')
+    'swe-validate\SKILL.md' = @('Accepted` for Feature, Implementation Plan, Design', 'Complete` for Evidence', 'Blocked` validation')
+}
+foreach ($relativeSkill in $phaseGateContract.Keys) {
+    $skillPath = Join-Path $skillsRoot $relativeSkill
+    if (-not (Test-Path -LiteralPath $skillPath -PathType Leaf)) { continue }
+    $skillText = Get-Content -Raw -LiteralPath $skillPath
+    foreach ($requiredPhrase in $phaseGateContract[$relativeSkill]) {
+        if ($skillText -notmatch [regex]::Escape($requiredPhrase)) { Add-Failure "Phase gate '$requiredPhrase' is missing: $skillPath" }
+    }
 }
 
 $nonScaffoldFiles = @(Get-ChildItem -LiteralPath $PluginRoot -Recurse -File | Where-Object {
@@ -297,7 +356,7 @@ foreach ($canonicalName in @('PLATFORM-ARCHITECTURE.md', 'SOLUTION-ARCHITECTURE.
 }
 
 $portfolioRoster = @('codex_engineer', 'repo_author', 'platform_engineer', 'research_engineer', 'platform_architect', 'feature_validator', 'architecture_reviewer', 'integration_engineer')
-$solutionRoster = @('codex_engineer', 'repo_author', 'solution_architect', 'package_architect', 'module_architect', 'solution_developer', 'package_developer', 'module_developer', 'integration_engineer', 'architecture_reviewer', 'azure_engineer', 'azure_db_developer', 'csharp_developer', 'full_stack_developer', 'maf_developer', 'ui_designer', 'code_commenter')
+$solutionRoster = @('codex_engineer', 'repo_author', 'solution_architect', 'package_architect', 'module_architect', 'solution_developer', 'package_developer', 'module_developer', 'integration_engineer', 'architecture_reviewer', 'solution_validator', 'azure_engineer', 'azure_db_developer', 'csharp_developer', 'full_stack_developer', 'maf_developer', 'ui_designer', 'code_commenter')
 foreach ($scaffoldName in @('portfolio', 'solution')) {
     $referenceRoot = Join-Path $scaffoldReferences $scaffoldName
     $roster = if ($scaffoldName -eq 'portfolio') { $portfolioRoster } else { $solutionRoster }
@@ -323,6 +382,83 @@ if (Test-Path -LiteralPath $sourceScaffoldsRoot -PathType Container) {
         if (Compare-Object -ReferenceObject $sourceRecords -DifferenceObject $referenceRecords -Property Relative, Hash) {
             Add-Failure "Source/reference scaffold parity failed: $scaffoldName"
         }
+    }
+
+    $configPaths = @(
+        (Join-Path $workspaceRoot '.codex\config.toml'),
+        (Join-Path $sourceScaffoldsRoot 'portfolio\.codex\config.toml'),
+        (Join-Path $sourceScaffoldsRoot 'solution\.codex\config.toml'),
+        (Join-Path $scaffoldReferences 'portfolio\.codex\config.toml'),
+        (Join-Path $scaffoldReferences 'solution\.codex\config.toml')
+    )
+    foreach ($configPath in $configPaths) {
+        if (-not (Test-Path -LiteralPath $configPath -PathType Leaf)) { continue }
+        $configText = Get-Content -Raw -LiteralPath $configPath
+        $featuresMatch = [regex]::Match($configText, '(?ms)^\[features\]\s*\r?\n(?<body>.*?)(?=^\[|\z)')
+        if (-not $featuresMatch.Success -or $featuresMatch.Groups['body'].Value -notmatch '(?m)^multi_agent\s*=\s*true\s*$' -or $featuresMatch.Groups['body'].Value -notmatch '(?m)^multi_agent_v2\s*=\s*true\s*$' -or $featuresMatch.Groups['body'].Value -notmatch '(?m)^shell_tool\s*=\s*true\s*$') {
+            Add-Failure "Codex config must enable multi_agent, the repository-required multi_agent_v2 workflow, and shell_tool: $configPath"
+        }
+    }
+    $rootConfigPath = Join-Path $workspaceRoot '.codex\config.toml'
+    if (Test-Path -LiteralPath $rootConfigPath -PathType Leaf) {
+        $rootConfigText = Get-Content -Raw -LiteralPath $rootConfigPath
+        $warningMatch = [regex]::Match($rootConfigText, '(?m)^suppress_unstable_features_warning\s*=\s*true\s*$')
+        $firstSectionMatch = [regex]::Match($rootConfigText, '(?m)^\[')
+        if (-not $warningMatch.Success -or ($firstSectionMatch.Success -and $warningMatch.Index -gt $firstSectionMatch.Index)) {
+            Add-Failure "Root warning-suppression setting must be a top-level key: $rootConfigPath"
+        }
+    }
+
+    $availableSkillNames = @(Get-ChildItem -LiteralPath (Join-Path $workspaceRoot 'plugins') -Directory | ForEach-Object {
+        $packageSkills = Join-Path $_.FullName 'skills'
+        if (Test-Path -LiteralPath $packageSkills -PathType Container) {
+            Get-ChildItem -LiteralPath $packageSkills -Directory | ForEach-Object Name
+        }
+    } | Sort-Object -Unique)
+    $sourceAgentFiles = @(Get-ChildItem -LiteralPath $sourceScaffoldsRoot -Recurse -File -Filter '*.toml' | Where-Object { $_.FullName -match '[\\/]\.codex[\\/]agents[\\/]' })
+    foreach ($agentFile in $sourceAgentFiles) {
+        $agentText = Get-Content -Raw -LiteralPath $agentFile.FullName
+        foreach ($allocation in [regex]::Matches($agentText, '\$([a-z][a-z0-9-]+)')) {
+            $allocatedSkill = $allocation.Groups[1].Value
+            if ($availableSkillNames -notcontains $allocatedSkill) { Add-Failure "Agent allocation references a missing skill '$allocatedSkill': $($agentFile.FullName)" }
+        }
+    }
+
+    $implementationAgentNames = @('solution-developer.toml', 'package-developer.toml', 'module-developer.toml', 'integration-engineer.toml', 'azure-engineer.toml', 'azure-db-developer.toml', 'csharp-developer.toml', 'full-stack-developer.toml', 'maf-developer.toml', 'ui-designer.toml')
+    $solutionAgentRoot = Join-Path $sourceScaffoldsRoot 'solution\.codex\agents\swe'
+    foreach ($agentName in $implementationAgentNames) {
+        $agentPath = Join-Path $solutionAgentRoot $agentName
+        if ((Get-Content -Raw -LiteralPath $agentPath) -match [regex]::Escape('$swe-validate')) { Add-Failure "Implementation role must not own formal validation: $agentPath" }
+    }
+    $solutionValidatorPath = Join-Path $solutionAgentRoot 'solution-validator.toml'
+    if (-not (Test-Path -LiteralPath $solutionValidatorPath -PathType Leaf) -or (Get-Content -Raw -LiteralPath $solutionValidatorPath) -notmatch [regex]::Escape('$swe-validate')) {
+        Add-Failure 'Solution scaffold must register an independent solution-validator allocated to $swe-validate.'
+    }
+
+    $portfolioPlatformPath = Join-Path $sourceScaffoldsRoot 'portfolio\.codex\agents\swe\platform-engineer.toml'
+    if ((Get-Content -Raw -LiteralPath $portfolioPlatformPath) -match [regex]::Escape('$swe-validate')) {
+        Add-Failure "Portfolio implementation role must not own formal validation: $portfolioPlatformPath"
+    }
+
+    foreach ($reviewerPath in @(
+        (Join-Path $sourceScaffoldsRoot 'portfolio\.codex\agents\swe\architecture-reviewer.toml'),
+        (Join-Path $sourceScaffoldsRoot 'solution\.codex\agents\swe\architecture-reviewer.toml')
+    )) {
+        $reviewerText = Get-Content -Raw -LiteralPath $reviewerPath
+        if ($reviewerText -notmatch [regex]::Escape('$swe-architect -review') -or $reviewerText -match [regex]::Escape('$swe-validate')) {
+            Add-Failure "Architecture reviewer must use `$swe-architect -review and must not use `$swe-validate: $reviewerPath"
+        }
+    }
+
+    $portfolioIntegrationPath = Join-Path $sourceScaffoldsRoot 'portfolio\.codex\agents\swe\integration-engineer.toml'
+    $portfolioIntegrationText = Get-Content -Raw -LiteralPath $portfolioIntegrationPath
+    foreach ($forbiddenAllocation in @('$swe-design', '$swe-implement', '$swe-validate')) {
+        if ($portfolioIntegrationText -match [regex]::Escape($forbiddenAllocation)) { Add-Failure "Portfolio integration role crosses child authority with ${forbiddenAllocation}: $portfolioIntegrationPath" }
+    }
+
+    foreach ($governancePath in @((Join-Path $sourceScaffoldsRoot 'portfolio\AGENTS.md'), (Join-Path $sourceScaffoldsRoot 'solution\AGENTS.md'))) {
+        $governanceText = Get-Content -Raw -LiteralPath $governancePath
+        if ($governanceText -notmatch [regex]::Escape('## Phase and Role Matrix')) { Add-Failure "Scaffold governance lacks the phase and role matrix: $governancePath" }
     }
 }
 
@@ -390,4 +526,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Output "Validated 13 skills, 18 canonical templates, architecture diagram contracts, scaffold behavior, agent registries, and available source/reference parity at $PluginRoot"
+Write-Output "Validated 13 skills, 18 canonical templates, lifecycle/config/role semantics, phase gates, scaffold behavior, agent registries, and available source/reference parity at $PluginRoot"

@@ -1,5 +1,6 @@
 ﻿# AGENTS
 allow_login_shell = true
+suppress_unstable_features_warning = true
 
 [agents]
 max_concurrent_threads_per_session = 8
@@ -51,8 +52,7 @@ config_file = "agents/swe/ui-designer.toml"
 # FEATURES / FLAGS
 
 [features]
-suppress_unstable_features_warning = true
-
+multi_agent = true
 multi_agent_v2 = true
 shell_tool = true
 

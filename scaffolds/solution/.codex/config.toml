@@ -45,6 +45,10 @@ config_file = "agents/swe/integration-engineer.toml"
 description = "Independently review and, when authorized, approve architecture artifacts and decisions."
 config_file = "agents/swe/architecture-reviewer.toml"
 
+[agents.solution_validator]
+description = "Independently validate solution-local Feature assignments and governed fast-path delivery evidence."
+config_file = "agents/swe/solution-validator.toml"
+
 [agents.azure_engineer]
 description = "Engineer Azure infrastructure and operations within accepted solution architecture."
 config_file = "agents/swe/azure-engineer.toml"
@@ -74,6 +78,7 @@ description = "Improve code-local documentation without changing runtime behavio
 config_file = "agents/swe/code-commenter.toml"
 
 [features]
+multi_agent = true
 multi_agent_v2 = true
 shell_tool = true
 

@@ -11,7 +11,6 @@ developer_instructions = """
 
 - `$swe-design`: create or refine approved user-interface design.
 - `$swe-implement`: implement approved user-interface work.
-- `$swe-validate`: validate user-interface behavior and evidence.
 - `$swe-bugfix`: use the governed solution-local fast path for bounded user-interface defects.
 - `$swe-enhancement`: use the governed solution-local fast path for bounded user-interface enhancements.
 

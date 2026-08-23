@@ -30,19 +30,19 @@ tmp/task-materials/   design inputs used to develop v2; not shipped process auth
 | Discovery | `$swe-research` | Records bounded, traceable research. |
 | Intent | `$swe-conceptualize` | Produces an Epic-local Concept. |
 | Impact | `$swe-assess-architecture` | Determines architecture impact and next authority. |
-| Architecture | `$swe-architect` | Authors or reconciles Platform, Solution, Package, or Module architecture, ADRs, contracts, and system views. |
+| Architecture | `$swe-architect` | Authors, reconciles, or independently reviews Platform, Solution, Package, or Module architecture, ADRs, contracts, and system views. |
 | Definition | `$swe-plan-features` | Defines canonical portfolio Features and acceptance criteria. |
 | Allocation | `$swe-plan-implementation` | Creates the portfolio-owned implementation handoff beside a Feature. |
 | Solution design | `$swe-design` | Creates local Design for an allocated implementation. |
 | Delivery | `$swe-implement` | Implements approved Design and records Evidence. |
-| Verification | `$swe-validate` | Produces local validation and reconciliation evidence. |
+| Verification | `$swe-validate` | Independently validates local delivery or integrated portfolio acceptance evidence. |
 | Fast path | `$swe-bugfix` | Records a bounded solution-local defect correction. |
 | Fast path | `$swe-enhancement` | Records a bounded solution-local improvement. |
 | Initialization | `$swe-scaffold` | Additively extends an existing repository with a portfolio or solution scaffold. |
 
 Architecture is organized as `Platform -> Solution -> Package -> Module`. Systems are runtime or operational views within platform or solution architecture, rather than a separate architecture level. The portfolio owns Epics, Concepts, platform architecture, cross-solution contracts, canonical Features, and their adjacent Implementation Plans. A solution owns solution/package/module architecture, local Design, source, tests, Evidence, and local Validation.
 
-Every cross-repository handoff uses both a stable artifact ID and a repository-relative path, with an optional revision. This dual locator lets a child Solution retain a durable link to the portfolio Feature and Implementation Plan without copying or redefining them.
+Every cross-repository handoff uses both a stable artifact ID and a repository-relative path, with an optional revision. This dual locator lets a child Solution retain a durable link to the portfolio Feature and Implementation Plan without copying or redefining them. Implementation roles run checks and produce Evidence; independent `solution-validator` and `feature-validator` roles author formal Validation. Architecture reviewers use `$swe-architect -review`, not Feature validation.
 
 ## SWA Analyze
 
@@ -67,7 +67,7 @@ $swe-scaffold -solution
 
 The skill copies from its own `references/portfolio/` or `references/solution/` tree into the active repository (or an explicit destination). It creates missing files and merges folders, but never overwrites, truncates, deletes, renames, or relocates an existing destination file. Its report distinguishes created files from skipped existing files.
 
-The portfolio scaffold includes platform-focused Codex agents and governance. The solution scaffold includes solution, package, and module architecture/development agents along with implementation specialists. Both install a repository-local `.codex` configuration, starter README/AGENTS guidance, version source, and governed artifact directories.
+The portfolio scaffold includes platform-focused Codex agents and governance. The solution scaffold includes solution, package, and module architecture/development agents, implementation specialists, and an independent solution validator. Both install a repository-local `.codex` configuration, starter README/AGENTS guidance, version source, and governed artifact directories.
 
 ## Development and validation
 
@@ -79,7 +79,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swa-analyze\script
 git diff --check
 ```
 
-The first command validates the exact process-skill roster, required resources, template metadata and traceability contracts, the scaffold references, and their agent registrations. Run it again after changing a process template, scaffold, or `swe-scaffold` reference. For all packages, validate JSON manifests, SKILL front matter, relative links, and affected TOML registrations before handing off changes.
+The first command validates the exact process-skill roster, required resources, template metadata and traceability contracts, lifecycle and phase-gate semantics, the current multi-agent feature plus the repository-required v2 workflow selector, role/skill authority, scaffold references, and agent registrations. Run it again after changing a process template, scaffold, or `swe-scaffold` reference. For all packages, validate JSON manifests, SKILL front matter, relative links, and affected TOML registrations before handing off changes.
 
 ## Extending the plugins
 

@@ -21,7 +21,7 @@ portfolio intent and architecture
   -> canonical Feature
   -> portfolio-owned Implementation Plan
   -> child Solution Design, implementation Evidence, and local Validation
-  -> portfolio Feature acceptance
+  -> independent feature-validator makes the portfolio Feature acceptance decision
   -> architecture promotion
 ```
 

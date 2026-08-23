@@ -11,7 +11,6 @@ developer_instructions = """
 
 - `$swe-design`: create or refine approved C#/.NET design.
 - `$swe-implement`: implement approved C#/.NET work.
-- `$swe-validate`: validate C#/.NET behavior and evidence.
 - `$swe-bugfix`: use the governed solution-local fast path for bounded C#/.NET defects.
 - `$swe-enhancement`: use the governed solution-local fast path for bounded C#/.NET enhancements.
 

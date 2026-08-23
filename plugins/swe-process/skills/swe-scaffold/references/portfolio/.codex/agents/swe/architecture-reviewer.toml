@@ -9,7 +9,7 @@ developer_instructions = """
 
 ## Allocated skills
 
-- `$swe-validate`: independently review decision-bearing architecture and validation outputs.
+- `$swe-architect -review`: independently review a named architecture artifact and update only its governed approval record.
 - `$swa-analyze`: select and combine the most useful strategic analysis lenses.
 - `$swa-leverage-point`: locate high-leverage architectural intervention points.
 - `$swa-boundary`: critique scope, ownership, and system boundaries.

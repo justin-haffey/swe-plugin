@@ -11,7 +11,7 @@ Apply the lifecycle, approval, locator, and acceptance-ID rules in [the artifact
 
 ## Workflow
 
-1. Resolve the approved `EPIC.md`, `CONCEPT.md`, architecture-impact assessment, and applicable canonical architecture.
+1. Resolve the `Accepted` `EPIC.md`, `Accepted` `CONCEPT.md`, and `Accepted` architecture-impact assessment. Require applicable canonical architecture to be `Target` with an `Accepted` Approval Record before decomposing Features.
 2. Identify independently valuable capabilities with explicit scope, dependencies, quality needs, and observable acceptance criteria. Allocate stable Feature-local IDs `AC-001`, `AC-002`, and so on.
 3. Under the Epic's `features/`, allocate the next local three-digit directory for each Feature: `NNN-short-name/`. Do not reuse IDs.
 4. Create `FEATURE.md` from [references/FEATURE-TEMPLATE.md](references/FEATURE-TEMPLATE.md), using `FEATURE-NNN`; numbering is local to the Epic.

@@ -51,6 +51,21 @@ template_version: "2.0.0"
 |---|---|---|
 | [CHECK] | [PASS_FAIL_BLOCKED] | [REFERENCE] |
 
+## Validation and Closure
+
+| Field | Value |
+|---|---|
+| Independent validation required | [YES_OR_NO_WITH_RISK_BASIS] |
+| Implemented recorded | [ISO_8601_TIMESTAMP_OR_PENDING] |
+| Validator | [INDEPENDENT_VALIDATOR_OR_NONE] |
+| Independence | [CONFIRMED_OR_NOT_APPLICABLE_OR_BLOCKED] |
+| Decision | [PENDING_OR_ACCEPTED_OR_REJECTED_OR_BLOCKED_OR_WAIVED] |
+| Validation recorded | [ISO_8601_TIMESTAMP_OR_PENDING] |
+| Evidence | [VALIDATION_EVIDENCE_OR_NONE] |
+| Closure owner | [OWNER_OR_PENDING] |
+| Closure recorded | [ISO_8601_TIMESTAMP_OR_PENDING] |
+| Waiver rationale | [REQUIRED_WHEN_WAIVED_OR_NONE] |
+
 ## Residual Risk
 
 - [RISK_OR_NONE]

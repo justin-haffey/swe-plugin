@@ -7,8 +7,10 @@ Use these v2 conventions for every process artifact.
 - Use `snake_case` for `artifact_type` values and `PascalCase` for lifecycle `status` values.
 - Preserve stable IDs after creation. Paths are locators, not identities.
 - Every `upstream` locator contains `repository`, `artifact_id`, `path`, and optional `revision`.
+- Epic acceptance outcomes use stable Epic-local IDs `EO-001`, `EO-002`, and so on.
 - Feature acceptance criteria use stable Feature-local IDs `AC-001`, `AC-002`, and so on. Never renumber an accepted criterion; mark it superseded and add a new ID.
 - Downstream Implementation Plan, Design, Evidence, and Validation artifacts preserve the exact acceptance criterion IDs they cover.
+- A fast-path Enhancement may use local `AC-NNN` criteria inside its `ENHANCEMENT.md`; those IDs do not enter Feature traceability and must not be presented as Feature acceptance criteria.
 
 ## Legal lifecycle transitions
 
@@ -23,7 +25,9 @@ Decision-bearing work artifacts (`EPIC`, `CONCEPT`, `ARCHITECTURE-IMPACT`, `FEAT
 
 Canonical architecture uses `Target -> Implemented -> Current -> Superseded`. Approval accepts the Target without changing its lifecycle status. Promote to `Implemented` only with implementation evidence and to `Current` only with validation and reconciliation.
 
-ADRs and contracts use `Proposed -> Accepted -> Superseded` or `Proposed -> Rejected`. Validation uses `Draft -> InReview -> Accepted`, `Rejected`, or `Blocked`; a blocked validation may return to `InReview` when its blocker changes. Research and Evidence use `Complete` only when their recorded work is complete. Fast paths use `Active -> Implemented -> Validated -> Closed`, or `Active -> Escalated`.
+ADRs and contracts use `Proposed -> Accepted -> Superseded` or `Proposed -> Rejected`. Validation uses `Draft -> InReview -> Accepted`, `Rejected`, or `Blocked`; a blocked validation may return to `InReview` when its blocker changes. Research and Evidence use `Complete` only when their recorded work is complete.
+
+Fast paths normally use `Active -> Implemented -> Validated -> Closed`, or `Active -> Escalated`. `Validated` requires a named independent validator and durable decision evidence. Independent validation is mandatory for externally visible behavior and for security, data, identity, integration, migration, concurrency, or operational risk, as well as whenever repository policy requires it. A low-risk fast path may instead use `Active -> Implemented -> Closed` only when its owner records `Decision: Waived` and a concrete waiver rationale; it must never claim `Validated`. The fast-path record must identify the validator, independence, decision, evidence, transition timestamps, closure owner, and waiver rationale when applicable.
 
 ## Approval record
 

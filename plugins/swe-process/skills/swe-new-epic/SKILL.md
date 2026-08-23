@@ -18,7 +18,7 @@ Require an outcome or problem statement. Infer the repository role from `AGENTS.
 1. Inspect `.swe/epics/` and allocate the next three-digit number. Never reuse a retired number.
 2. Normalize the short name to lowercase hyphenated text.
 3. Create `.swe/epics/NNN-short-name/EPIC.md` from [references/EPIC-TEMPLATE.md](references/EPIC-TEMPLATE.md).
-4. Set `id: EPIC-NNN`, portfolio authority, stable parent/upstream locators, acceptance outcomes, constraints, and affected solutions.
+4. Set `id: EPIC-NNN`, portfolio authority, stable parent/upstream locators, stable Epic-local `EO-NNN` acceptance outcomes, constraints, and affected solutions. Reserve `AC-NNN` for Feature-local acceptance criteria.
 5. Create empty `RESEARCH/`, `features/`, and `decisions/` directories only when the repository preserves empty directories; otherwise let later skills create them.
 6. Validate links, identifiers, and placeholders. Do not create feature or architecture artifacts.
 

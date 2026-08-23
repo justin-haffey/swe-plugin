@@ -11,7 +11,6 @@ developer_instructions = """
 
 - `$swe-design`: create or refine approved Azure data design.
 - `$swe-implement`: implement approved Azure data work.
-- `$swe-validate`: validate Azure data behavior and evidence.
 - `$swe-bugfix`: use the governed solution-local fast path for bounded Azure data defects.
 - `$swe-enhancement`: use the governed solution-local fast path for bounded Azure data enhancements.
 

@@ -2,7 +2,6 @@
 name: loc
 description: Estimate lines of code for the current repository or an optional directory and create or update that directory's .swe/LOC.md report. Invoke when the user asks for a line-count estimate, LOC report, or $loc [DIRECTORY_PATH:OPTIONAL]. Use Codebase Memory Module.end_line values grouped by file type; do not pretend that graph coverage is an exact filesystem count.
 ---
-
 # Lines of Code
 
 Use this utility as `$loc [DIRECTORY_PATH:OPTIONAL]`. It measures the selected repository scope with Codebase Memory and maintains only the selected scope's `.swe/LOC.md`.
@@ -10,7 +9,7 @@ Use this utility as `$loc [DIRECTORY_PATH:OPTIONAL]`. It measures the selected r
 ## Scope and safety
 
 - Resolve an omitted `DIRECTORY_PATH` to the current repository/workspace root. Resolve a supplied path and stop if it does not exist or is outside the intended workspace.
-- This skill is independent of `swe-process`. Do not edit plugin manifests, process skills, scaffolds, README files, or any file other than the target `.swe/LOC.md` and its containing `.swe/` directory.
+- Do not edit plugin manifests, process skills, scaffolds, README files, or any file other than the target `.swe/LOC.md` and its containing `.swe/` directory.
 - Treat the result as an estimate. Never report graph totals as exact physical line counts.
 - Preserve existing `.swe/LOC.md` history and user-authored content. If the file is malformed or its ownership markers are missing, stop and explain instead of replacing it.
 

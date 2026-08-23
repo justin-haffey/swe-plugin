@@ -19,11 +19,11 @@ upstream canonical Feature
   -> upstream portfolio Implementation Plan
   -> accepted local architecture and Design
   -> code, tests, and EVIDENCE
-  -> local VALIDATION
+  -> independent solution-validator produces local VALIDATION
   -> architecture reconciliation and upstream handoff
 ```
 
-Every implementation scope retains dual locators for the upstream Feature and its portfolio-owned Implementation Plan. A local artifact may refine implementation, but it does not copy or redefine upstream intent or allocation.
+Every implementation scope retains dual locators for the upstream Feature and its portfolio-owned Implementation Plan. A local artifact may refine implementation, but it does not copy or redefine upstream intent or allocation. Implementation agents verify their changes and produce Evidence; an independent `solution-validator` makes the formal local validation decision.
 
 ## Extending This Scaffold
 

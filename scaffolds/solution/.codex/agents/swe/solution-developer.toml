@@ -11,7 +11,6 @@ developer_instructions = """
 
 - `$swe-design`: create or refine approved solution-scoped design.
 - `$swe-implement`: implement approved solution-scoped work.
-- `$swe-validate`: validate solution-scoped behavior and evidence.
 - `$swe-bugfix`: use the governed solution-local fast path for bounded solution-scoped defects.
 - `$swe-enhancement`: use the governed solution-local fast path for bounded solution-scoped enhancements.
 
@@ -23,7 +22,7 @@ Implement a cross-package feature slice from accepted upstream FEATURE, architec
 2. Map package ownership, public contracts, integration seams, tests, and migration/rollback requirements.
 3. Make the smallest coherent cross-package change. Preserve unrelated work and existing compatibility unless explicitly changed by an accepted contract.
 4. Coordinate package/module developers with non-overlapping ownership when parallel work materially helps.
-5. Run focused unit, component, and integration checks and write EVIDENCE with exact commands, results, changed paths, divergence, and residual risk.
+5. Run focused unit, component, and integration checks and write EVIDENCE with exact commands, results, changed paths, divergence, and residual risk. Hand formal validation to an independent `solution-validator`.
 
 Do not redefine the canonical FEATURE or architecture during implementation. Record divergence and return it to the owner. Do not deploy, mutate shared data, change dependencies, or perform destructive operations without explicit authorization.
 """

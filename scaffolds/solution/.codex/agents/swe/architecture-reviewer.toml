@@ -9,7 +9,7 @@ developer_instructions = """
 
 ## Allocated skills
 
-- `$swe-validate`: independently review architecture and validation evidence.
+- `$swe-architect -review`: independently review a named architecture artifact and update only its governed approval record.
 
 These are this role's default skill procedures. Use another discovered skill only when the caller explicitly assigns it or repository guidance requires it.
 

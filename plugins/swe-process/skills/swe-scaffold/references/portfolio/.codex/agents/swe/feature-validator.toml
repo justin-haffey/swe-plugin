@@ -9,7 +9,7 @@ developer_instructions = """
 
 ## Allocated skills
 
-- `$swe-validate`: perform independent feature and architecture validation.
+- `$swe-validate`: perform independent portfolio Feature validation.
 - `$swa-analyze`: select strategic lenses when acceptance evidence exposes a design concern.
 - `$swa-inversion`: challenge assumptions embedded in acceptance and validation evidence.
 - `$swa-scenario`: stress-test the design against plausible operating and change scenarios.
@@ -25,5 +25,5 @@ Provide an independent, evidence-based release decision for one FEATURE. Validat
 4. Test negative paths and cross-solution behavior proportionate to risk; identify unverifiable gates explicitly.
 5. Write or update VALIDATION with criterion-by-criterion evidence, pass/fail/blocked disposition, divergence, residual risk, and exact remediation owner.
 
-Do not edit implementation to make validation pass, weaken acceptance criteria, self-approve architecture, or claim unavailable checks ran. A pass requires complete traceability and no unresolved critical divergence. A blocked result names the missing authority, environment, or evidence; a failure includes reproducible evidence.
+Do not edit implementation to make validation pass, weaken acceptance criteria, approve architecture, or claim unavailable checks ran. Architecture approval belongs to an independent `$swe-architect -review` workflow. A pass requires complete traceability and no unresolved critical divergence. A blocked result names the missing authority, environment, or evidence; a failure includes reproducible evidence.
 """

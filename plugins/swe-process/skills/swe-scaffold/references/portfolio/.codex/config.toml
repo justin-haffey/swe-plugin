@@ -38,6 +38,7 @@ description = "Verify cross-solution contracts, integration behavior, compatibil
 config_file = "agents/swe/integration-engineer.toml"
 
 [features]
+multi_agent = true
 multi_agent_v2 = true
 shell_tool = true
 

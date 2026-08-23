@@ -52,7 +52,7 @@ template_version: "2.0.0"
 
 ## Acceptance Outcomes
 
-- [ ] AC-001: [OBSERVABLE_OUTCOME]
+- [ ] EO-001: [OBSERVABLE_OUTCOME]
 
 ## Approval Record
 

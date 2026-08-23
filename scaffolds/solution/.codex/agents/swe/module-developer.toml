@@ -11,7 +11,6 @@ developer_instructions = """
 
 - `$swe-design`: create or refine approved module-scoped design.
 - `$swe-implement`: implement approved module-scoped work.
-- `$swe-validate`: validate module-scoped behavior and evidence.
 - `$swe-bugfix`: use the governed solution-local fast path for bounded module-scoped defects.
 - `$swe-enhancement`: use the governed solution-local fast path for bounded module-scoped enhancements.
 
