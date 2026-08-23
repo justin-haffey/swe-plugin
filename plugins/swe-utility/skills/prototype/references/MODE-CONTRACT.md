@@ -45,11 +45,15 @@ Legal modes are:
 
 The primary agent is the sole writer of `STATE.md`. Use ISO 8601 UTC timestamps and repository-relative forward-slash paths. Preserve transition history. If the YAML header is malformed, has unresolved placeholders, names another repository, or conflicts with the body history, stop rather than replacing it.
 
+State `status` and `mode` must agree: `Active` with `On`, `Closing` with `Closing`, and `Inactive` with `Off`.
+
 ## Run identity and scope
 
 Generate a stable run ID such as `PROTOTYPE-RUN-20260823T021530Z`. If that ID already exists, append a short collision suffix. A run's scope must be equal to or narrower than the state scope.
 
 Keep one active run per repository state. A completed run may remain in history while the mode stays `On`; the next implementation request creates another run and updates `active_run`. Never reuse a reconciled run ID for unrelated work.
+
+Legal run `status` values are `Active`, `Reconciling`, `Reconciled`, `Blocked`, and developer-authorized `Cancelled`. Legal `backtracking_status` values are `Pending`, `InProgress`, `Complete`, `Blocked`, and `Cancelled`. Set both fields consistently during reconciliation.
 
 ## Durable records
 
@@ -62,6 +66,7 @@ For both records:
 - Use `snake_case` for `artifact_type` and `PascalCase` for `status` values.
 - Replace every `[UPPER_SNAKE_CASE]` placeholder before writing.
 - Preserve stable IDs and prior transition or evidence entries.
+- Update only the YAML header, the bounded `PROTOTYPE:STATE-SUMMARY` block, and rows inside the bounded transition history when changing state; preserve all prior transition rows.
 - Do not put an unescaped multiline developer instruction in YAML; preserve it in the fenced `Developer Instruction` body section.
 - Treat the records as operational evidence, not decision-bearing approval artifacts.
 

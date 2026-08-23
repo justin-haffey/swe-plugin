@@ -49,7 +49,7 @@ Implementation agents may test and produce Evidence, but they do not author form
 
 ## Procedure
 
-1. **Normalize the evidence.** Update the active `PROTOTYPE.md` with the exact developer instruction, repository and revision/worktree anchor, changed paths, checks actually run, observed behavior, embodied decisions, assumptions, divergences, and blockers. Preserve quoted text verbatim.
+1. **Normalize the evidence.** Set run `status` to `Reconciling` and `backtracking_status` to `InProgress`. Update the active `PROTOTYPE.md` with the exact developer instruction, repository and revision/worktree anchor, changed paths, checks actually run, observed behavior, embodied decisions, assumptions, divergences, and blockers. Preserve quoted text verbatim.
 2. **Classify scope and route.** Compare the prototype with current accepted Feature intent, contracts, and architecture. Select fast path or full lifecycle using the table above, and record the evidence for that choice.
 3. **Capture as-built delivery.** The implementation role creates or updates solution-owned `EVIDENCE.md`, or the chosen fast-path record, from verified results. It maps observed behaviors to tests and records failures or unrun checks plainly.
 4. **Reconstruct local intent.** The appropriate developer and architect create a Draft `DESIGN.md` that describes the behavior that now exists, alternatives still open, debt deliberately accepted for the prototype, and the changes required to make it production-ready. Reconcile affected architecture as `Target`; never relabel the implementation as approved architecture retroactively.
@@ -57,7 +57,7 @@ Implementation agents may test and produce Evidence, but they do not author form
 6. **Review reconstructed architecture.** An independent architecture reviewer compares the candidate Target with the as-built evidence and existing Current architecture. It records conflicts, debt, and required repair. Normal approval policy decides whether the Target is accepted; Prototype Mode does not.
 7. **Validate behavior independently.** A `solution-validator` checks the prototype against the reconstructed criteria, Design, architecture, and Evidence. A `feature-validator` performs portfolio acceptance only after all required child evidence and local validation exist. Record `Blocked` when criteria are still ambiguous rather than manufacturing a pass.
 8. **Reconcile differences.** For every mismatch, choose and record one of: repair implementation, revise Draft intent, create a Proposed architecture decision, defer as named debt with an owner, or block for a developer decision. Never edit an accepted artifact to make the history appear forward-governed.
-9. **Close the run.** Set the run header `backtracking_status` and body status to `Complete`, then set run `status` to `Reconciled` only when the route, artifacts, evidence, reviews, validation state, handoffs, and remaining decisions are all durable. Update the state transition/history. A blocked run prevents the mode from turning off.
+9. **Close the run.** Set the run header `backtracking_status` and body status to `Complete`, then set run `status` to `Reconciled` only when the route, artifacts, evidence, reviews, validation state, handoffs, and remaining decisions are all durable. If reconciliation itself cannot complete, set both fields to `Blocked`. Update the state transition/history. A blocked run prevents the mode from turning off.
 
 ## Exact orchestration example
 

@@ -24,7 +24,7 @@ Read [`references/MODE-CONTRACT.md`](references/MODE-CONTRACT.md) before changin
 2. Inspect `.swe/prototype/STATE.md` when it exists. If it is malformed, points at another repository, or contains an unknown mode, stop without replacing it.
 3. If the state is already `On`, reuse it and its open run. Do not create duplicate state or silently widen its scope.
 4. Otherwise, create `.swe/prototype/`, render `STATE.md` from [`references/STATE-TEMPLATE.md`](references/STATE-TEMPLATE.md), generate a unique `PROTOTYPE-RUN-[UTC_TIMESTAMP]` ID, and render `.swe/prototype/runs/[RUN_ID]/PROTOTYPE.md` from [`references/RUN-TEMPLATE.md`](references/RUN-TEMPLATE.md).
-5. Record the actor, ISO 8601 activation time, repository identity, repository-relative scope, active run ID, and the transition from `Off` to `On`. Replace every template placeholder.
+5. Record the actor, ISO 8601 activation time, repository identity, repository-relative scope, active run ID, and the transition from `Off` to `On`. Set state `status` to `Active`. Replace every template placeholder; use an explicit pending value when no implementation instruction has followed the mode invocation yet.
 6. Print this canonical sentinel as a standalone line:
 
    ```text
@@ -58,10 +58,10 @@ For every prototype request:
 ## Disable with `-off`
 
 1. Resolve and validate the same repository state used by `-on`. If no state exists or the state is already `Off`, make no files and print the canonical off-sentinel idempotently.
-2. Change a valid `On` state to `Closing` and record the transition. Do not emit the off-sentinel yet.
-3. Find every run under `.swe/prototype/runs/` whose status is not `Reconciled` or `Cancelled`. Follow [`references/BACKTRACKING.md`](references/BACKTRACKING.md) for each one.
+2. Change a valid `On` state to `Closing`, set state `status` to `Closing`, update the bounded state summary, and record the transition. Do not emit the off-sentinel yet.
+3. Find every run under `.swe/prototype/runs/` whose status is not `Reconciled` or `Cancelled`. Follow [`references/BACKTRACKING.md`](references/BACKTRACKING.md) for each one. If a run received no implementation instruction and changed nothing, the explicit `-off` request may mark it `Cancelled` with that reason instead of inventing backtracking work.
 4. If evidence, repository access, or required human direction blocks reconciliation, set the affected run to `Blocked`, leave state as `Closing`, report the blocker, and do not print an off-sentinel.
-5. After every open run is reconciled or explicitly cancelled by the developer, set `mode` to `Off`, clear `active_run`, record the deactivation actor and time, and append the transition without erasing history.
+5. After every open run is reconciled or explicitly cancelled by the developer, set `mode` to `Off`, set state `status` to `Inactive`, clear `active_run`, update the bounded state summary, record the deactivation actor and time, and append the transition without erasing history.
 6. Print this canonical sentinel as a standalone line:
 
    ```text

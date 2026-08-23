@@ -18,7 +18,9 @@ template_version: "2.0"
 ---
 # Prototype Mode State
 
+<!-- PROTOTYPE:STATE-SUMMARY:START -->
 Prototype Mode is on for the recorded repository scope. The active run is [`[RUN_ID]`](runs/[RUN_ID]/PROTOTYPE.md).
+<!-- PROTOTYPE:STATE-SUMMARY:END -->
 
 ## Transition History
 

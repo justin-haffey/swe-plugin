@@ -56,6 +56,8 @@ Decision-bearing artifacts default to named human approval. `-auto-approve` dele
 
 Work artifacts move through `Draft -> InReview -> Accepted -> Superseded`. Architecture moves through `Target -> Implemented -> Current -> Superseded`, with implementation Evidence required for the first promotion and validation plus reconciliation required for the second. See the full rules in the [artifact contract](plugins/swe-process/references/ARTIFACT-CONTRACT.md) and in the generated scaffold governance files.
 
+`$prototype -on` deliberately reverses that sequence for explicitly requested, repository-local prototype work: implementation may begin before the ordinary lifecycle entry gates, but the exact request, scope, changes, behavior, checks, and decisions are recorded durably. After implementation, the workflow backtracks into the smallest truthful fast path or Draft/Target/Proposed artifact chain and submits it to ordinary review and independent validation. `$prototype -off` succeeds only after every open run is reconciled or developer-cancelled. The mode does not grant deployment, external-mutation, destructive-action, credential, dependency, Git, cross-repository, acceptance, or validation authority.
+
 ## Using a scaffold
 
 Use the final skill only after choosing the repository’s authority:
@@ -79,7 +81,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swa-analyze\script
 git diff --check
 ```
 
-The first command validates the exact process-skill roster, required resources, template metadata and traceability contracts, lifecycle and phase-gate semantics, the current multi-agent feature plus the repository-required v2 workflow selector, role/skill authority, scaffold references, and agent registrations. Run it again after changing a process template, scaffold, or `swe-scaffold` reference. For all packages, validate JSON manifests, SKILL front matter, relative links, and affected TOML registrations before handing off changes.
+The first command validates the exact process-skill roster, required resources, template metadata and traceability contracts, Prototype Mode integration, lifecycle and phase-gate semantics, the current multi-agent feature plus the repository-required v2 workflow selector, role/skill authority, scaffold references, and agent registrations. Run it again after changing a process template, scaffold, or `swe-scaffold` reference. For all packages, validate JSON manifests, SKILL front matter, relative links, and affected TOML registrations before handing off changes.
 
 ## Extending the plugins
 

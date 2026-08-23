@@ -1,4 +1,4 @@
 interface:
   display_name: "Implement SWE Design"
-  short_description: "Build approved solution work with evidence"
-  default_prompt: "Use $swe-implement to implement this approved Design and capture evidence."
+  short_description: "Implement accepted Design with evidence"
+  default_prompt: "Use $swe-implement to implement this accepted Design and capture evidence."

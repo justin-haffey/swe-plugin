@@ -7,6 +7,8 @@ description: Turn Epic research into a portfolio-owned conceptual model, vocabul
 
 Create or revise only the Epic-local conceptual artifact.
 
+This phase is upstream of architecture impact, Feature planning, the portfolio Implementation Plan, local Design, and coding. It models intent and domain meaning without allocating repositories or producing delivery artifacts.
+
 Apply the lifecycle, approval, and locator rules in [the artifact contract](../../references/ARTIFACT-CONTRACT.md).
 
 ## Workflow

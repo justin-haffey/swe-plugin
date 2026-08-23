@@ -281,7 +281,7 @@ if (-not (Test-Path -LiteralPath $contractPath -PathType Leaf)) {
     Add-Failure "Missing artifact contract: $contractPath"
 } else {
     $contractText = Get-Content -Raw -LiteralPath $contractPath
-    foreach ($requiredText in @('Draft -> InReview -> Accepted -> Superseded', 'Target -> Implemented -> Current -> Superseded', 'Proposed -> Accepted -> Superseded', 'auto-approve', 'force')) {
+    foreach ($requiredText in @('Draft -> InReview -> Accepted -> Superseded', 'Target -> Implemented -> Current -> Superseded', 'Proposed -> Accepted -> Superseded', 'auto-approve', 'force', 'Prototype Mode', 'workflow-sequencing exception', '.swe/prototype/runs/')) {
         if ($contractText -notmatch [regex]::Escape($requiredText)) { Add-Failure "Artifact contract missing semantic rule '$requiredText'." }
     }
     foreach ($requiredText in @('EO-001', 'Active -> Implemented -> Validated -> Closed', 'Decision: Waived', 'named independent validator')) {
@@ -328,12 +328,13 @@ foreach ($fastPathTemplate in $fastPathTemplates) {
 }
 
 $phaseGateContract = [ordered]@{
-    'swe-conceptualize\SKILL.md' = @('EPIC.md', 'Accepted')
+    'swe-conceptualize\SKILL.md' = @('EPIC.md', 'Accepted', 'upstream of architecture impact')
     'swe-assess-architecture\SKILL.md' = @('Epic and Concept', 'Accepted')
     'swe-architect\SKILL.md' = @('Accepted` Concept', 'Accepted` architecture-impact assessment')
     'swe-plan-features\SKILL.md' = @('Accepted` `EPIC.md`', 'Accepted` `CONCEPT.md`', 'Accepted` Approval Record')
     'swe-plan-implementation\SKILL.md' = @('Accepted` `FEATURE.md`', 'Accepted` Approval Record')
-    'swe-design\SKILL.md' = @('Feature and Implementation Plan to be `Accepted`', 'Accepted` Approval Record')
+    'swe-design\SKILL.md' = @('Feature and Implementation Plan to be `Accepted`', 'Accepted` Approval Record', 'allocation and handoff input', '`$swe-implement` is the following coding phase')
+    'swe-implement\SKILL.md' = @('accepted local `DESIGN.md` as the immediate input to the coding phase', 'accepted portfolio `IMPLEMENTATION-PLAN.md`', 'return to `$swe-design`')
     'swe-validate\SKILL.md' = @('Accepted` for Feature, Implementation Plan, Design', 'Complete` for Evidence', 'Blocked` validation')
 }
 foreach ($relativeSkill in $phaseGateContract.Keys) {
@@ -366,6 +367,91 @@ foreach ($scaffoldName in @('portfolio', 'solution')) {
 
 $workspaceRoot = Split-Path -Parent (Split-Path -Parent $PluginRoot)
 $sourceScaffoldsRoot = Join-Path $workspaceRoot 'scaffolds'
+$prototypeSkillRoot = Join-Path $workspaceRoot 'plugins\swe-utility\skills\prototype'
+if (Test-Path -LiteralPath (Split-Path -Parent $prototypeSkillRoot) -PathType Container) {
+    $prototypeResourcePaths = @(
+        (Join-Path $prototypeSkillRoot 'SKILL.md'),
+        (Join-Path $prototypeSkillRoot 'agents\openai.yaml'),
+        (Join-Path $prototypeSkillRoot 'references\MODE-CONTRACT.md'),
+        (Join-Path $prototypeSkillRoot 'references\BACKTRACKING.md'),
+        (Join-Path $prototypeSkillRoot 'references\STATE-TEMPLATE.md'),
+        (Join-Path $prototypeSkillRoot 'references\RUN-TEMPLATE.md')
+    )
+    foreach ($prototypeResourcePath in $prototypeResourcePaths) {
+        if (-not (Test-Path -LiteralPath $prototypeResourcePath -PathType Leaf)) {
+            Add-Failure "Prototype skill resource is missing: $prototypeResourcePath"
+        }
+    }
+
+    $prototypeSkillPath = Join-Path $prototypeSkillRoot 'SKILL.md'
+    if (Test-Path -LiteralPath $prototypeSkillPath -PathType Leaf) {
+        $prototypeSkillText = Get-Content -Raw -LiteralPath $prototypeSkillPath
+        if ($prototypeSkillText -notmatch '(?ms)^---\s*.*?^name:\s*prototype\s*$.*?^description:\s*\S+.*?^---\s*$') {
+            Add-Failure "Prototype skill frontmatter is invalid: $prototypeSkillPath"
+        }
+        foreach ($requiredText in @('$prototype [-on|-off]', 'IGNORE Approval Governance', '.swe/prototype/STATE.md', '<<<<<PROTOTYPE_MODE_ON>>>>>', '<<<<<PROTOTYPE_MODE_OFF>>>>>', 'Closing', 'references/BACKTRACKING.md')) {
+            if ($prototypeSkillText -notmatch [regex]::Escape($requiredText)) {
+                Add-Failure "Prototype skill is missing '$requiredText': $prototypeSkillPath"
+            }
+        }
+    }
+
+    $prototypeUiPath = Join-Path $prototypeSkillRoot 'agents\openai.yaml'
+    if (Test-Path -LiteralPath $prototypeUiPath -PathType Leaf) {
+        $prototypeUiText = Get-Content -Raw -LiteralPath $prototypeUiPath
+        if ($prototypeUiText -notmatch [regex]::Escape('$prototype -on') -or $prototypeUiText -notmatch '(?m)^\s*allow_implicit_invocation:\s*false\s*$') {
+            Add-Failure "Prototype skill must be explicitly invoked: $prototypeUiPath"
+        }
+    }
+
+    $prototypeBacktrackingPath = Join-Path $prototypeSkillRoot 'references\BACKTRACKING.md'
+    if (Test-Path -LiteralPath $prototypeBacktrackingPath -PathType Leaf) {
+        $prototypeBacktrackingText = Get-Content -Raw -LiteralPath $prototypeBacktrackingPath
+        foreach ($requiredText in @('$orchestrate code feature-001', 'solution-developer', 'integration-engineer', 'solution-architect', 'platform-engineer', 'platform-architect', 'architecture-reviewer', 'solution-validator', 'feature-validator', 'Draft', 'Target', 'Proposed')) {
+            if ($prototypeBacktrackingText -notmatch [regex]::Escape($requiredText)) {
+                Add-Failure "Prototype backtracking lacks '$requiredText': $prototypeBacktrackingPath"
+            }
+        }
+    }
+
+    foreach ($prototypeTemplateContract in @(
+        @('references\STATE-TEMPLATE.md', 'prototype_mode_state'),
+        @('references\RUN-TEMPLATE.md', 'prototype_run')
+    )) {
+        $prototypeTemplatePath = Join-Path $prototypeSkillRoot $prototypeTemplateContract[0]
+        if (-not (Test-Path -LiteralPath $prototypeTemplatePath -PathType Leaf)) { continue }
+        $prototypeTemplateText = Get-Content -Raw -LiteralPath $prototypeTemplatePath
+        $prototypeHeader = [regex]::Match($prototypeTemplateText, '(?ms)^---\s*\r?\n(?<header>.*?)\r?\n---\s*\r?\n')
+        if (-not $prototypeHeader.Success) {
+            Add-Failure "Prototype template lacks bounded YAML frontmatter: $prototypeTemplatePath"
+            continue
+        }
+        if ($prototypeHeader.Groups['header'].Value -notmatch ("(?m)^artifact_type:\s*`"{0}`"\s*$" -f [regex]::Escape($prototypeTemplateContract[1]))) {
+            Add-Failure "Prototype template artifact_type is invalid: $prototypeTemplatePath"
+        }
+        foreach ($field in @('title', 'artifact_type', 'id', 'status', 'authority', 'scope', 'updated', 'template_version')) {
+            if ($prototypeHeader.Groups['header'].Value -notmatch "(?m)^$([regex]::Escape($field)):\s*") {
+                Add-Failure "Prototype template missing '$field': $prototypeTemplatePath"
+            }
+        }
+    }
+
+    $utilityManifestPath = Join-Path $workspaceRoot 'plugins\swe-utility\.codex-plugin\plugin.json'
+    if (Test-Path -LiteralPath $utilityManifestPath -PathType Leaf) {
+        try {
+            $utilityManifest = Get-Content -Raw -LiteralPath $utilityManifestPath | ConvertFrom-Json
+            if ($utilityManifest.version -ne '2.0.1' -or $utilityManifest.author.name -ne 'Ghostworx.ai, LLC' -or $utilityManifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
+                Add-Failure "SWE Utility manifest version or publisher is invalid: $utilityManifestPath"
+            }
+            if (($utilityManifest.interface.defaultPrompt -join "`n") -notmatch [regex]::Escape('$prototype -on')) {
+                Add-Failure "SWE Utility manifest does not advertise prototype mode: $utilityManifestPath"
+            }
+        } catch {
+            Add-Failure "Invalid SWE Utility manifest: $($_.Exception.Message)"
+        }
+    }
+}
+
 if (Test-Path -LiteralPath $sourceScaffoldsRoot -PathType Container) {
     foreach ($scaffoldName in @('portfolio', 'solution')) {
         $sourceRoot = Join-Path $sourceScaffoldsRoot $scaffoldName
@@ -459,6 +545,26 @@ if (Test-Path -LiteralPath $sourceScaffoldsRoot -PathType Container) {
     foreach ($governancePath in @((Join-Path $sourceScaffoldsRoot 'portfolio\AGENTS.md'), (Join-Path $sourceScaffoldsRoot 'solution\AGENTS.md'))) {
         $governanceText = Get-Content -Raw -LiteralPath $governancePath
         if ($governanceText -notmatch [regex]::Escape('## Phase and Role Matrix')) { Add-Failure "Scaffold governance lacks the phase and role matrix: $governancePath" }
+        foreach ($requiredText in @('## Prototype Mode', '$prototype [-on|-off]', '.swe/prototype/STATE.md', '<<<<<PROTOTYPE_MODE_ON>>>>>', '<<<<<PROTOTYPE_MODE_OFF>>>>>', 'Closing', 'backtrack')) {
+            if ($governanceText -notmatch [regex]::Escape($requiredText)) { Add-Failure "Scaffold governance lacks Prototype Mode rule '$requiredText': $governancePath" }
+        }
+        foreach ($forbiddenText in @('behavier', 'recieve', '$prototype [on|off]', '**PROTOTYPE_MODE**')) {
+            if ($governanceText -match [regex]::Escape($forbiddenText)) { Add-Failure "Scaffold governance retains obsolete Prototype Mode text '$forbiddenText': $governancePath" }
+        }
+        $phaseMatrixMatch = [regex]::Match($governanceText, '(?ms)^## Phase and Role Matrix\s*\r?\n(?<body>.*?)(?=^## |\z)')
+        if ($phaseMatrixMatch.Success) {
+            $phaseTableLines = @($phaseMatrixMatch.Groups['body'].Value -split '\r?\n' | Where-Object { $_ -match '^\|' })
+            if ($phaseTableLines.Count -lt 3) {
+                Add-Failure "Scaffold phase matrix is incomplete: $governancePath"
+            } else {
+                $expectedPipes = ([regex]::Matches($phaseTableLines[0], '\|')).Count
+                foreach ($phaseTableLine in $phaseTableLines) {
+                    if (([regex]::Matches($phaseTableLine, '\|')).Count -ne $expectedPipes) {
+                        Add-Failure "Scaffold phase matrix has a malformed row: $governancePath -> $phaseTableLine"
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -526,4 +632,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Output "Validated 13 skills, 18 canonical templates, lifecycle/config/role semantics, phase gates, scaffold behavior, agent registries, and available source/reference parity at $PluginRoot"
+Write-Output "Validated 13 process skills, 18 canonical templates, Prototype Mode integration, lifecycle/config/role semantics, phase gates, scaffold behavior, agent registries, and available source/reference parity at $PluginRoot"
