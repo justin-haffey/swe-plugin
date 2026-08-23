@@ -42,3 +42,14 @@ Decision-bearing artifacts include an Approval Record with:
 - `Bypass reason`: required only when the decision is `Bypassed`.
 
 Human approval is the default. Under `auto-approve`, author and approver must differ and no more than two reject/repair cycles are allowed before human escalation. `force` records a human-authorized bypass; it never fabricates acceptance, validation, or evidence.
+
+## Prototype-first reconciliation
+
+Prototype Mode is a workflow-sequencing exception, not an approval mode. An explicit developer instruction may allow repository-local prototype implementation to begin before ordinary lifecycle artifacts exist or meet their acceptance entry gates. Repository ownership, filesystem scope, destructive-action controls, external-side-effect authority, deployment controls, credentials, Git safety, and tool approvals remain unchanged.
+
+Each prototype run records its exact developer instruction, repository scope, changed paths, observed behavior, checks, decisions, assumptions, and limitations under `.swe/prototype/runs/`. After implementation, agents backtrack from that evidence into the smallest truthful governed route:
+
+- a solution-local bugfix or enhancement fast path when Feature intent, contracts, and accepted architecture are unchanged; or
+- the full Epic, Concept, architecture-impact, Target architecture, Feature, Implementation Plan, Design, Evidence, and Validation chain when the implemented capability requires it.
+
+Reconstructed decision-bearing work starts as `Draft`; reconstructed architecture starts as `Target`; ADRs and contracts start as `Proposed`. Approval Records remain `Pending` until ordinary governance supplies a real decision. Prototype Mode never retroactively makes an artifact `Accepted`, treats implementation as approval, edits accepted history to appear forward-governed, or fabricates validation. The mode may return to `Off` only after all open runs are reconciled or explicitly cancelled by the developer.

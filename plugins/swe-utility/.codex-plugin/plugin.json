@@ -5,18 +5,19 @@
   "author": {
     "name": "Ghostworx.ai, LLC"
   },
-  "keywords": ["utility", "software-engineering", "orchestration", "review", "versioning"],
+  "keywords": ["utility", "software-engineering", "orchestration", "prototype", "review", "versioning"],
   "skills": "./skills/",
   "interface": {
     "displayName": "SWE Utilities",
     "shortDescription": "Software engineering utility skills",
-    "longDescription": "Provides reusable discovery, review, orchestration, style, domain-modeling, and versioning workflows.",
+    "longDescription": "Provides reusable discovery, review, orchestration, prototype-first delivery, style, domain-modeling, and versioning workflows.",
     "developerName": "Ghostworx.ai, LLC",
     "category": "Productivity",
     "capabilities": ["Read", "Write"],
     "defaultPrompt": [
       "Use $grill to pressure-test a plan before implementation.",
       "Use $orchestrate to coordinate a bounded multi-agent workflow.",
+      "Use $prototype -on or $prototype -off to control scoped prototype-first delivery.",
       "Use $version to version, check in, synchronize, and tag approved work."
     ],
     "brandColor": "#2563EB",

@@ -48,6 +48,18 @@ Follow these rules in order.
 9. Keep task-planning state in memory. Do not create files solely for the orchestration.
 10. Stop when the goal is satisfied, validation is complete, or additional delegation is unlikely to improve the result.
 
+## Prototype Mode propagation
+
+Before routing work, inspect `.swe/prototype/STATE.md` when it exists. If it contains a valid `mode: "On"`, read the `$prototype` mode contract and apply these requirements:
+
+1. Preserve the state repository scope and active run ID; orchestration cannot widen either one.
+2. Put the canonical `<<<<<PROTOTYPE_MODE_ON>>>>>` sentinel, run ID, repository-relative scope, deferred-entry-gate rule, and unchanged safety boundaries in every subagent prompt.
+3. Let the explicitly requested local implementation proceed without requiring pre-existing accepted Epic, Feature, Plan, Design, or architecture artifacts. Do not treat this as permission for external, destructive, deployment, credential, dependency, or Git side effects.
+4. Require workers to return exact changed paths, checks, observed behavior, decisions, assumptions, divergences, and risks. Workers do not change Prototype Mode state or close the run.
+5. After joining the workflow, return integrated evidence to the primary agent and execute the `$prototype` backtracking process. Working code alone is not a complete prototype orchestration.
+
+The durable `PROTOTYPE.md` is evidence for the developer's workflow, not an orchestration planning file. A sentinel without a valid repository state, run ID, and matching scope cannot activate or broaden Prototype Mode.
+
 ## Discovery Pass
 
 Before spawning, perform a short routing pass in memory.
@@ -61,6 +73,7 @@ Identify:
 - required skills: available skills that should be invoked by the parent or subagents;
 - available agents: standalone `.codex/agents/**/*.toml` files merged with any `[agents.*]` registrations in `.codex/config.toml`, plus built-in `@default`, `@explorer`, and `@worker` as fallbacks;
 - side effects: whether tasks may read, edit, test, browse, call connectors, or only advise.
+- prototype state: whether Prototype Mode is `On`, plus its repository scope and active run ID when present.
 
 Ask for clarification only when a missing detail materially changes safety, destination, or output format and no safe assumption exists.
 

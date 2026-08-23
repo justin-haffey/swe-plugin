@@ -1,7 +1,7 @@
 interface:
-  display_name: "Lines of Code"
-  short_description: "Estimate repository lines by file type"
-  default_prompt: "Use $loc to estimate lines of code."
+  display_name: "Prototype Mode"
+  short_description: "Toggle scoped prototype-first delivery and backtracking"
+  default_prompt: "Use $prototype -on to enable scoped prototype-first delivery, or $prototype -off to reconcile and disable it."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

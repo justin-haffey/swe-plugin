@@ -1,43 +1,83 @@
 ---
-name: loc
-description: Estimate lines of code for the current repository or an optional directory and create or update that directory's .swe/LOC.md report. Invoke when the user asks for a line-count estimate, LOC report, or $loc [DIRECTORY_PATH:OPTIONAL]. Use Codebase Memory Module.end_line values grouped by file type; do not pretend that graph coverage is an exact filesystem count.
+name: prototype
+description: Enable or disable scoped prototype-first delivery with persistent repository state, exact mode sentinels, deferred upfront SWE phase gates, and mandatory post-implementation backtracking. Use only when the developer invokes $prototype -on or $prototype -off.
 ---
-# Lines of Code
+# Prototype Mode
 
-Use this utility as `$loc [DIRECTORY_PATH:OPTIONAL]`. It measures the selected repository scope with Codebase Memory and maintains only the selected scope's `.swe/LOC.md`.
+Use this utility as `$prototype [-on|-off]`. Require exactly one flag and reject an omitted flag, both flags, or extra arguments.
 
-## Scope and safety
+Prototype Mode reverses the order of the governed SWE workflow for explicitly requested local prototype work: implement first, then reconstruct and review the appropriate lifecycle artifacts from observed evidence. It is an execution-sequencing exception, not unrestricted authority.
 
-- Resolve an omitted `DIRECTORY_PATH` to the current repository/workspace root. Resolve a supplied path and stop if it does not exist or is outside the intended workspace.
-- Do not edit plugin manifests, process skills, scaffolds, README files, or any file other than the target `.swe/LOC.md` and its containing `.swe/` directory.
-- Treat the result as an estimate. Never report graph totals as exact physical line counts.
-- Preserve existing `.swe/LOC.md` history and user-authored content. If the file is malformed or its ownership markers are missing, stop and explain instead of replacing it.
+Read [`references/MODE-CONTRACT.md`](references/MODE-CONTRACT.md) before changing mode. Read and follow [`references/BACKTRACKING.md`](references/BACKTRACKING.md) before completing a prototype run or turning the mode off. Render new state and run records from the templates in this skill's `references/` directory.
 
-## Measurement workflow
+## Invocation contract
 
-1. Identify the Codebase Memory project for the resolved repository. If it is not indexed, index that repository before measuring.
-2. Use `get_architecture` (scoped to `DIRECTORY_PATH` when supplied) and `get_graph_schema` to confirm the indexed project and the `Module`/`File` properties. Use `query_graph` to retrieve one row per module file:
+- `$prototype -on` enables Prototype Mode for the current repository scope.
+- `$prototype -off` reconciles every open prototype run and disables the mode only after reconciliation succeeds.
+- The absence of `.swe/prototype/STATE.md`, or a valid state record whose `mode` is `Off`, means Prototype Mode is off.
+- Only the primary agent changes mode state. A delegated agent observes the propagated mode, run ID, and scope but does not independently enable or disable it.
+- Treat `<<<<<PROTYPE_MODE_ON>>>>>` and `<<<<<PROTYPE_MODE_OFF>>>>>` as legacy compatibility aliases when received from a trusted parent task. Always emit and persist the correctly spelled canonical forms.
 
-   ```cypher
-   MATCH (m:Module)
-   RETURN m.file_path AS path, m.end_line AS lines
-   ORDER BY path
+## Enable with `-on`
+
+1. Resolve the current repository root and read its applicable `AGENTS.md` files. Stop if the intended repository or writable scope is ambiguous.
+2. Inspect `.swe/prototype/STATE.md` when it exists. If it is malformed, points at another repository, or contains an unknown mode, stop without replacing it.
+3. If the state is already `On`, reuse it and its open run. Do not create duplicate state or silently widen its scope.
+4. Otherwise, create `.swe/prototype/`, render `STATE.md` from [`references/STATE-TEMPLATE.md`](references/STATE-TEMPLATE.md), generate a unique `PROTOTYPE-RUN-[UTC_TIMESTAMP]` ID, and render `.swe/prototype/runs/[RUN_ID]/PROTOTYPE.md` from [`references/RUN-TEMPLATE.md`](references/RUN-TEMPLATE.md).
+5. Record the actor, ISO 8601 activation time, repository identity, repository-relative scope, active run ID, and the transition from `Off` to `On`. Replace every template placeholder.
+6. Print this canonical sentinel as a standalone line:
+
+   ```text
+   <<<<<PROTOTYPE_MODE_ON>>>>>
    ```
 
-   Filter returned paths to the requested directory prefix using normalized `/` separators. Deduplicate by normalized path, retaining the greatest `end_line` for a file. `end_line` is the estimate for that file; do not add duplicate module spans.
-3. Group rows by extension. At minimum classify `.md` as Markdown, `.toml` as TOML, `.yaml`/`.yml` as YAML, `.json` as JSON, `.ps1`/`.psm1` as PowerShell, `.cs` as C#, `.js`/`.jsx` as JavaScript, `.ts`/`.tsx` as TypeScript, `.py` as Python, and `.sh` as Shell. Keep any other extension as its own named type rather than silently dropping it.
-4. Query graph coverage separately when possible: count scoped `File` nodes and compare them with the deduplicated `Module` rows. List missing or unsupported paths/types in the report. A zero result for a language means “no indexed Module rows matched,” not proof that the filesystem contains no such files.
-5. Sum the per-type estimates and verify that the displayed total equals the sum of displayed rows. Record the project, scope, timestamp, method, module-file count, graph-file count, and coverage caveat.
+## Behavior while on
 
-## `.swe/LOC.md` update
+Treat the requested phrase `IGNORE Approval Governance` narrowly and literally for sequencing: ignore ordinary SWE artifact-acceptance entry gates before carrying out the developer's explicitly requested, local prototype implementation. A direct developer instruction supplies implementation authority within the recorded repository scope, whether it is semantic prose or an invocation of another available skill.
 
-Use [`references/LOC-TEMPLATE.md`](references/LOC-TEMPLATE.md) as the structure for a new report. Substitute every `{{...}}` placeholder before writing it; no template placeholders may remain in the generated report.
+Prototype Mode does not grant or imply authority to:
 
-- If `.swe/LOC.md` is absent, create `.swe/` and render the template with the current estimate and an initial history entry.
-- If it exists and contains the `LOC:CURRENT` and `LOC:HISTORY` markers, replace only the current estimate block and append a dated snapshot inside history. Keep prior snapshots byte-for-byte unchanged.
-- If it exists without those markers, do not overwrite it. Report the measured estimate and the migration needed to make the file skill-owned.
-- Use Markdown tables with numeric `Files` and `Estimated lines` columns. Include a bold `Total` row and a coverage/method note. The report should identify the scope directory and measurement timestamp.
+- write outside the recorded repository scope;
+- deploy, publish, release, send messages, or mutate remote or shared services;
+- alter production data, credentials, identity, billing, or security controls;
+- perform destructive operations, broad deletion, dependency installation or upgrade, or unrelated cleanup;
+- commit, tag, push, rewrite Git history, or bypass sandbox and tool approvals;
+- mark an artifact `Accepted`, claim validation, or fabricate evidence without the ordinary required decision.
+
+Those actions still require their normal explicit authorization. Repository authority still decides where artifacts belong; Prototype Mode only lets the requested implementation precede their creation or acceptance.
+
+For every prototype request:
+
+1. Capture the developer's operative instruction verbatim in the active `PROTOTYPE.md`, including text placed in quotation marks or fenced examples. Do not silently normalize quoted example text.
+2. Record intended scope and expected behavior before or at the first implementation edit. If the current run is already reconciled, create a new run and make it the state's `active_run` while leaving mode `On`.
+3. Execute the requested local work using the named skill or the smallest appropriate implementation workflow. Do not stop merely because the ordinary Epic, Feature, Plan, Design, or approval gate does not yet exist.
+4. Record actual changed paths, tests and checks run, observed behavior, deviations, decisions, assumptions, and unresolved risks. Report unrun checks honestly.
+5. When delegating or orchestrating, include the canonical on-sentinel, repository scope, and run ID in every task. Workers return evidence to the primary agent; the primary agent owns the durable run record and backtracking closure.
+6. Immediately after implementation or orchestration completes, execute the backtracking process. Do not wait for `-off` when the run can be reconciled now.
+
+## Disable with `-off`
+
+1. Resolve and validate the same repository state used by `-on`. If no state exists or the state is already `Off`, make no files and print the canonical off-sentinel idempotently.
+2. Change a valid `On` state to `Closing` and record the transition. Do not emit the off-sentinel yet.
+3. Find every run under `.swe/prototype/runs/` whose status is not `Reconciled` or `Cancelled`. Follow [`references/BACKTRACKING.md`](references/BACKTRACKING.md) for each one.
+4. If evidence, repository access, or required human direction blocks reconciliation, set the affected run to `Blocked`, leave state as `Closing`, report the blocker, and do not print an off-sentinel.
+5. After every open run is reconciled or explicitly cancelled by the developer, set `mode` to `Off`, clear `active_run`, record the deactivation actor and time, and append the transition without erasing history.
+6. Print this canonical sentinel as a standalone line:
+
+   ```text
+   <<<<<PROTOTYPE_MODE_OFF>>>>>
+   ```
+
+The off transition hands workflow sequencing back to ordinary repository governance. It does not retroactively accept Draft artifacts or promote Target architecture.
 
 ## Validation
 
-Before finishing, confirm that the target `.swe/LOC.md` exists, contains the scope, timestamp, per-type table, bold total, coverage note, and no unresolved `{{...}}` placeholders. Recalculate the total from the table. Do not claim exactness, complete indexing, or a successful write when the graph or filesystem prevents that conclusion.
+Before reporting a transition or completed run, verify:
+
+- `STATE.md` and every run record have bounded, parseable YAML headers and no unresolved `[PLACEHOLDER]` tokens;
+- the state repository, scope, mode, `active_run`, and transition history agree;
+- on/off output uses exactly the canonical sentinel, with no misspelling inside it;
+- the developer instruction is preserved verbatim in the run record;
+- implementation evidence identifies actual files and checks without invented results;
+- backfilled artifacts remain in their legal initial lifecycle states until ordinary approval;
+- all open runs are reconciled or explicitly cancelled before `Off` is recorded.

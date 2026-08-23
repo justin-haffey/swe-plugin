@@ -62,7 +62,9 @@ SWA skills analyze existing engineering artifacts and source evidence through st
 
 Architecture is `Platform -> Solution -> Package -> Module`; systems are views, not a separate architecture level. Retain dual upstream locators: stable artifact ID plus repository-relative path, with revision when known. Do not copy portfolio Features or Implementation Plans into child solutions.
 
-Default decision approval is human. `-auto-approve` uses an independent appropriate agent and permits at most two repair/review cycles; `-force` requires explicit human authorization and a recorded bypass. Do not weaken those rules in a skill, template, agent, or scaffold.
+Default decision approval is human. `-auto-approve` uses an independent appropriate agent and permits at most two repair/review cycles; `-force` requires explicit human authorization and a recorded bypass. Do not weaken those decision rules in a skill, template, agent, or scaffold.
+
+`$prototype -on` is a workflow-sequencing exception, not an approval mode. It may defer ordinary artifact-acceptance entry gates for explicitly requested, repository-local prototype implementation, but it must preserve ownership and safety boundaries, record durable run evidence, backtrack into the appropriate Draft/Target/Proposed artifacts, and return those artifacts to ordinary review. It never implies `-auto-approve`, `-force`, acceptance, deployment authority, external mutation authority, or fabricated validation.
 
 ## Scaffold parity and sequencing
 
