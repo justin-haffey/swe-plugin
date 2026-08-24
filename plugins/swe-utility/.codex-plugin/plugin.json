@@ -1,6 +1,6 @@
 {
   "name": "swe-utility",
-  "version": "2.0.2",
+  "version": "2.0.4",
   "description": "Reusable utility skills for governed software engineering work.",
   "author": {
     "name": "Ghostworx.ai, LLC"
@@ -8,7 +8,7 @@
   "keywords": ["utility", "software-engineering", "orchestration", "handoff", "fork", "prototype", "review", "versioning"],
   "skills": "./skills/",
   "interface": {
-    "displayName": "SWE Utilities",
+    "displayName": "SWE Utilities 2.0.2",
     "shortDescription": "Software engineering utility skills",
     "longDescription": "Provides reusable discovery, review, orchestration, cross-repository delivery handoff, prototype-first delivery, style, domain-modeling, and versioning workflows.",
     "developerName": "Ghostworx.ai, LLC",
@@ -17,6 +17,7 @@
     "defaultPrompt": [
       "Use $grill to pressure-test a plan before implementation.",
       "Use $orchestrate to coordinate a bounded multi-agent workflow.",
+      "Use $bridge to prepare a direct request for a named child repository and track the fork when supported.",
       "Use $prototype -on or $prototype -off to control scoped prototype-first delivery.",
       "Use $version to version, check in, synchronize, and tag approved work."
     ],

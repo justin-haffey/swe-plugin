@@ -1,6 +1,6 @@
 {
   "name": "swe-process",
-  "version": "2.0.2",
+  "version": "2.0.4",
   "description": "Governed end-to-end software engineering workflows for portfolio and solution repositories.",
   "author": {
     "name": "Ghostworx.ai, LLC"
@@ -8,7 +8,7 @@
   "keywords": ["software-engineering", "design", "adr", "planning", "governance"],
   "skills": "./skills/",
   "interface": {
-    "displayName": "SWE Process",
+    "displayName": "SWE Process 2.0.3",
     "shortDescription": "Governed engineering artifacts",
     "longDescription": "Turns portfolio intent into research, concepts, federated architecture, Features, implementation assignments, solution designs, code, evidence, and independent validation.",
     "developerName": "Ghostworx.ai, LLC",

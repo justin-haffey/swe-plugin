@@ -1,0 +1,10 @@
+interface:
+  display_name: "Patterns"
+  short_description: "Perform search and query operations against this design pattern body of knowledge"
+  default_prompt: "Locate design $patterns" that may improve the agentic architecture or design"
+
+policy:
+  allow_implicit_invocation: true
+
+dependencies:
+  tools: []

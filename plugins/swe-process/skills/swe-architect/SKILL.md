@@ -2,7 +2,6 @@
 name: swe-architect
 description: Create, revise, or independently review canonical platform, solution, package, or module architecture plus governed ADRs and cross-solution contracts.
 ---
-
 # Architect
 
 Resolve architecture at the highest active-repository authority unless a narrower flag is supplied. Use `-review [ARTIFACT_PATH]` only for an independent architecture approval review.
@@ -18,9 +17,15 @@ Apply the canonical filenames, lifecycle, approval, and locator rules in [the ar
 
 Authoring or revision requires an `Accepted` Concept and `Accepted` architecture-impact assessment. Reconciliation of existing accepted architecture instead requires the accepted governing change and its implementation evidence. Read the Epic concept, impact assessment, current canonical architecture, decisions, contracts, and affected code. Systems are views within platform or solution architecture, not a separate structural level.
 
+## Gauging Complexity
+
+Produce `Complex` **Outputs** when the `-in-depth` flag is specified, or when you intuitively determine the architecture will be: large in scope, critical, complex or highly specialized, or otherwise deservers special attention.
+
 ## Outputs
 
-Use the matching template in `references/`:
+**Standard**. Use the matching template in `references/`:
+
+**Complex**. Use the matching template in `references/in-depth-version/`:
 
 - `architecture/PLATFORM-ARCHITECTURE.md`
 - `architecture/SOLUTION-ARCHITECTURE.md`

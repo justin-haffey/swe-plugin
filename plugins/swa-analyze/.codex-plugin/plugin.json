@@ -1,6 +1,6 @@
 {
   "name": "swa-analyze",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Strategic software-architecture analysis of existing engineering artifacts and codebases.",
   "author": {
     "name": "Ghostworx.ai, LLC"
@@ -8,7 +8,7 @@
   "keywords": ["software-architecture", "analysis", "strategy", "codebase-memory"],
   "skills": "./skills/",
   "interface": {
-    "displayName": "SWA Analyze",
+    "displayName": "SWA Analyze 2.0.2",
     "shortDescription": "Strategic architecture analysis",
     "longDescription": "Selects and applies evidence-backed strategic thinking lenses to existing software-engineering artifacts and code, then writes an advisory ANALYSIS.md without changing the analyzed design or implementation.",
     "developerName": "Ghostworx.ai, LLC",

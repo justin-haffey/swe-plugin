@@ -1,0 +1,10 @@
+interface:
+  display_name: "Bridge"
+  short_description: "Fork a request into a named child repository"
+  default_prompt: "Use $bridge to prepare this request for the named repository and track the fork when the host supports it."
+
+policy:
+  allow_implicit_invocation: false
+
+dependencies:
+  tools: []
