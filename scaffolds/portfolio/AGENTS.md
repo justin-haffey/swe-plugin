@@ -2,6 +2,8 @@
 
 This repository is the authority for platform intent, portfolio work, and cross-solution architecture. These instructions apply to the whole repository unless a more specific `AGENTS.md` narrows them.
 
+Use **codebase-memory-mcp** to semantically traverse`markdown (.md)` artifacts and documention - in favor of grep - when navigating the file system.
+
 ## Read Before Acting
 
 1. Inspect `.swe/prototype/STATE.md` when it exists. If its `mode` is `On` or `Closing`, read the installed `$prototype` skill and its mode/backtracking references before acting; stop if those resources are unavailable or the state is malformed.
@@ -86,17 +88,17 @@ When `$swe-architect` is invoked without a scope flag, use the maximum architect
 
 ## Phase and Role Matrix
 
-| Stage | Entry gate | Producing skill | Author | Independent decision or handoff |
-| --- | --- | --- | --- | --- |
-| Epic | Durable cross-solution outcome | `$swe-new-epic` | `platform-engineer` | Named human or independent appropriate agent accepts `EPIC.md` |
-| Research | Accepted Epic and bounded question | `$swe-research` | `research-engineer` | Evidence is `Complete`; it does not approve itself |
-| Concept | Accepted Epic and relevant research | `$swe-conceptualize` | `platform-architect` or assigned conceptual author | Named human or independent architecture reviewer accepts `CONCEPT.md` |
-| Architecture Impact | Accepted Epic and Concept | `$swe-assess-architecture` | `platform-architect` | `architecture-reviewer` or named human accepts the assessment |
-| Target Architecture | Accepted Concept and impact assessment | `$swe-architect` | `platform-architect` | `architecture-reviewer` uses `$swe-architect -review`; approval does not change `Target` status |
-| Feature | Accepted Epic, Concept, impact assessment, and approved Target architecture | `$swe-plan-features` | `platform-engineer` | Independent `feature-validator` or named human accepts `FEATURE.md` |
-| Implementation Plan | Accepted Feature and applicable architecture | `$swe-plan-implementation` | `platform-engineer` | Independent integration reviewer or named human accepts the Plan; child receives dual locators |
-| Child delivery | Accepted Feature and Plan | Child `$swe-design` then `$swe-implement` | Child solution roles | Child `solution-validator` returns local `VALIDATION.md` and evidence locators |
-| Portfolio acceptance | Complete child evidence and local validations | `$swe-validate` | `feature-validator` | Independent portfolio decision is `Accepted`, `Rejected`, or `Blocked` |
+| Stage                | Entry gate                                                                  | Producing skill                                                                                                                                     | Author                                               | Independent decision or handoff                                                                |
+| -------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Epic                 | Durable cross-solution outcome                                              | `$swe-new-epic`                                                                                                                                   | `platform-engineer`                                | Named human or independent appropriate agent accepts`EPIC.md`                                |
+| Research             | Accepted Epic and bounded question                                          | `$swe-research`                                                                                                                                   | `research-engineer`                                | Evidence is`Complete`; it does not approve itself                                            |
+| Concept              | Accepted Epic and relevant research                                         | `$swe-conceptualize`                                                                                                                              | `platform-architect` or assigned conceptual author | Named human or independent architecture reviewer accepts`CONCEPT.md`                         |
+| Architecture Impact  | Accepted Epic and Concept                                                   | `$swe-assess-architecture`                                                                                                                        | `platform-architect`                               | `architecture-reviewer` or named human accepts the assessment                                |
+| Target Architecture  | Accepted Concept and impact assessment                                      | `$swe-architect` | `platform-architect` | `architecture-reviewer` uses `$swe-architect -review`; approval does not change `Target` status |                                                      |                                                                                                |
+| Feature              | Accepted Epic, Concept, impact assessment, and approved Target architecture | `$swe-plan-features`                                                                                                                              | `platform-engineer`                                | Independent`feature-validator` or named human accepts `FEATURE.md`                         |
+| Implementation Plan  | Accepted Feature and applicable architecture                                | `$swe-plan-implementation`                                                                                                                        | `platform-engineer`                                | Independent integration reviewer or named human accepts the Plan; child receives dual locators |
+| Child delivery       | Accepted Feature and Plan                                                   | Child`$swe-design` then `$swe-implement`                                                                                                        | Child solution roles                                 | Child`solution-validator` returns local `VALIDATION.md` and evidence locators              |
+| Portfolio acceptance | Complete child evidence and local validations                               | `$swe-validate`                                                                                                                                   | `feature-validator`                                | Independent portfolio decision is`Accepted`, `Rejected`, or `Blocked`                    |
 
 Implementation agents run repository-native checks and produce Evidence; they do not author formal Validation for their own work. Architecture approval and delivery validation are separate procedures and roles.
 

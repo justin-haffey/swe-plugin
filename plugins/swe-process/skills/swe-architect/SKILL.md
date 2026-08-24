@@ -17,15 +17,11 @@ Apply the canonical filenames, lifecycle, approval, and locator rules in [the ar
 
 Authoring or revision requires an `Accepted` Concept and `Accepted` architecture-impact assessment. Reconciliation of existing accepted architecture instead requires the accepted governing change and its implementation evidence. Read the Epic concept, impact assessment, current canonical architecture, decisions, contracts, and affected code. Systems are views within platform or solution architecture, not a separate structural level.
 
-## Gauging Complexity
-
-Produce `Complex` **Outputs** when the `-in-depth` flag is specified, or when you intuitively determine the architecture will be: large in scope, critical, complex or highly specialized, or otherwise deservers special attention.
-
 ## Outputs
 
-**Standard**. Use the matching template in `references/`:
+<!--[DEPRECIATED] Use the matching templates in `references/`; -->
 
-**Complex**. Use the matching template in `references/in-depth-version/`:
+Use the matching templates in `references/v2/`:
 
 - `architecture/PLATFORM-ARCHITECTURE.md`
 - `architecture/SOLUTION-ARCHITECTURE.md`

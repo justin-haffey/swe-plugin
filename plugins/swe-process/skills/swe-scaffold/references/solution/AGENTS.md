@@ -2,6 +2,8 @@
 
 This repository is the authority for one Solution and its Package and Module architecture, Design, code, tests, and delivery evidence. These instructions apply to the whole repository unless a more specific `AGENTS.md` narrows them.
 
+Use **codebase-memory-mcp** to semantically traverse`markdown (.md)` artifacts and documention - in favor of grep - when navigating the file system.
+
 ## Read Before Acting
 
 1. Inspect `.swe/prototype/STATE.md` when it exists. If its `mode` is `On` or `Closing`, read the installed `$prototype` skill and its mode/backtracking references before acting; stop if those resources are unavailable or the state is malformed.
@@ -91,14 +93,14 @@ When `$swe-architect` is invoked without a scope flag, use the maximum architect
 
 ## Phase and Role Matrix
 
-| Stage | Entry gate | Producing skill | Author | Independent decision or handoff |
-| --- | --- | --- | --- | --- |
-| Local Architecture | Accepted governing Concept, impact assessment, and parent architecture | `$swe-architect` | Appropriate solution, package, or module architect | `architecture-reviewer` uses `$swe-architect -review`; approval does not change `Target` status |
-| Design | Accepted Feature, Implementation Plan, and applicable architecture | `$swe-design` | Assigned developer or architect who will not validate delivery | Independent mapped reviewer or named human accepts `DESIGN.md` |
-| Implementation and Evidence | Accepted Design | `$swe-implement` | Assigned implementation specialist | Implementer runs checks and completes `EVIDENCE.md`; Evidence does not approve itself |
-| Local Validation | Accepted Feature, Plan, Design, and architecture plus Complete Evidence | `$swe-validate` | Independent `solution-validator` | Writes `VALIDATION.md` with `Accepted`, `Rejected`, or `Blocked` |
-| Portfolio handoff | Accepted local Validation and evidence locators | governed handoff | Delivery owner | Portfolio `feature-validator` makes final Feature acceptance decision |
-| Fast path | Bounded solution-local eligible change | `$swe-bugfix` or `$swe-enhancement` | Assigned implementation specialist | `solution-validator` is mandatory for defined risk; low-risk waiver is recorded without claiming `Validated` |
+| Stage                       | Entry gate                                                              | Producing skill                                                                                                                                                                 | Author                                                         | Independent decision or handoff                                                                                  |
+| --------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Local Architecture          | Accepted governing Concept, impact assessment, and parent architecture  | `$swe-architect` | Appropriate solution, package, or module architect | `architecture-reviewer` uses `$swe-architect -review`; approval does not change `Target` status |                                                                |                                                                                                                  |
+| Design                      | Accepted Feature, Implementation Plan, and applicable architecture      | `$swe-design`                                                                                                                                                                 | Assigned developer or architect who will not validate delivery | Independent mapped reviewer or named human accepts`DESIGN.md`                                                  |
+| Implementation and Evidence | Accepted Design                                                         | `$swe-implement`                                                                                                                                                              | Assigned implementation specialist                             | Implementer runs checks and completes`EVIDENCE.md`; Evidence does not approve itself                           |
+| Local Validation            | Accepted Feature, Plan, Design, and architecture plus Complete Evidence | `$swe-validate`                                                                                                                                                               | Independent`solution-validator`                              | Writes`VALIDATION.md` with `Accepted`, `Rejected`, or `Blocked`                                          |
+| Portfolio handoff           | Accepted local Validation and evidence locators                         | governed handoff                                                                                                                                                                | Delivery owner                                                 | Portfolio`feature-validator` makes final Feature acceptance decision                                           |
+| Fast path                   | Bounded solution-local eligible change                                  | `$swe-bugfix` or `$swe-enhancement`                                                                                                                                         | Assigned implementation specialist                             | `solution-validator` is mandatory for defined risk; low-risk waiver is recorded without claiming `Validated` |
 
 Implementation agents may verify their own work and produce Evidence, but they must not author formal Validation for that work. The `architecture-reviewer` approves architecture only through `$swe-architect -review`; the `solution-validator` independently validates delivered behavior.
 

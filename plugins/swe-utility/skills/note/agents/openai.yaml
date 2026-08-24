@@ -1,0 +1,10 @@
+interface:
+  display_name: "Note"
+  short_description: "Summarize the current topic (or topics) of discussion and save them as a note(s)."
+  default_prompt: "Create a $note for each topic we have discussed."
+
+policy:
+  allow_implicit_invocation: false
+
+dependencies:
+  tools: []
