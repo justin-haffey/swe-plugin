@@ -1,6 +1,6 @@
 {
   "name": "swe-utility",
-  "version": "2.0.4",
+  "version": "2.2.0",
   "description": "Reusable utility skills for governed software engineering work.",
   "author": {
     "name": "Ghostworx.ai, LLC"
@@ -8,7 +8,7 @@
   "keywords": ["utility", "software-engineering", "orchestration", "handoff", "fork", "prototype", "review", "versioning"],
   "skills": "./skills/",
   "interface": {
-    "displayName": "SWE Utilities 2.0.2",
+    "displayName": "SWE Utilities 2.2.0",
     "shortDescription": "Software engineering utility skills",
     "longDescription": "Provides reusable discovery, review, orchestration, cross-repository delivery handoff, prototype-first delivery, style, domain-modeling, and versioning workflows.",
     "developerName": "Ghostworx.ai, LLC",

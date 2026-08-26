@@ -25,7 +25,7 @@ passages, or carry subject matter, named entities, recurring anecdotes, or
 signature phrases into the card as style requirements.
 
 The completed card must contain STYLE_DNA, STYLE_CARD, and CONFIDENCE NOTES.
-It must be usable by the mimic-style skill for original writing.
+It must be usable by the mimic skill for original writing.
 
 ## Arguments
 

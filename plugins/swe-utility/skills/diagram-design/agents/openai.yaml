@@ -1,0 +1,10 @@
+interface:
+  display_name: "Deepen"
+  short_description: "Use when you need to create a visual diagram for an artifact. Generates self-contained HTML files with inline SVG and CSS."
+  default_prompt: "use $diagram-design to create the diagram(s)"
+
+policy:
+  allow_implicit_invocation: true
+
+dependencies:
+  tools: []

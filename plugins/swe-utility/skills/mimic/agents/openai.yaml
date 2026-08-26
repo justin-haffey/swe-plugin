@@ -1,0 +1,10 @@
+interface:
+  display_name: "Mimic"
+  short_description: "Rewrite content with a captured style card"
+  default_prompt: "Use $mimic [STYLE_NAME] [CONTENT] to rewrite content with a captured STYLE_CARD."
+
+policy:
+  allow_implicit_invocation: true
+
+dependencies:
+  tools: []
