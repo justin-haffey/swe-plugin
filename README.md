@@ -2,29 +2,31 @@
 
 SWE Plugin **3.1.0** provides portable engineering workflows for a portfolio and its child solutions. V3 reduces repeated artifact writing, starts work when its actual prerequisites permit it, and separates implementation progress from tested, independently accepted delivery.
 
+![1788841929240](plugins\swe-process\assets\icon.png)
+
 V3.1 adds [canonical eligibility packet preparation and consolidated adoption preflight](plugins/swe-process/references/V31-HELPERS.md). The packet builder derives IDs, hashes and review counts while preserving unresolved judgments; preflight combines exact migration proposals, package and registry checks, owner compatibility review, and actual-host smoke evidence. Both are read-only and cannot approve work or activate policy. Efficiency measurement is deferred to the real Epic 003 use case; no measured speed or token savings are claimed.
 
 The four packages remain:
 
-| Package | Responsibility |
-| --- | --- |
+| Package         | Responsibility                                                                         |
+| --------------- | -------------------------------------------------------------------------------------- |
 | `swe-process` | Governed lifecycle, internal delivery bridge, bounded testing, templates and scaffolds |
-| `swe-codex` | Plugin, skill and agent authoring, advisory pattern lookup and repository wrap-up |
-| `swe-utility` | Optional discovery, orchestration, prototype, style and versioning helpers |
-| `swa-analyze` | Advisory strategic architecture analysis of existing artifacts and source |
+| `swe-codex`   | Plugin, skill and agent authoring, advisory pattern lookup and repository wrap-up      |
+| `swe-utility` | Optional discovery, orchestration, prototype, style and versioning helpers             |
+| `swa-analyze` | Advisory strategic architecture analysis of existing artifacts and source              |
 
 The [generated skill catalog](plugins/swe-process/references/SKILL-CATALOG.json) is the exact inventory across packages. Specialist commands remain callable. `$swe-comment` still documents changed code without changing behavior; `$swe-bridge` is internal to the coordinator. The public utility `$bridge` handles explicit direct requests under the same transport rules without acquiring lifecycle authority.
 
 ## Start here
 
-| Task | Command |
-| --- | --- |
-| Initialize portfolio governance | `$swe-scaffold -portfolio` |
-| Initialize a child solution | `$swe-scaffold -solution` |
-| Deliver an Epic | `$swe-max -epic <Epic ID or path>` |
-| Correct a bounded local defect | `$swe-bugfix` |
-| Refine a bounded local capability | `$swe-enhancement` |
-| Run required checks for a change or verification batch | `$swe-test <scope>` |
+| Task                                                   | Command                              |
+| ------------------------------------------------------ | ------------------------------------ |
+| Initialize portfolio governance                        | `$swe-scaffold -portfolio`         |
+| Initialize a child solution                            | `$swe-scaffold -solution`          |
+| Deliver an Epic                                        | `$swe-max -epic <Epic ID or path>` |
+| Correct a bounded local defect                         | `$swe-bugfix`                      |
+| Refine a bounded local capability                      | `$swe-enhancement`                 |
+| Run required checks for a change or verification batch | `$swe-test <scope>`                |
 
 Install the appropriate packages through your configured Codex marketplace. Installing a package does not automatically migrate existing repository governance. Verify the target host exposes the required skills, Goal tools and subagent transport before starting `$swe-max`.
 
