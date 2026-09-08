@@ -1,6 +1,6 @@
 {
   "name": "swe-codex",
-  "version": "2.2.0",
+  "version": "3.1.0",
   "description": "Codex-native workflows for creating plugins, skills, agents, and preparing completed repository goals for review.",
   "author": {
     "name": "Ghostworx.ai, LLC"
@@ -8,7 +8,7 @@
   "keywords": ["codex", "plugins", "skills", "agents", "hooks", "repository-wrap-up"],
   "skills": "./skills/",
   "interface": {
-    "displayName": "SWE Codex 2.2.0",
+    "displayName": "SWE Codex 3.1.0",
     "shortDescription": "Build governed Codex solutions",
     "longDescription": "Creates and evolves Codex plugins, reusable skills, and native custom agents using portable repository conventions.",
     "developerName": "Ghostworx.ai, LLC",

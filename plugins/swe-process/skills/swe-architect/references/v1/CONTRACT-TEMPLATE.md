@@ -15,7 +15,7 @@ owners:
   - "[CONTRACT_OWNER]"
 created: "[YYYY_MM_DD]"
 updated: "[YYYY_MM_DD]"
-template_version: "2.0.0"
+template_version: "3.0.0"
 ---
 
 # [CONTRACT_NAME]
@@ -41,6 +41,14 @@ template_version: "2.0.0"
 ## Conformance
 
 [PRODUCER_AND_CONSUMER_VALIDATION]
+
+## Review Packet
+
+- Decision bytes or immutable snapshot: [INPUT_AND_DECISION_FINGERPRINT_LOCATORS]
+- Effective policy and named approver: [POLICY_LOCATOR_AND_APPROVER]
+- Paired decisions and order: [PAIRED_ARTIFACT_LOCATORS_OR_NONE]
+- Review cycle history: [DURABLE_HISTORY_LOCATOR]; repair cycles consumed: [COUNT]
+- Correspondence at decision time: [VERIFIED_MATCH_OR_BLOCKER]
 
 ## Approval Record
 

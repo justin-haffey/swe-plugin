@@ -24,7 +24,7 @@ Keep skills declarative where possible. Put credentials in approved environment 
 4. Scaffold the plugin with the repository's plugin workflow when available. Keep the directory name and manifest `name` identical, lowercase, hyphenated, and under 64 characters.
 5. Create or migrate each skill as a focused bundle with `SKILL.md`; add `agents/openai.yaml` when local conventions use it. Keep frontmatter limited to `name` and `description`.
 6. Update the repository marketplace only when the user wants the plugin installable there. Preserve marketplace identity and ordering; append a complete entry with `source`, `policy.installation`, `policy.authentication`, and `category`.
-7. Validate manifest JSON, skill frontmatter, resource paths, marketplace paths, and any native agent TOML. Run repository validators when available.
+7. Specify manifest JSON, skill frontmatter, resource, marketplace-path and native TOML checks. Route their execution and repository validators through `$swe-test` to `test-runner` (`gpt-5.6-luna`, `medium`). Keep semantic review and artifact repairs with their owning author; receipts do not grant acceptance. Missing required tester or tooling is a blocker, never a silent executor substitution.
 
 ## Safety and State
 

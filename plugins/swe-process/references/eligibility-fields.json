@@ -1,0 +1,15 @@
+{
+  "schema": "swe-eligibility-fields/v1",
+  "packet_schema": "swe-eligibility/v1",
+  "required": ["schema", "assignment_id", "repository", "phase", "feature", "plan", "architecture", "risk", "dependencies", "reviewed_independence", "review", "behavior_consumers"],
+  "phases": ["Design", "Implementation", "FeatureCompletion", "EpicAcceptance"],
+  "risk_flags": ["isolated", "reversible", "reviewed_deferral", "mandatory_early_checks", "public_contract", "cross_solution", "security", "persistence", "concurrency", "operational"],
+  "review_required": ["consumed_cycles", "cycle_history"],
+  "locators": ["feature", "plan", "architecture", "design", "policy_adoption", "run_authorization", "major_approval", "portfolio_validation"],
+  "phase_required": {
+    "Design": [],
+    "Implementation": ["design"],
+    "FeatureCompletion": ["design", "implementation_complete", "criteria", "pending_checks", "delivery"],
+    "EpicAcceptance": ["design", "implementation_complete", "criteria", "pending_checks", "delivery", "assignments_complete", "architecture_reconciled", "portfolio_validation"]
+  }
+}

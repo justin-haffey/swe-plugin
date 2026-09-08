@@ -15,476 +15,138 @@ owners:
   - "[MODULE_ARCHITECT]"
 created: "[YYYY_MM_DD]"
 updated: "[YYYY_MM_DD]"
-template_version: "2.0.0"
+template_version: "3.0.0"
 ---
 
 # [MODULE_NAME] Module Architecture
 
-<!--
-PURPOSE OF THIS TEMPLATE
+## Responsibility and Invariants
 
-Use this document to describe the architecture of a cohesive software MODULE: a library,
-assembly, bounded subsystem, framework module, or similarly sized code unit. It is intentionally
-more compact than a solution-level architecture document while retaining enough rigor for future
-maintainers, integrators, reviewers, and AI/software-engineering agents to reason about the module.
+[MODULE_RESPONSIBILITY_AND_INVARIANTS]
 
-Adaptation:
-- Module: use all Required sections; keep deployment brief or mark N/A.
-- Package: retain the same structure, but expand dependencies, compatibility, and deployment.
-- Solution: add system landscape, infrastructure, operations, organizational ownership, and
-  environment-specific deployment detail rather than simply making every module section longer.
+## Interfaces and Collaborators
 
-Authoring rules:
-1. Prefer architecture facts over implementation narration.
-2. State scope and non-goals explicitly.
-3. Document interfaces, invariants, ownership, runtime behavior, and rationale—not only classes.
-4. Keep 1-3 representative runtime scenarios unless more are architecturally significant.
-5. Use diagrams only when they communicate structure or behavior better than prose.
-6. For every diagram, identify its purpose, scope, important relationships, and any omitted detail.
-7. Keep decisions short here; link a separate ADR when a decision needs a full decision record.
-8. Mark future work as Planned; never present it as Current architecture.
-9. Delete instructions/comments and unused optional subsections when publishing.
--->
+| Interface | Direction | Contract |
+|---|---|---|
+| [INTERFACE] | [INBOUND_OR_OUTBOUND] | [CONTRACT] |
 
-## 1. Purpose
+### Building-Block View
 
-### 1.1 Summary
-
-<!-- Required. In 2-5 sentences, explain what the module is, what capability it owns, and why it exists. -->
-
-`<Module summary>`
-
-### 1.2 Scope
-
-<!-- Required. Define the architecture boundary. Name what is inside and outside. -->
-
-**In scope**
-
-- `<responsibility / namespace / subsystem>`
-- `<responsibility>`
-
-**Out of scope**
-
-- `<explicit non-goal>`
-- `<responsibility owned elsewhere>`
-
-### 1.3 Stakeholders
-
-<!-- Required. Use roles rather than names unless ownership requires a named individual/team. -->
-
-| Stakeholder                  | Primary concern                  | Uses this document for         |
-| ---------------------------- | -------------------------------- | ------------------------------ |
-| `<module consumers>`       | `<API stability, behavior>`    | `<integration>`              |
-| `<maintainers>`            | `<correctness, change impact>` | `<implementation/evolution>` |
-| `<operators/testers/etc.>` | `<quality concern>`            | `<verification/operation>`   |
-
-## 2. Drivers
-
-### 2.1 Responsibilities
-
-<!-- Required. Architectural responsibilities, not a feature backlog. -->
-
-| ID   | Responsibility       | Architectural consequence              |
-| ---- | -------------------- | -------------------------------------- |
-| R-01 | `<responsibility>` | `<structure/API/behavior it drives>` |
-| R-02 | `<responsibility>` | `<consequence>`                      |
-
-### 2.2 Quality Goals
-
-<!-- Required. Rank the few quality attributes that materially shape the architecture. -->
-
-| Priority | Quality attribute                                     | Concrete meaning for this module   | Evidence / measure               |
-| -------- | ----------------------------------------------------- | ---------------------------------- | -------------------------------- |
-| 1        | `<Extensibility / Performance / Reliability / ...>` | `<scenario-specific definition>` | `<test, benchmark, invariant>` |
-| 2        | `<quality>`                                         | `<definition>`                   | `<evidence>`                   |
-
-### 2.3 Constraints
-
-<!-- Required. Include platform, language/runtime, compatibility, regulatory, dependency, and repository constraints. -->
-
-- `<constraint>`
-- `<constraint>`
-
-### 2.4 Non-Goals
-
-<!-- Recommended. Prevent accidental scope expansion. -->
-
-- `<not provided by this module>`
-- `<deferred capability>`
-
-## 3. Context
-
-### 3.1 External Context
-
-<!--
-Required. Identify consumers, upstream/downstream libraries, framework/runtime dependencies,
-and external resources. For a library module, treat consuming code and framework libraries as
-external actors/systems. Keep this zoomed out.
--->
-
-| External element        | Direction         | Contract / dependency | Notes       |
-| ----------------------- | ----------------- | --------------------- | ----------- |
-| `<consumer>`          | `<in/out/both>` | `<public API>`      | `<notes>` |
-| `<framework/library>` | `<in>`          | `<API/package>`     | `<notes>` |
-
-### 3.2 Context Diagram
-
-<!--
-Recommended. C4-style context view adapted to a module. Replace placeholders.
-Show the module as one box; surround it with consumers and external dependencies.
-Do not include internal classes here.
--->
+Use this view to show coarse internal responsibilities and dependency direction. Avoid a class-per-box diagram; add a class or data-model view only when the model itself is architecturally significant.
 
 ```mermaid
 flowchart LR
-    Consumer["<Consuming code / system>"]
-    Module["<Module>\n<one-line responsibility>"]
-    Dependency["<External framework / library>"]
+    Caller["[CALLER_OR_CONSUMER]"]
+    Collaborator["[EXTERNAL_COLLABORATOR]"]
 
-    Consumer -->|"<uses public API>"| Module
-    Module -->|"<depends on>"| Dependency
-```
-
-**View notes**
-
-- **Purpose:** `<what question this view answers>`
-- **Audience:** `<stakeholders>`
-- **Boundary:** `<what is intentionally omitted>`
-
-## 4. Structure
-
-### 4.1 Architecture Strategy
-
-<!-- Required. 3-7 bullets describing the organizing ideas that make the design coherent. -->
-
-- `<principle / pattern / decomposition strategy>`
-- `<principle>`
-- `<principle>`
-
-### 4.2 Module Decomposition
-
-<!--
-Required. Describe architectural building blocks: namespaces, layers, subsystems, major abstractions,
-or source partitions. Each row should state responsibility and allowed dependencies.
--->
-
-| Building block | Responsibility       | Depends on         | Exposes         |
-| -------------- | -------------------- | ------------------ | --------------- |
-| `<block>`    | `<responsibility>` | `<dependencies>` | `<contracts>` |
-| `<block>`    | `<responsibility>` | `<dependencies>` | `<contracts>` |
-
-### 4.3 Component / Building-Block Diagram
-
-<!--
-Required for non-trivial modules. This is the main static architecture view.
-Show coarse architectural blocks and dependency direction. Avoid a class-per-box diagram.
--->
-
-```mermaid
-flowchart TB
-    subgraph Module["<Module boundary>"]
-        A["<Core block>"]
-        B["<Supporting block>"]
-        C["<Adapter / integration block>"]
+    subgraph Module["[MODULE_NAME]"]
+        API["[PUBLIC_INTERFACE]"]
+        Core["[CORE_BEHAVIOR]"]
+        Adapter["[ADAPTER_OR_PERSISTENCE]"]
     end
 
-    A --> B
-    C --> A
+    Caller -->|"[INVOCATION]"| API
+    API -->|"[DELEGATES]"| Core
+    Core -->|"[PORT_OR_CONTRACT]"| Adapter
+    Adapter -->|"[INTERACTION]"| Collaborator
 ```
 
-**View notes**
+- Relationship meaning: [ARROW_SEMANTICS]
+- Key invariant: [DIAGRAM_INVARIANT]
+- Scope and omissions: [DIAGRAM_SCOPE_AND_OMISSIONS]
 
-- **Elements:** `<what the boxes represent>`
-- **Relations:** `<meaning of arrows>`
-- **Key rule:** `<dependency/invariant rule>`
+## State and Behavior
 
-### 4.4 Key Types and Contracts
+[STATE_LIFECYCLE_AND_KEY_BEHAVIOR]
 
-<!-- Recommended. Cover architecturally significant types only. -->
+## Failure, Security, and Observability
 
-| Type / contract       | Role       | Key collaborators | Stability                             |
-| --------------------- | ---------- | ----------------- | ------------------------------------- |
-| `<interface/class>` | `<role>` | `<types>`       | `<public/internal/extension point>` |
+- [CONCERN_AND_RESPONSE]
 
-## 5. Model
+## Traceability and Divergence
 
-### 5.1 Domain / Data Model
+- [PARENT_ADR_OR_FEATURE_LINK]
+- [DIVERGENCE_OR_NONE]
 
-<!--
-Recommended when the module owns a meaningful model, graph, protocol, state machine, schema,
-or metadata structure. Replace with ER/class/graph notation as appropriate.
--->
+## Profile and Decision Basis
 
-```mermaid
-classDiagram
-    class CoreAbstraction {
-        <<interface>>
-        +Id
-    }
-    class ConcreteType
-    class RelatedType
+- Profile: [COMPACT_OR_DETAILED]; rationale: [ONE_SENTENCE_PROFILE_RATIONALE]
+- Parent alignment and exclusions: [GOVERNING_CONSTRAINTS_AND_BOUNDARY]
+- Invariants: [MUST_HOLD_BEHAVIOR_AND_OWNERSHIP_RULES]
+- Alternatives and consequences: [CHOICE_REJECTED_ALTERNATIVE_AND_TRADEOFF]
+- Feasibility and verification: [PROOF_OBLIGATIONS_AND_REQUIRED_CHECKS]
+- Applicability: [OMITTED_CONCERN_AND_REASON_OR_NONE]
 
-    CoreAbstraction <|.. ConcreteType
-    ConcreteType --> RelatedType : "<relationship>"
-```
+## Failure, Security, and Operational Readiness
 
-### 5.2 State and Ownership
+- Failure and recovery: [ERROR_RETRY_RESOURCE_LIMIT_AND_RECOVERY_BEHAVIOR]
+- Security and trust: [THREAT_BOUNDARY_AND_CONTROL]
+- Operations and compatibility: [OBSERVABILITY_DEPLOYMENT_MIGRATION_AND_REVERSAL]
 
-<!-- Required when state/lifetime matters. State who owns what, lifetime rules, mutation boundaries, and cleanup. -->
+## Detailed Scenarios and Boundary Proofs
 
-- **State owner:** `<type/subsystem>`
-- **Lifetime:** `<creation → active → disposal/removal>`
-- **Mutation boundary:** `<who may mutate>`
-- **Consistency rule:** `<invariant>`
-- **Cleanup rule:** `<cleanup/disposal semantics>`
+Record concrete scenarios for the concerns that justified Detailed. Remove irrelevant rows with a short applicability rationale; do not require every neighboring artifact to expand.
 
-### 5.3 Core Invariants
+| Scenario | Trigger and boundary | Expected behavior | Limit or failure | Proof and owner |
+|---|---|---|---|---|
+| [SCENARIO] | [INPUT_ACTOR_AND_TRUST_BOUNDARY] | [OUTCOME_AND_INVARIANT] | [LIMIT_FAILURE_AND_RECOVERY] | [CONCRETE_CHECK_AND_OWNER] |
 
-<!-- Required. Write invariants as testable statements. -->
+## State, Data, and Concurrency
 
-1. `<Invariant>`
-2. `<Invariant>`
-3. `<Invariant>`
+- Data authority, schema, and ownership: [OWNER_STORE_RETENTION_AND_CLASSIFICATION]
+- State lifecycle and transitions: [LEGAL_TRANSITIONS_AND_INVALID_INPUT_HANDLING]
+- Consistency, transactions, and concurrency: [ATOMICITY_ORDERING_IDEMPOTENCY_AND_SYNCHRONIZATION]
+- Resource limits: [JOINTLY_REACHABLE_LIMITS_BACKPRESSURE_AND_EXHAUSTION]
+- Migration and reversibility: [COMPATIBILITY_WINDOW_DATA_MIGRATION_AND_ROLLBACK]
 
-## 6. Runtime
+## Contracts and Dependency Governance
 
-<!--
-Required for modules with meaningful collaboration. Select 1-3 architecturally significant
-scenarios: creation/registration, hot path, failure/recovery, disposal, or extension execution.
-Do not document routine getters/setters.
--->
+| Boundary | Producer and consumers | Operation and semantics | Compatibility and failure | Conformance |
+|---|---|---|---|---|
+| [BOUNDARY] | [PARTICIPANTS_AND_OWNERS] | [REAL_OPERATION_SCHEMA_AND_SEMANTICS] | [VERSION_ERRORS_AND_DEPRECATION] | [CONCRETE_PARTICIPANT_FIXTURE_AND_PROOF] |
 
-### 6.1 Scenario: `<name>`
+- Dependency direction and forbidden coupling: [ALLOWED_DIRECTION_AND_CYCLE_PREVENTION]
+- Dependency classification and supply chain: [REQUIRED_OPTIONAL_BUILD_TEST_AND_PROVENANCE]
+- Public surface and extensions: [API_EXPOSURE_EXTENSION_ORDER_LIFETIME_AND_ISOLATION]
+- Integration feasibility: [PARTICIPANT_AVAILABILITY_AUTHORIZED_WORK_AND_REACHABLE_LIMITS]
 
-**Trigger:** `<what starts the flow>`
-**Result:** `<observable outcome>`
+## Quality and Operational Scenarios
 
-```mermaid
-sequenceDiagram
-    participant Caller
-    participant Facade as "<Public facade>"
-    participant Core as "<Core subsystem>"
-    participant Extension as "<Extension/dependency>"
+| Quality | Stimulus and environment | Measurable response | Verification and evidence |
+|---|---|---|---|
+| [QUALITY] | [LOAD_FAULT_OR_SECURITY_SCENARIO] | [LATENCY_CAPACITY_AVAILABILITY_OR_RECOVERY_TARGET] | [CHECK_OWNER_AND_LOCATOR] |
 
-    Caller->>Facade: <operation>
-    Facade->>Core: <validate / mutate>
-    Core->>Extension: <optional collaboration>
-    Extension-->>Core: <result>
-    Core-->>Caller: <result>
-```
+- Deployment units, topology, environments, and configuration: [OWNERS_BOUNDARIES_AND_SECRET_HANDLING]
+- Reliability and disaster recovery: [REDUNDANCY_FAILURE_DOMAINS_RESTORE_AND_RECOVERY_OBJECTIVES]
+- Threat model and access: [IDENTITY_AUTHORIZATION_TRUST_TRANSITIONS_AND_CONTROLS]
+- Observability and support: [LOG_METRIC_TRACE_ALERT_AND_OPERATIONAL_OWNER]
+- Delivery and supply chain: [BUILD_RELEASE_INFRASTRUCTURE_AND_DEPENDENCY_CONTROLS]
+- Cost and capacity: [CAPACITY_MODEL_LIMITS_AND_OPERATING_ASSUMPTIONS]
 
-**Failure behavior:** `<exceptions, rollback/commit semantics, retry behavior>`
+## Evolution and Decision Traceability
 
-### 6.2 Concurrency
+- Alternatives and tradeoffs: [SIGNIFICANT_OPTIONS_REASON_FOR_SELECTION_AND_NEGATIVE_CONSEQUENCES]
+- Compatibility and adoption: [CONSUMER_MIGRATION_SEQUENCE_AND_RETIRED_BEHAVIOR]
+- Risks and unresolved decisions: [OWNER_PROOF_NEEDED_AND_BLOCKING_GATE]
+- Feasibility and early verification: [PROTOTYPE_OR_CHECK_LOCATORS_AND_ACTUAL_LIMITATIONS]
+- Traceability and divergence: [ACCEPTED_UPSTREAM_DECISIONS_IMPLEMENTATION_EVIDENCE_AND_KNOWN_DIVERGENCE]
 
-<!-- Required if the module is thread-safe, concurrent, asynchronous, or shared. Otherwise state "Not thread-safe by design." -->
+## Review Packet
 
-- **Concurrency model:** `<locks / lock-free / actor / immutable / single-threaded>`
-- **Atomic operations:** `<operations that are atomic>`
-- **Snapshot semantics:** `<what reads observe>`
-- **Ordering:** `<ordering/version rules>`
-- **Known race boundaries:** `<important caveats>`
+- Decision bytes or immutable snapshot: [INPUT_AND_DECISION_FINGERPRINT_LOCATORS]
+- Effective policy and named approver: [POLICY_LOCATOR_AND_APPROVER]
+- Paired decisions and order: [PAIRED_ARTIFACT_LOCATORS_OR_NONE]
+- Review cycle history: [DURABLE_HISTORY_LOCATOR]; repair cycles consumed: [COUNT]
+- Correspondence at decision time: [VERIFIED_MATCH_OR_BLOCKER]
 
-## 7. Interfaces
+## Approval Record
 
-### 7.1 Public API Surface
-
-<!-- Required. Describe contract families and semantics; do not copy every method signature. -->
-
-| API family               | Purpose       | Contract expectations | Extension impact          |
-| ------------------------ | ------------- | --------------------- | ------------------------- |
-| `<interface / facade>` | `<purpose>` | `<semantics>`       | `<compatibility notes>` |
-
-### 7.2 Extension Points
-
-<!-- Required when extensibility is an architectural goal. -->
-
-| Extension point                | Mechanism                              | Contract    | Typical use    |
-| ------------------------------ | -------------------------------------- | ----------- | -------------- |
-| `<SPI/interface/base class>` | `<inherit/compose/register/adapter>` | `<rules>` | `<use case>` |
-
-### 7.3 Compatibility
-
-<!-- Recommended for reusable libraries/modules. -->
-
-- **Runtime/language:** `<target>`
-- **Framework compatibility:** `<BCL/framework interop>`
-- **Source compatibility policy:** `<policy>`
-- **Binary compatibility policy:** `<policy>`
-- **Serialization/persistence compatibility:** `<policy or N/A>`
-
-## 8. Cross-Cutting Concerns
-
-<!-- Keep only concerns that materially affect this module. -->
-
-### 8.1 Error Handling
-
-- `<validation strategy>`
-- `<exception/fault policy>`
-- `<post-commit failure policy>`
-
-### 8.2 Observability
-
-- `<events, diagnostics, tracing, versioning, metrics, hooks, or N/A>`
-
-### 8.3 Performance
-
-- **Critical paths:** `<operations>`
-- **Complexity / scaling:** `<expected complexity>`
-- **Allocation/lifetime considerations:** `<notes>`
-
-### 8.4 Security
-
-- `<trust boundary, validation, dangerous reflection/dynamic behavior, or N/A>`
-
-### 8.5 Persistence / Serialization
-
-- `<persistence model, snapshot format, compatibility, or explicitly N/A>`
-
-## 9. Deployment
-
-<!--
-Optional for a module. Use only when packaging/runtime placement changes architecture.
-For an in-process library, a short statement is enough. For packages/services, expand.
--->
-
-**Deployment status:** `<N/A — in-process library | package | hosted service | other>`
-
-```mermaid
-flowchart LR
-    Host["<Host process / application>"]
-    Module["<Module / package>"]
-    Runtime["<Runtime / platform>"]
-
-    Host --> Module
-    Module --> Runtime
-```
-
-## 10. Decisions
-
-<!--
-Required. Record only architecturally significant decisions. If a decision requires alternatives,
-trade studies, or a long rationale, create an ADR and link it from this table.
--->
-
-| ID    | Decision       | Status                  | Rationale | Consequence / trade-off |
-| ----- | -------------- | ----------------------- | --------- | ----------------------- |
-| AD-01 | `<decision>` | `<Accepted/Proposed>` | `<why>` | `<cost/benefit>`      |
-
-## 11. Quality
-
-### 11.1 Quality Scenarios
-
-<!-- Required. Make top quality goals testable. -->
-
-| ID   | Scenario                       | Expected response         | Verification                |
-| ---- | ------------------------------ | ------------------------- | --------------------------- |
-| Q-01 | `<stimulus under condition>` | `<measurable response>` | `<test/benchmark/review>` |
-
-### 11.2 Verification Strategy
-
-- **Unit:** `<architectural invariants tested>`
-- **Concurrency:** `<stress/race testing>`
-- **Compatibility:** `<framework/API tests>`
-- **Performance:** `<benchmarks if relevant>`
-- **Architecture:** `<dependency/API/diagram consistency checks>`
-
-## 12. Risks
-
-| ID    | Risk / debt | Impact       | Mitigation       | Status                      |
-| ----- | ----------- | ------------ | ---------------- | --------------------------- |
-| RK-01 | `<risk>`  | `<impact>` | `<mitigation>` | `<Open/Accepted/Planned>` |
-
-## 13. Evolution
-
-<!--
-Required for foundational/reusable modules. Separate current extension seams from future capabilities.
-State what the present architecture intentionally enables next.
--->
-
-### 13.1 Current Extension Seams
-
-- `<extension seam>`
-- `<extension seam>`
-
-### 13.2 Planned Directions
-
-- `<planned capability — not yet implemented>`
-- `<planned capability>`
-
-### 13.3 Change Rules
-
-- `<what can evolve compatibly>`
-- `<what requires an ADR / major version / migration>`
-
-## 14. Glossary
-
-| Term       | Meaning                                  |
-| ---------- | ---------------------------------------- |
-| `<term>` | `<precise module-specific definition>` |
-
-## Appendix A — Diagram Guidance
-
-<!--
-Use this catalog to decide which diagrams belong in the document. Do not include every diagram by default.
-
-1. Context diagram — almost always useful. Shows the module boundary and external collaborators.
-2. Building-block/component diagram — required for non-trivial modules. Shows coarse internal structure.
-3. Domain/class/data diagram — use when a model or schema is architecturally significant.
-4. Runtime/sequence diagram — use for 1-3 non-obvious collaboration scenarios.
-5. Deployment diagram — optional for in-process libraries; required when runtime placement matters.
-6. State diagram — use when lifecycle or execution states are central.
-7. Dependency diagram — use when allowed/forbidden dependency direction is a key design constraint.
-
-Diagram quality rules:
-- Give each diagram one architectural question to answer.
-- Keep the abstraction level consistent inside a diagram.
-- Label important relationships; arrows without semantics are ambiguous.
-- Include a legend when notation is not obvious.
-- State scope and omissions below the diagram.
-- Prefer generated diagrams for volatile code-level detail; hand-maintain only stable architectural views.
--->
-
-### Optional State Diagram Placeholder
-
-```mermaid
-stateDiagram-v2
-    [*] --> Created
-    Created --> Active
-    Active --> Completed
-    Active --> Failed
-    Completed --> [*]
-    Failed --> [*]
-```
-
-### Optional Dependency Diagram Placeholder
-
-```mermaid
-flowchart LR
-    PublicAPI["Public API"] --> Core["Core"]
-    Adapter["Adapter"] --> Core
-    Core --> Abstractions["Abstractions"]
-
-    %% Document forbidden reverse dependencies in prose immediately below.
-```
-
-## Appendix B — Template Basis
-
-This template intentionally combines three established architecture-documentation approaches:
-
-1. **arc42** — used for the overall narrative spine: goals, constraints, context, solution strategy,
-   building blocks, runtime, cross-cutting concepts, decisions, quality, risks, and glossary. arc42 is
-   technology-neutral and explicitly tailorable.
-2. **SEI Views & Beyond** — used for stakeholder-focused views and for requiring each important view
-   to communicate elements, relationships, interfaces/behavior, cross-view information, and design rationale.
-3. **C4 model** — used for disciplined visual abstraction: context, internal structural zoom, dynamic/runtime,
-   and deployment views, while avoiding unnecessary diagram levels.
-
-Research references:
-
-- arc42 Template Overview: https://arc42.org/overview/
-- arc42 Building Block View: https://docs.arc42.org/section-5/
-- SEI Views and Beyond Collection: https://www.sei.cmu.edu/library/views-and-beyond-collection/
-- SEI Views and Beyond Documentation Template: https://www.sei.cmu.edu/library/views-and-beyond-documentation-template/
-- C4 Model: https://c4model.com/
-- C4 Diagrams: https://c4model.com/diagrams
+| Field | Value |
+|---|---|
+| Mode | [HUMAN_OR_AUTO_APPROVE_OR_FORCE] |
+| Author | [AUTHOR] |
+| Approver | [INDEPENDENT_APPROVER_OR_FORCE_AUTHORIZING_HUMAN] |
+| Decision | [PENDING_OR_ACCEPTED_OR_CHANGES_REQUIRED_OR_REJECTED_OR_BYPASSED] |
+| Recorded | [ISO_8601_TIMESTAMP_OR_PENDING] |
+| Evidence | [REVIEW_REFERENCE_OR_NONE] |
+| Bypass reason | [REQUIRED_FOR_FORCE_OR_NONE] |

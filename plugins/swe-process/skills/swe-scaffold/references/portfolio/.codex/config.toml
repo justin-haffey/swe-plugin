@@ -37,6 +37,10 @@ config_file = "agents/swe/architecture-reviewer.toml"
 description = "Verify cross-solution contracts, integration behavior, compatibility, and release readiness."
 config_file = "agents/swe/integration-engineer.toml"
 
+[agents.test_runner]
+description = "Execute bounded repository checks through swe-test using Luna at medium."
+config_file = "agents/swe/test-runner.toml"
+
 [features]
 multi_agent = true
 multi_agent_v2 = true

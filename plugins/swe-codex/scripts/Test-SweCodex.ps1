@@ -10,6 +10,21 @@ function Add-Failure {
 }
 
 $pluginRoot = Split-Path -Parent $PSScriptRoot
+$repositoryRoot = Split-Path -Parent (Split-Path -Parent $pluginRoot)
+$catalogHelper = Join-Path $repositoryRoot 'plugins\swe-process\scripts\Get-SweCatalog.ps1'
+if (-not (Test-Path -LiteralPath $catalogHelper -PathType Leaf)) { throw "Missing catalog helper: $catalogHelper" }
+$null = & $catalogHelper -Check
+$catalog = Get-Content -Raw -LiteralPath (Join-Path $repositoryRoot 'plugins\swe-process\references\SKILL-CATALOG.json') | ConvertFrom-Json
+$package = @($catalog.packages | Where-Object name -eq 'swe-codex')
+if ($package.Count -ne 1) { throw 'Catalog lacks unique Codex package.' }
+foreach ($skill in $package[0].skills) {
+    $catalogSkillRoot = Split-Path -Parent (Join-Path $repositoryRoot $skill.path)
+    foreach ($resource in @('SKILL.md', 'agents\openai.yaml', 'references')) {
+        if (-not (Test-Path -LiteralPath (Join-Path $catalogSkillRoot $resource))) { Add-Failure "Missing Codex skill resource: $($skill.name)/$resource" }
+    }
+    $definition = Get-Content -Raw -LiteralPath (Join-Path $catalogSkillRoot 'SKILL.md')
+    if ($definition -notmatch ('(?ms)\A---\s*\r?\n.*?^name:\s*' + [regex]::Escape($skill.name) + '\s*$.*?^description:\s*\S.*?^---')) { Add-Failure "Invalid Codex skill front matter: $($skill.name)" }
+}
 $manifestPath = Join-Path $pluginRoot '.codex-plugin\plugin.json'
 $hookConfigPath = Join-Path $pluginRoot 'hooks\hooks.json'
 $hookScriptPath = Join-Path $pluginRoot 'hooks\goal-complete.mjs'
@@ -27,7 +42,7 @@ foreach ($path in @($manifestPath, $hookConfigPath, $hookScriptPath, $skillPath,
 if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
     try {
         $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
-        if ($manifest.name -ne 'swe-codex' -or $manifest.version -ne '2.0.2') {
+        if ($manifest.name -ne 'swe-codex' -or $manifest.version -ne '3.1.0') {
             Add-Failure "SWE Codex manifest identity or version is invalid: $manifestPath"
         }
         if ($manifest.author.name -ne 'Ghostworx.ai, LLC' -or $manifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
@@ -69,10 +84,13 @@ if (Test-Path -LiteralPath $skillPath -PathType Leaf) {
     if ($skillText -notmatch '(?s)^---\s*\r?\nname:\s*repo-wrap-up\s*\r?\ndescription:\s*.+?\r?\n---') {
         Add-Failure "repo-wrap-up front matter is invalid: $skillPath"
     }
-    foreach ($requiredText in @('repo-author', 'built-in `worker`', 'BUILT_IN_WORKER_FALLBACK', 'must not delegate again', 'references/REVIEW-HANDOFF.md', 'git diff --check', 'Do not stage or commit')) {
+    foreach ($requiredText in @('repo-author', 'built-in `worker`', 'BUILT_IN_WORKER_FALLBACK', 'references/REVIEW-HANDOFF.md', 'git diff --check', 'Do not stage or commit')) {
         if ($skillText -notmatch [regex]::Escape($requiredText)) {
             Add-Failure "repo-wrap-up is missing '$requiredText': $skillPath"
         }
+    }
+    if ($skillText -notmatch '(?i)must not delegate (again|another wrap-up)') {
+        Add-Failure "repo-wrap-up must prohibit recursive wrap-up delegation while preserving tester dispatch: $skillPath"
     }
 }
 
@@ -135,7 +153,7 @@ if ($null -eq $node) {
 }
 
 if ($script:Failures.Count -gt 0) {
-    $script:Failures | ForEach-Object { Write-Error $_ }
+    $script:Failures | ForEach-Object { [Console]::Error.WriteLine($_) }
     exit 1
 }
 

@@ -5,7 +5,7 @@ description: Extend an active repository with the governed SWE portfolio or solu
 
 # SWE Scaffold
 
-Merge one finalized v2 scaffold into the active repository. Create missing directories and files, preserve every existing file, and report both created and skipped paths.
+Merge one finalized V3 scaffold into the active repository. Create missing directories and files, preserve every existing file, and report both created and skipped paths. Copying files does not adopt new governance in an existing repository.
 
 ## Invocation
 
@@ -23,7 +23,8 @@ Exactly one scaffold switch is required. Do not infer portfolio versus solution 
 4. For a portfolio run, the script first rejects the legacy root-level `WORK-CONTEXT.md`, `STRUCTURAL-CONTEXT.md`, or `ENGINEERING-CONTEXT.md` layout. Explicitly migrate those files to `.swe/context/` and update the root `CONTEXT-MAP.md` before rerunning; the additive copier must not create duplicate context authorities.
 5. The script reads the matching `references/portfolio/` or `references/solution/` tree, preflights type collisions, merges missing folders, atomically publishes only absent files, and returns a structured report. Add `-AsJson` for JSON output.
 6. Review the report. Never convert a skipped path into an overwrite, and do not add a force-overwrite path.
-7. Validate that `AGENTS.md`, `README.md`, `VERSION.md`, `.codex/config.toml`, the expected agent roster, and the repository-specific engineering directories exist after the merge. Existing versions of those files are valid skipped results.
+7. Request bounded executable checks through `$swe-test` and `test-runner` (`gpt-5.6-luna`, `medium`) for governance, agent registry paths, and engineering directories. Discover the actual host role/model and tool permissions; static TOML alone does not prove execution. Existing files are valid skipped results; if older governance or registry prevents tester routing, report the precise adoption/capability blocker without modifying it.
+8. For an existing customized repository, start with [the V3.1 adoption preflight](../../references/V31-HELPERS.md) to combine the proposed diff, version/registry checks, owner compatibility review and actual-host smoke evidence. Follow the [V3 migration guide](../../references/V3-MIGRATION.md). Adopt at an explicitly approved Epic/revision boundary using separately authorized edits. Preserve local agents, MCP/settings, accepted history and exhausted review counts; rerunning this copier is not a migration.
 
 ## Safety
 
@@ -38,10 +39,10 @@ Exactly one scaffold switch is required. Do not infer portfolio versus solution 
 
 - The script exits successfully and reports a summary.
 - Every source file is either created or reported as an existing skipped file.
-- Portfolio runs contain the 8-agent portfolio catalog; solution runs contain the 18-agent solution catalog, including an independent `solution-validator`.
+- Fresh portfolios and solutions contain their registered role files, including `test-runner` on Luna/medium and the solution's independent `solution-validator`. Derive the roster from each source registry; existing customized registries stay skipped.
 - Portfolio runs keep `CONTEXT-MAP.md` at the root, place its three routed vocabularies under `.swe/context/`, and never leave legacy root duplicates.
 - No source file is silently omitted and no existing destination file changes.
 
 ## Output
 
-Report the selected scaffold, destination, created-file count, skipped-existing count, and any validation limitation. Preserve the script's `SchemaVersion`, path arrays, and nested `Counts` object when another tool consumes the result.
+Report the selected scaffold, destination, created-file count, skipped-existing count, effective governance/adoption status, tester capability and any validation limitation. Preserve the copier's existing `SchemaVersion: 2.0`, path arrays, and nested `Counts` object for compatible readers; the package version and copied content are V3.

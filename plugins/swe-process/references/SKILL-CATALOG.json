@@ -1,0 +1,270 @@
+{
+  "schema_version": 3,
+  "release_version": "3.1.0",
+  "packages": [
+    {
+      "name": "swa-analyze",
+      "version": "3.1.0",
+      "skills": [
+        {
+          "name": "swa-abstraction",
+          "path": "plugins/swa-analyze/skills/swa-abstraction/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swa-analyze",
+          "path": "plugins/swa-analyze/skills/swa-analyze/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swa-boundary",
+          "path": "plugins/swa-analyze/skills/swa-boundary/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swa-constraint",
+          "path": "plugins/swa-analyze/skills/swa-constraint/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swa-dialectic",
+          "path": "plugins/swa-analyze/skills/swa-dialectic/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swa-first-principles",
+          "path": "plugins/swa-analyze/skills/swa-first-principles/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swa-interface",
+          "path": "plugins/swa-analyze/skills/swa-interface/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swa-inversion",
+          "path": "plugins/swa-analyze/skills/swa-inversion/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swa-leverage-point",
+          "path": "plugins/swa-analyze/skills/swa-leverage-point/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swa-metaphor",
+          "path": "plugins/swa-analyze/skills/swa-metaphor/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swa-pattern",
+          "path": "plugins/swa-analyze/skills/swa-pattern/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swa-perspective",
+          "path": "plugins/swa-analyze/skills/swa-perspective/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swa-scenario",
+          "path": "plugins/swa-analyze/skills/swa-scenario/SKILL.md",
+          "visibility": "public"
+        }
+      ]
+    },
+    {
+      "name": "swe-codex",
+      "version": "3.1.0",
+      "skills": [
+        {
+          "name": "new-agent",
+          "path": "plugins/swe-codex/skills/new-agent/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "new-plugin",
+          "path": "plugins/swe-codex/skills/new-plugin/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "new-skill",
+          "path": "plugins/swe-codex/skills/new-skill/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "patterns",
+          "path": "plugins/swe-codex/skills/patterns/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "repo-wrap-up",
+          "path": "plugins/swe-codex/skills/repo-wrap-up/SKILL.md",
+          "visibility": "public"
+        }
+      ]
+    },
+    {
+      "name": "swe-process",
+      "version": "3.1.0",
+      "skills": [
+        {
+          "name": "swe-architect",
+          "path": "plugins/swe-process/skills/swe-architect/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-assess-architecture",
+          "path": "plugins/swe-process/skills/swe-assess-architecture/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-bridge",
+          "path": "plugins/swe-process/skills/swe-bridge/SKILL.md",
+          "visibility": "internal"
+        },
+        {
+          "name": "swe-bugfix",
+          "path": "plugins/swe-process/skills/swe-bugfix/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-comment",
+          "path": "plugins/swe-process/skills/swe-comment/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-conceptualize",
+          "path": "plugins/swe-process/skills/swe-conceptualize/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-design",
+          "path": "plugins/swe-process/skills/swe-design/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-enhancement",
+          "path": "plugins/swe-process/skills/swe-enhancement/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-implement",
+          "path": "plugins/swe-process/skills/swe-implement/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-max",
+          "path": "plugins/swe-process/skills/swe-max/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-new-epic",
+          "path": "plugins/swe-process/skills/swe-new-epic/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-plan-features",
+          "path": "plugins/swe-process/skills/swe-plan-features/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-plan-implementation",
+          "path": "plugins/swe-process/skills/swe-plan-implementation/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-research",
+          "path": "plugins/swe-process/skills/swe-research/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-scaffold",
+          "path": "plugins/swe-process/skills/swe-scaffold/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-test",
+          "path": "plugins/swe-process/skills/swe-test/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "swe-validate",
+          "path": "plugins/swe-process/skills/swe-validate/SKILL.md",
+          "visibility": "public"
+        }
+      ]
+    },
+    {
+      "name": "swe-utility",
+      "version": "3.1.0",
+      "skills": [
+        {
+          "name": "bridge",
+          "path": "plugins/swe-utility/skills/bridge/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "capture-style",
+          "path": "plugins/swe-utility/skills/capture-style/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "deepen",
+          "path": "plugins/swe-utility/skills/deepen/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "diagram-design",
+          "path": "plugins/swe-utility/skills/diagram-design/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "domain-modeling",
+          "path": "plugins/swe-utility/skills/domain-modeling/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "grill",
+          "path": "plugins/swe-utility/skills/grill/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "loc",
+          "path": "plugins/swe-utility/skills/loc/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "mimic",
+          "path": "plugins/swe-utility/skills/mimic/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "note",
+          "path": "plugins/swe-utility/skills/note/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "orchestrate",
+          "path": "plugins/swe-utility/skills/orchestrate/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "orchestrate-max",
+          "path": "plugins/swe-utility/skills/orchestrate-max/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "prototype",
+          "path": "plugins/swe-utility/skills/prototype/SKILL.md",
+          "visibility": "public"
+        },
+        {
+          "name": "version",
+          "path": "plugins/swe-utility/skills/version/SKILL.md",
+          "visibility": "public"
+        }
+      ]
+    }
+  ]
+}

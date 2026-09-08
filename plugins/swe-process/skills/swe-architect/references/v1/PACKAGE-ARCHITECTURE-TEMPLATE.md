@@ -15,7 +15,7 @@ owners:
   - "[PACKAGE_ARCHITECT]"
 created: "[YYYY_MM_DD]"
 updated: "[YYYY_MM_DD]"
-template_version: "2.0.0"
+template_version: "3.0.0"
 ---
 
 # [PACKAGE_NAME] Package Architecture
@@ -67,6 +67,29 @@ flowchart LR
 
 - [PARENT_ADR_OR_FEATURE_LINK]
 - [DIVERGENCE_OR_NONE]
+
+## Profile and Decision Basis
+
+- Profile: [COMPACT_OR_DETAILED]; rationale: [ONE_SENTENCE_PROFILE_RATIONALE]
+- Parent alignment and exclusions: [GOVERNING_CONSTRAINTS_AND_BOUNDARY]
+- Invariants: [MUST_HOLD_BEHAVIOR_AND_OWNERSHIP_RULES]
+- Alternatives and consequences: [CHOICE_REJECTED_ALTERNATIVE_AND_TRADEOFF]
+- Feasibility and verification: [PROOF_OBLIGATIONS_AND_REQUIRED_CHECKS]
+- Applicability: [OMITTED_CONCERN_AND_REASON_OR_NONE]
+
+## Failure, Security, and Operational Readiness
+
+- Failure and recovery: [ERROR_RETRY_RESOURCE_LIMIT_AND_RECOVERY_BEHAVIOR]
+- Security and trust: [THREAT_BOUNDARY_AND_CONTROL]
+- Operations and compatibility: [OBSERVABILITY_DEPLOYMENT_MIGRATION_AND_REVERSAL]
+
+## Review Packet
+
+- Decision bytes or immutable snapshot: [INPUT_AND_DECISION_FINGERPRINT_LOCATORS]
+- Effective policy and named approver: [POLICY_LOCATOR_AND_APPROVER]
+- Paired decisions and order: [PAIRED_ARTIFACT_LOCATORS_OR_NONE]
+- Review cycle history: [DURABLE_HISTORY_LOCATOR]; repair cycles consumed: [COUNT]
+- Correspondence at decision time: [VERIFIED_MATCH_OR_BLOCKER]
 
 ## Approval Record
 

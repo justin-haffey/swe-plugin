@@ -264,6 +264,8 @@ Update local override files such as `AGENTS.override.md` only when:
 
 ### 9. Validate
 
+Route executable syntax, static, script, and behavioral checks through `$swe-test` to `test-runner` (`gpt-5.6-luna`, `medium`), using exact scope and native commands. The author owns repairs; independent reviewers judge adequacy. Missing required tester or tooling is Blocked. The validation steps below define obligations for that request; they do not authorize the author to execute checks or accept their own work.
+
 Before finalizing:
 
 1. Check filename and `name` alignment.

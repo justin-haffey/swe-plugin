@@ -15,7 +15,7 @@ owners:
   - "[OWNER]"
 created: "[YYYY_MM_DD]"
 updated: "[YYYY_MM_DD]"
-template_version: "2.0.0"
+template_version: "3.0.0"
 ---
 
 # [BUG_TITLE]
@@ -46,6 +46,11 @@ template_version: "2.0.0"
 |---|---|---|
 | [REGRESSION_OR_REPOSITORY_CHECK] | [PASS_FAIL_BLOCKED] | [REFERENCE] |
 
+- Execution route: `$swe-test` -> `test-runner` (`gpt-5.6-luna`, `medium`).
+- Immutable receipt and actual source/dependency generation: [RECEIPT_LOCATOR_AND_GENERATION]
+- Remaining required checks and closure gate: [NONE_OR_PENDING_OBLIGATIONS]
+- Standalone closure requires all required checks; no deferral to an absent Epic checkpoint.
+
 ## Validation and Closure
 
 | Field | Value |
@@ -60,6 +65,8 @@ template_version: "2.0.0"
 | Closure owner | [OWNER_OR_PENDING] |
 | Closure recorded | [ISO_8601_TIMESTAMP_OR_PENDING] |
 | Waiver rationale | [REQUIRED_WHEN_WAIVED_OR_NONE] |
+| Reviewed substantive fingerprint | [FINGERPRINT_OR_PENDING] |
+| Cycle history and count | [DURABLE_LOCATOR_AND_CONSUMED_CYCLES] |
 
 ## Residual Risk
 

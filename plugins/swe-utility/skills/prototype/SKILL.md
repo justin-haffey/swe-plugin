@@ -51,7 +51,7 @@ For every prototype request:
 1. Capture the developer's operative instruction verbatim in the active `PROTOTYPE.md`, including text placed in quotation marks or fenced examples. Do not silently normalize quoted example text.
 2. Record intended scope and expected behavior before or at the first implementation edit. If the current run is already reconciled, create a new run and make it the state's `active_run` while leaving mode `On`.
 3. Execute the requested local work using the named skill or the smallest appropriate implementation workflow. Do not stop merely because the ordinary Epic, Feature, Plan, Design, or approval gate does not yet exist.
-4. Record actual changed paths, tests and checks run, observed behavior, deviations, decisions, assumptions, and unresolved risks. Report unrun checks honestly.
+4. Route agent-directed test, verification-build, lint/static and browser execution through `$swe-test` to `test-runner` (`gpt-5.6-luna`, `medium`). Developers own source/test repairs. Record changed paths, actual receipts, observed behavior, deviations, decisions, assumptions, and risks. Missing required execution remains Blocked. Prototype sequencing alone grants neither V3 test deferral nor approval, and cannot reset review-cycle history; report unrun checks honestly.
 5. When delegating or orchestrating, include the canonical on-sentinel, repository scope, and run ID in every task. Workers return evidence to the primary agent; the primary agent owns the durable run record and backtracking closure.
 6. Immediately after implementation or orchestration completes, execute the backtracking process. Do not wait for `-off` when the run can be reconciled now.
 

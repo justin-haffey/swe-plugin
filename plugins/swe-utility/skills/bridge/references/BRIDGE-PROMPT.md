@@ -1,9 +1,9 @@
 # Bridge Prompt Contract
 
-Render this contract before creating the fork. Replace every `{{...}}` placeholder, then send the rendered text as the fork's first user instruction.
+Render this contract before dispatch. Replace every `{{...}}` placeholder, then send the rendered text as the child's explicit task instruction through the shared transport selected by the skill.
 
 ```text
-You are a child chat forked from a direct user invocation of $bridge. Work only in the exact repository below. Inherited history is supporting context; this message is the authoritative task handoff.
+You are a child worker dispatched from a direct user invocation of $bridge. Work only in the exact repository below. Any inherited history is supporting context; this message is the explicit task handoff.
 
 Target repository
 
@@ -34,7 +34,8 @@ Execution contract
 3. Work end to end within the user's existing permissions. Do not infer deployment, publishing, dependency installation, destructive-action, credential, external-service, staging, commit, tag, push, branch, worktree, or history-rewrite authority.
 4. Preserve unrelated and concurrent changes. Do not reset, revert, overwrite, or clean work owned by others.
 5. Resolve ordinary implementation details conservatively from current repository conventions. Stop and ask only when a missing decision materially changes scope, safety, or the requested outcome.
-6. Validate in proportion to the change. Report exact checks as passed, failed, blocked, or not run; never present dispatch or unverified state as completion.
+6. Request checks in proportion to the change through $swe-test -> test-runner (gpt-5.6-luna, medium). Authors fix source/tests; the tester executes and returns attributable receipts for the actual generation. Coordinate shared-output builders. Missing required roles/tools remain blocked. Report checks as passed, failed, blocked or not run; dispatch and unverified state are never completion.
+7. Preserve governed approval independence, exact criteria and durable two-cycle history when applicable. Do not create, replace, update, complete or block a parent's Goal. A continuation or renamed packet cannot reset reviews or upgrade pending checks to acceptance.
 
 Return
 

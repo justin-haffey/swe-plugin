@@ -1,91 +1,88 @@
 # SWE Plugin
 
-SWE Plugin is a source repository for Codex customizations that make a software-engineering process portable, reviewable, and usable across a portfolio repository and its child solution repositories. Version 2.0.2 centers on a governed artifact flow: portfolio intent becomes an Epic, research, accepted architecture and Features; solution repositories turn allocated work into Design, code, evidence, and validation.
+SWE Plugin **3.1.0** provides portable engineering workflows for a portfolio and its child solutions. V3 reduces repeated artifact writing, starts work when its actual prerequisites permit it, and separates implementation progress from tested, independently accepted delivery.
 
-The repository contains four plugins. `swe-process` is the primary v2 package. `swe-codex` provides focused authoring workflows for Codex plugins, skills, and agents plus a goal-completion repository wrap-up hook, `swe-utility` contains reusable supporting skills, and `swa-analyze` provides portfolio-focused strategic architecture analysis.
+V3.1 adds [canonical eligibility packet preparation and consolidated adoption preflight](plugins/swe-process/references/V31-HELPERS.md). The packet builder derives IDs, hashes and review counts while preserving unresolved judgments; preflight combines exact migration proposals, package and registry checks, owner compatibility review, and actual-host smoke evidence. Both are read-only and cannot approve work or activate policy. Efficiency measurement is deferred to the real Epic 003 use case; no measured speed or token savings are claimed.
 
-## Repository layout
+The four packages remain:
 
-```text
-plugins/
-  swe-process/        v2 engineering-process skills, templates, validator, and scaffold copier
-  swe-codex/          Codex authoring skills and goal-completion wrap-up hook
-  swe-utility/        reusable supporting skills
-  swa-analyze/        strategic software-architecture analysis router and lenses
-scaffolds/
-  portfolio/          final scaffold for a portfolio/platform authority repository
-  solution/           final scaffold for a child solution repository
-tmp/task-materials/   design inputs used to develop v2; not shipped process authority
+| Package | Responsibility |
+| --- | --- |
+| `swe-process` | Governed lifecycle, internal delivery bridge, bounded testing, templates and scaffolds |
+| `swe-codex` | Plugin, skill and agent authoring, advisory pattern lookup and repository wrap-up |
+| `swe-utility` | Optional discovery, orchestration, prototype, style and versioning helpers |
+| `swa-analyze` | Advisory strategic architecture analysis of existing artifacts and source |
+
+The [generated skill catalog](plugins/swe-process/references/SKILL-CATALOG.json) is the exact inventory across packages. Specialist commands remain callable. `$swe-comment` still documents changed code without changing behavior; `$swe-bridge` is internal to the coordinator. The public utility `$bridge` handles explicit direct requests under the same transport rules without acquiring lifecycle authority.
+
+## Start here
+
+| Task | Command |
+| --- | --- |
+| Initialize portfolio governance | `$swe-scaffold -portfolio` |
+| Initialize a child solution | `$swe-scaffold -solution` |
+| Deliver an Epic | `$swe-max -epic <Epic ID or path>` |
+| Correct a bounded local defect | `$swe-bugfix` |
+| Refine a bounded local capability | `$swe-enhancement` |
+| Run required checks for a change or verification batch | `$swe-test <scope>` |
+
+Install the appropriate packages through your configured Codex marketplace. Installing a package does not automatically migrate existing repository governance. Verify the target host exposes the required skills, Goal tools and subagent transport before starting `$swe-max`.
+
+## Portfolio walkthrough
+
+Start with an Epic and reuse applicable verified research. Concept and Architecture Impact share an authoring/review packet but retain their distinct decisions. Change only the affected architecture, contracts and ADRs. Co-author each Feature and its adjacent Implementation Plan, preserving distinct approvals and explicit assignment dependencies.
+
+The coordinator sends an assignment as soon as its approved Feature, allocation, affected architecture and Design-entry prerequisites are ready. A child can enter Design before it has an approved local Design; coding requires that approval. Unrelated assignments can proceed while a prerequisite is blocked. A dependency that requires validated behavior cannot consume an implementation-complete result with checks pending.
+
+After all work is implemented, drain deferred verification batches and necessary fixes, complete independent solution decisions, then reconcile every Feature's cross-solution criteria. A scoped integrated architecture assessment, any required remediation and final reconciliation precede Epic acceptance.
+
+## Solution walkthrough
+
+Verify the exact checkout, dirty baseline, allowed files and upstream Feature/Plan IDs and paths. Author implementation choices and concrete test obligations in the local Design, referencing approved upstream intent. Choose the appropriate developer for the work; the existence of Solution, Package and Module roles does not require three handoffs.
+
+Developers write source and tests and own repairs. `$swe-test` dispatches bounded execution to `test-runner` using **gpt-5.6-luna / medium**, including verification builds, static checks, browser checks and reruns. The tester saves actual outputs and attributable receipts, with no source, test, configuration or assertion repairs. The independent validator judges criterion coverage and can request a fresh tester execution; a green exit or test count alone does not establish acceptance.
+
+Use these checkpoints precisely:
+
+**Implementation complete → Verification complete → Epic accepted**
+
+Evidence can be Draft with implementation complete and checks pending. Complete Evidence requires all required observations; verification complete requires successful checks for the relevant generation. Failed observations remain evidence and cannot prove accepted delivery. Acceptance comes from the actual independent Validation decision, never a developer-written progress field.
+
+## Risk and approval
+
+Minimal-risk work may batch behavioral checks at the Epic implementation checkpoint only when an independent reviewer confirms it is isolated and reversible. Required structural/build checks still run. Public or cross-solution contracts, security, persistence, concurrency, operational effects and foundational prerequisite behavior require early checks. Uncertain dependencies or risk block deferral. Standalone fast paths finish their required checks before closure.
+
+Human approval remains the default unless the repository owner records a V3 standing policy or supplies explicit run authorization. Major intent, contract and risk decisions retain named human approval; technical review stays independent. Preserve a specifically named approver. Automatic review allows at most two repair/review cycles across resumes or renamed packets. Explicit human `-force` records a bypass, never acceptance.
+
+`$prototype -on` remains a separately authorized sequencing exception. It records repository-local observations and backtracks into Draft/Target/Proposed artifacts for ordinary review. It does not grant acceptance, cross-repository writes, external mutation, deployment or Git authority, or reset historical review limits.
+
+## Artifact and role ownership
+
+Architecture stays **Platform → Solution → Package → Module**; systems are views. Portfolio owns Epics, Concepts, impact assessments, Platform architecture, shared contracts, Features and adjacent Plans. Solutions own local architecture, Design, code, tests, Evidence and local Validation. Preserve stable IDs, criterion IDs, dual locators and accepted history; do not copy portfolio artifacts into solutions.
+
+Skills define procedures and output contracts. Agent TOMLs define expertise, model, scope and independence. `agents/openai.yaml` describes a skill to the host; it does not implement or launch a worker. The coordinator schedules work; scripts generate repetitive structure and capture observations. A role file alone does not prove host availability. See [official subagent configuration](https://learn.chatgpt.com/docs/agent-configuration/subagents).
+
+Use Compact architecture templates (`references/v1/`) by default. Select Detailed (`references/v2/`) per artifact for critical boundaries or complex state, failure, compatibility or operational concerns. Record one sentence explaining the choice. Both profiles preserve the same governance; existing accepted Detailed artifacts need no shortening rewrite.
+
+The [artifact contract](plugins/swe-process/references/ARTIFACT-CONTRACT.md) supplies the authoritative lifecycle and progress rules. `$swa-analyze` writes only advisory `architecture/analysis/<scope-key>/ANALYSIS.md`; it cannot change or approve the system it examines.
+
+## Scaffolding and adoption
+
+The final sources are [portfolio](scaffolds/portfolio/) and [solution](scaffolds/solution/). Their packaged copies under `swe-scaffold/references/` must match byte for byte. The copier creates missing files and merges directories; every existing file is skipped. A copied tester alone does not activate V3 in older governance.
+
+Use the [migration and compatibility guide](plugins/swe-process/references/V3-MIGRATION.md) for a read-only proposed diff and separately authorized adoption, preferably at the next Epic or assignment revision. Retain customized agents, MCP registrations and settings. Re-running the scaffold is not a migration. Rollback requires draining V3 deferred obligations and a reviewable handoff; it does not undo code or historical approvals.
+
+Production templates live with their creating skill under `references/`. `scaffolds/_templates/` and `tmp/task-materials/` remain development evidence, not runtime template authorities. Generated coverage and metadata sections never author decisions or overwrite accepted content.
+
+## Maintainer commands
+
+No package-manager build is required. The shipped surface is Markdown, JSON/YAML/TOML, PowerShell, hooks and scaffold assets. Refresh the catalog after an intentional inventory change:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swe-process\scripts\Get-SweCatalog.ps1 -Write
 ```
 
-[`scaffolds/_templates/`](scaffolds/_templates/) is a temporary development corpus. The production templates belong with the process skills that create them under [`plugins/swe-process/skills/`](plugins/swe-process/skills/); do not treat the temporary corpus as a runtime override layer.
-
-## SWE Process v2
-
-`swe-process` deliberately has a clean, 15-skill roster:
-
-| Phase | Skill | Outcome |
-| --- | --- | --- |
-| End-to-end | `$swe-max` | Coordinates one Epic through a formal Goal, governed implementation, architectural remediation, and independent validation. |
-| Portfolio work | `$swe-new-epic` | Creates a governed Epic container. |
-| Discovery | `$swe-research` | Records bounded, traceable research. |
-| Intent | `$swe-conceptualize` | Produces an Epic-local Concept. |
-| Impact | `$swe-assess-architecture` | Determines architecture impact and next authority. |
-| Architecture | `$swe-architect` | Authors, reconciles, or independently reviews Platform, Solution, Package, or Module architecture, ADRs, contracts, and system views. |
-| Definition | `$swe-plan-features` | Defines canonical portfolio Features and acceptance criteria. |
-| Allocation | `$swe-plan-implementation` | Creates the portfolio-owned implementation handoff beside a Feature. |
-| Solution design | `$swe-design` | Creates local Design for an allocated implementation. |
-| Delivery | `$swe-implement` | Implements approved Design and records Evidence. |
-| Code documentation | `$swe-comment` | Documents changed source using Git context and behavior-preserving comments. |
-| Verification | `$swe-validate` | Independently validates local delivery or integrated portfolio acceptance evidence. |
-| Fast path | `$swe-bugfix` | Records a bounded solution-local defect correction. |
-| Fast path | `$swe-enhancement` | Records a bounded solution-local improvement. |
-| Initialization | `$swe-scaffold` | Additively extends an existing repository with a portfolio or solution scaffold. |
-
-Architecture is organized as `Platform -> Solution -> Package -> Module`. Systems are runtime or operational views within platform or solution architecture, rather than a separate architecture level. The portfolio owns Epics, Concepts, platform architecture, cross-solution contracts, canonical Features, and their adjacent Implementation Plans. A solution owns solution/package/module architecture, local Design, source, tests, Evidence, and local Validation.
-
-Every cross-repository handoff uses both a stable artifact ID and a repository-relative path, with an optional revision. This dual locator lets a child Solution retain a durable link to the portfolio Feature and Implementation Plan without copying or redefining them. Implementation roles run checks and produce Evidence; independent `solution-validator` and `feature-validator` roles author formal Validation. Architecture reviewers use `$swe-architect -review`, not Feature validation.
-
-## SWE Utility
-
-`swe-utility` provides supporting workflows used by the process without expanding lifecycle authority. Its internal [`$swe-bridge`](plugins/swe-utility/skills/swe-bridge/SKILL.md) skill is invoked only by `$swe-max` after the complete Implementation Plan stage is accepted. It uses `/fork` or the host's exact thread-fork equivalent to send a self-contained assignment prompt into the exact child solution, then dynamically enters at `$swe-design` or an already-authorized `$swe-implement` handoff. It is not a direct user workflow, and dispatch alone never counts as delivery.
-
-## SWA Analyze
-
-`swa-analyze` contains a routing skill and twelve focused strategic lenses: leverage points, boundaries, metaphors, abstraction, first principles, inversion, interfaces, patterns, dialectics, constraints, perspectives, and scenarios. `$swa-analyze [<developer_input>]` inspects the requested scope, selects the smallest useful set of lenses, and produces one evidence-backed report at `architecture/analysis/<scope-key>/ANALYSIS.md`.
-
-The analysis is advisory. It reviews existing SWE artifacts and source evidence, uses Codebase Memory graph discovery with direct-source confirmation, and recommends governed follow-up work without modifying the architecture, lifecycle artifacts, contracts, code, tests, or evidence it examines. Portfolio analysis roles receive explicit `$swa-*` allocations; every portfolio and solution agent TOML explicitly declares its own default skill allocation.
-
-## Approval and lifecycle
-
-Decision-bearing artifacts default to named human approval. `-auto-approve` delegates review only to an independent, appropriate agent; the author cannot approve its own work, and two repair-and-review cycles are the maximum before human escalation. `-force` requires explicit human authorization and records the bypass; it does not invent acceptance, validation, or evidence.
-
-Work artifacts move through `Draft -> InReview -> Accepted -> Superseded`. Architecture moves through `Target -> Implemented -> Current -> Superseded`, with implementation Evidence required for the first promotion and validation plus reconciliation required for the second. See the full rules in the [artifact contract](plugins/swe-process/references/ARTIFACT-CONTRACT.md) and in the generated scaffold governance files.
-
-`$prototype -on` deliberately reverses that sequence for explicitly requested, repository-local prototype work: implementation may begin before the ordinary lifecycle entry gates, but the exact request, scope, changes, behavior, checks, and decisions are recorded durably. After implementation, the workflow backtracks into the smallest truthful fast path or Draft/Target/Proposed artifact chain and submits it to ordinary review and independent validation. `$prototype -off` succeeds only after every open run is reconciled or developer-cancelled. The mode does not grant deployment, external-mutation, destructive-action, credential, dependency, Git, cross-repository, acceptance, or validation authority.
-
-## Using a scaffold
-
-Use the final skill only after choosing the repository’s authority:
-
-```text
-$swe-scaffold -portfolio
-$swe-scaffold -solution
-```
-
-The skill copies from its own `references/portfolio/` or `references/solution/` tree into the active repository (or an explicit destination). It creates missing files and merges folders, but never overwrites, truncates, deletes, renames, or relocates an existing destination file. Its report distinguishes created files from skipped existing files.
-
-The portfolio scaffold includes platform-focused Codex agents and governance. The solution scaffold includes solution, package, and module architecture/development agents, implementation specialists, and an independent solution validator. Both install a repository-local `.codex` configuration, starter README/AGENTS guidance, version source, and governed artifact directories.
-
-## Goal completion wrap-up
-
-When the installed `swe-codex` plugin observes a successful goal completion, its trusted `PostToolUse` hook requests `$repo-wrap-up` before the final response. The skill attempts the repository's `repo-author` agent first and falls back to a built-in `worker` subagent when that role is unavailable. The wrap-up inspects the attributable Git diff and relevant lifecycle artifacts, reconciles human-facing README files, changes AGENTS files only for durable governance changes, runs repository-native checks, and pauses with an exact user-review handoff.
-
-Hook trust remains explicit in Codex. The wrap-up never stages, commits, pushes, tags, releases, deploys, changes versions, rewrites history, or absorbs ambiguous unrelated worktree changes.
-
-## Development and validation
-
-No package-manager build is required; the distributable surface is plugin metadata, Markdown skills/templates, scaffold files, PowerShell, and TOML configuration. Work from the repository root and validate v2 process changes with:
+Route agent-directed validation through `$swe-test`. Native commands are:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swe-process\scripts\Test-SweProcess.ps1
@@ -94,8 +91,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swa-analyze\script
 git diff --check
 ```
 
-The process command validates the exact process-skill roster, required resources, template metadata and traceability contracts, the `$swe-max` to `$swe-bridge` transition, Prototype Mode integration, lifecycle and phase-gate semantics, the current multi-agent feature plus the repository-required v2 workflow selector, role/skill authority, scaffold references, and agent registrations. The SWE Codex command validates the goal-completion hook, handler behavior, plugin registration, and `$repo-wrap-up` bundle. Run the process command again after changing a process template, scaffold, or `swe-scaffold` reference. For all packages, validate JSON manifests, SKILL front matter, relative links, and affected TOML registrations before handing off changes.
+Validation covers inventory/version consistency, artifact metadata and locators, role routing, workflow boundaries, scaffold collisions and parity, hook behavior and the new helpers. Also parse affected JSON, YAML and TOML and resolve Markdown references. Static checks cannot prove live role discovery; run the supported-host tester smoke test and fixture rehearsal when changing dispatch or execution.
 
-## Extending the plugins
-
-Read [AGENTS.md](AGENTS.md) before modifying this repository. It defines the source-of-truth order, the package and scaffold boundaries, plugin/skill conventions, validation expectations, and safe Git practices. In particular, process templates must remain owned by the skill that creates them, scaffold references must match their top-level sources, and `swe-scaffold` is created or refreshed last after both scaffolds are final.
+The trusted `swe-codex` goal-completion hook requests `$repo-wrap-up`: a repository author reconciles documentation, routes checks through the tester and returns exact review paths. It does not stage, commit, publish, version or deploy. Read [AGENTS.md](AGENTS.md) before extending these packages.

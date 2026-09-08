@@ -1,0 +1,7 @@
+interface:
+  display_name: "Run Scoped Checks"
+  short_description: "Bounded checks with attributable receipts"
+  default_prompt: "Use $swe-test to run the required checks for this change and report receipts and missing coverage."
+
+policy:
+  allow_implicit_invocation: true

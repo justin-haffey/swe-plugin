@@ -15,7 +15,7 @@ After the final documentation edit and required checks, capture:
 - current branch and `git status --short`;
 - `git diff --stat` and the exact completed-goal review paths;
 - any pre-existing staged paths from `git diff --cached --name-only`;
-- repository-native validation results;
+- repository-native validation results and immutable `$swe-test` receipt locators matching the final generation;
 - repository-local documentation, generated-file, or parity checks supplied by applicable instructions or native validation.
 
 Do not run `git add`, `git commit`, `git stash`, `git reset`, `git checkout`, `git clean`, `git push`, or any version, tag, release, or deployment operation.

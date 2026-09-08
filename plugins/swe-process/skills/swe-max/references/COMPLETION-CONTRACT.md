@@ -1,6 +1,6 @@
 # SWE Max Completion Contract
 
-Read this contract at the all-coded gate, for failed decisions and blockers, during architectural remediation, and before any root Goal update.
+Read this contract at the Implementation complete, Verification complete and Epic accepted checkpoints, for failed decisions and blockers, during remediation, and before any root Goal update.
 
 ## Root Goal Ownership
 
@@ -32,20 +32,28 @@ The delivery set must be non-empty when Epic outcomes remain unimplemented. Do n
 The coordinator may update the Goal to `complete` only when all of these are true:
 
 1. The Epic and every required decision-bearing artifact have legal lifecycle states, valid dual locators, and real approval records.
-2. `Mode: auto-approve` records the actual independent agent, durable evidence, and author/reviewer independence for every automatic decision; no approval is fabricated and no `-force` bypass was used.
+2. Effective adoption/run policy and explicitly named approvers are honored, including Major human decisions where required. `Mode: auto-approve` records the actual independent agent, durable evidence and author/reviewer independence for every authorized automatic decision; no approval is fabricated and no `-force` bypass was used.
 3. Every Feature in the delivery set is concrete, `Accepted`, implemented in code, and covered by an `Accepted` portfolio Implementation Plan.
 4. Every child assignment has an `Accepted` Design, implemented source and tests, a complete `EVIDENCE.md`, and `Accepted` independent local Validation.
 5. Exact traceability is complete for every `(Epic ID, Feature ID, AC-NNN)` from Feature through Implementation Plan, Design, Evidence, local Validation, and per-Feature portfolio Validation.
-6. Required repository-native format, lint, build, test, security, integration, migration, and operational checks pass. An unavailable required check is not a pass.
+6. Required repository-native format, lint, build, test, security, integration, migration, browser and operational checks pass through `$swe-test` and the effective `test-runner` (`gpt-5.6-luna`, `medium`). Receipts identify the generation actually executed, including dirty source and dependency outputs. An unavailable, partial, stale or unattributed required check is not a pass.
 7. A new post-implementation `architecture/analysis/<scope-key>/ANALYSIS.md` covers the resulting portfolio and child boundaries.
 8. No unresolved major architectural finding remains. Every remediation successor and Feature has traversed the same Design, implementation, Evidence, local Validation, and portfolio Validation chain.
-9. Every check and independent Validation affected by remediation was rerun, and a fresh affected `$swa-analyze` report confirms the major finding's fixed point.
-10. Integrated portfolio `$swe-validate -auto-approve` has an `Accepted` decision for every Feature in the delivery set.
+9. Every check affected by remediation was rerun through `$swe-test`, affected independent Validation was reconfirmed against matching frozen decision bytes, and a fresh affected `$swa-analyze` report confirms the major finding's fixed point. Unaffected current receipts and decisions may be reused.
+10. Integrated portfolio `$swe-validate` has an independent `Accepted` decision under the effective approval policy for every Feature in the delivery set; use `-auto-approve` only when authorized.
 11. Architecture reconciliation reflects only verified evidence and operational truth; no status was promoted merely to complete the run.
 12. Completed child agents and tasks are closed or otherwise cleanly ended, and every required durable artifact locator is collected.
-13. No result depends on a fabricated approval, unavailable validation, placeholder implementation, unauthorized external action, or unintegrated child-task output.
+13. No result depends on fabricated approval, unavailable validation, placeholder implementation, unauthorized external action or unintegrated child output. All deferred obligations are drained and required shared-output build slots have receipts matching the consumed generation.
 
 Partial implementation, placeholder or deferred Features, missing Evidence, unavailable required validation, unresolved major findings, or incomplete assignments are never successful completion.
+
+## Checkpoint distinction
+
+Implementation complete (P90) proves all required implementation and mandatory early gates. Reviewed Minimal assignments may still have Draft Evidence and explicit pending checks/local acceptance. This checkpoint never grants accepted delivery or satisfies a `ValidatedBehavior` dependency. Missing implementation or a failed mandatory early gate blocks it; approved deferred obligations do not.
+
+Verification complete (P95) drains those obligations, applies author-owned fixes and necessary refactoring, reruns affected checks through `$swe-test`, and requires Complete Evidence and independent Accepted local Validation for every assignment. Interrupted or unavailable testing preserves pending/blocked progress rather than fabricating a pass. Failed receipts remain evidence after successful repairs.
+
+Epic accepted (P120) additionally requires integrated per-Feature portfolio decisions, architectural analysis/remediation/reconciliation and every invariant above. Portfolio progress is derived from child Evidence and Validation. Legacy `Complete` bridge responses are observations requiring current Evidence/Validation inspection; missing V3 fields remain unknown until verified.
 
 ## Architecture Lifecycle
 
@@ -64,11 +72,11 @@ For every major finding:
 1. Record the affected artifacts, Features, criteria, repositories, and governing invariant.
 2. Route the repair to the earliest owning lifecycle phase. Never semantically edit an `Accepted` artifact; create a revision or successor.
 3. Add remediation Features and assignments to the delivery inventory and complete their full governed delivery.
-4. Rerun all affected checks and independent local and portfolio Validation.
+4. Request affected checks through `$swe-test` and reconfirm independent local and portfolio Validation for the reviewed generation.
 5. Rerun affected `$swa-analyze` coverage into a new collision-free advisory report.
 6. Preserve durable evidence that the finding is resolved, lawfully superseded, or reclassified with an independent rationale.
 
-Allow at most two author-repair/independent-review cycles for the same artifact revision and decision or the same finding. The initial review is cycle zero; each repair after `ChangesRequired` followed by another independent review consumes one cycle. `ChangesRequired` returns repairable work to `Draft`; a final `Rejected` artifact requires an explicit decision and reason from an owner named in its metadata or governing repository policy. Reopening the same rejected revision does not reset the counter. Exhausted lawful cycles are a blocker, not permission to weaken governance.
+Allow at most two author-repair/independent-review cycles for the same unresolved decision or finding. The initial review is cycle zero; each repair after `ChangesRequired` followed by independent review consumes one cycle. Record the durable cycle-history locator. `ChangesRequired` returns repairable work to `Draft`; a final `Rejected` artifact requires an explicit owner decision and reason. Reopening, resume, packet/executor changes or a successor for the same unresolved decision never resets the counter. Exhaustion requires explicit human disposition; a diagnosis cannot add a review cycle. Freeze substantive bytes or use an immutable snapshot, and reject acceptance when current bytes do not match those reviewed.
 
 ## Fail-Closed Routing
 
@@ -76,11 +84,11 @@ Allow at most two author-repair/independent-review cycles for the same artifact 
 | --- | --- |
 | Failed automatic approval | Repair and independently review at the owning phase, for no more than two cycles. Final rejection requires an owner decision or the blocker protocol. |
 | Unavailable child repository | Preserve its assignment and exact missing path; do not substitute a similarly named checkout or claim delivery. |
-| Missing or incomplete Evidence | Return to child delivery. Do not run successful Validation or pass the all-coded gate. |
+| Missing or incomplete Evidence | Pending approved deferred checks may pass P90 with Draft Evidence; missing implementation/early gates may not. Return to the relevant child phase and do not pass P95 or claim Accepted Validation until required observations are complete and successful. |
 | Required check unavailable or persistently failing | Record the command, environment, failure, affected criteria, and safe repairs attempted; never call it a pass. |
 | Major architectural finding | Enter governed remediation and add all successor work to the delivery set. |
 | Required prohibited action | Stop before the action. Explicit risk awareness does not authorize deployment, publishing, dependencies, credentials, destructive work, external mutation, or Git history changes. |
-| Dedicated task cannot be created, read, or integrated | Fall back to project-scoped custom agents in the exact repository; if that also fails, preserve the handoff and use the blocker protocol. |
+| Selected child transport cannot dispatch, retrieve or integrate safely | Try a supported authorized transport that honors exact scope without duplicate dispatch. New user-visible tasks require user/host authority. If none works, preserve the handoff and use the blocker protocol. |
 
 ## Blocker Protocol
 

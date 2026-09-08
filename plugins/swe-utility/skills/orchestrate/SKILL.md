@@ -8,7 +8,7 @@ description: Plan and execute simple or complex multi-step tasks through an in-m
 
 Turn a user request into a compact executable orchestration for Codex. Track a formal goal only when the user explicitly requested goal tracking; otherwise use the task plan. Choose subagents, assign tasks and useful skills, run the workflow, integrate results, and stop cleanly.
 
-This skill is a meta-planner. It must not create task-planning files, scratch plans, task manifests, or orchestration artifacts on disk. Keep the plan in the conversation unless the user's actual task requires file output.
+This skill is a meta-planner. It must not create task-planning files, scratch plans or task manifests on disk. Keep the plan in conversation. A governed caller may permit a narrowly defined disposable continuation view only for recovery: derive it from canonical artifacts/receipts, stamp input fingerprints, and verify current artifacts, dirty state and live handles before resume. It is not approval authority or a second plan.
 
 ## Invocation Modes
 
@@ -45,7 +45,7 @@ Follow these rules in order.
 6. Tell write-capable workers they are not alone in the codebase, must not revert others' changes, and must adapt to concurrent edits.
 7. Require each subagent to return a concise handoff, not raw logs.
 8. Ensure subagents invoke relevant skills explicitly with `$skill-name` when a skill is needed.
-9. Keep task-planning state in memory. Do not create files solely for the orchestration.
+9. Keep task-planning state in memory; use only an explicitly permitted fingerprinted recovery view under a governing caller's contract.
 10. Stop when the goal is satisfied, validation is complete, or additional delegation is unlikely to improve the result.
 
 ## Prototype Mode propagation
@@ -97,6 +97,7 @@ Choose agents by task shape.
 - If no cataloged custom agent is a clear fit, use `@worker` for bounded implementation, fixes, test updates, document generation, and production changes.
 - If no cataloged custom agent is a clear fit, use `@default` for synthesis, broad judgment, ambiguous tasks, and when no specialized role is justified.
 - Use the parent agent for orchestration, final integration, user-facing decisions, and conflict resolution.
+- For adopted SWE V3 check execution, route every agent-directed build, lint, test, security, integration and browser check through `$swe-test` to the effective `test-runner` (`gpt-5.6-luna`, `medium`). Developers own test/source authoring and repairs; independent reviewers/validators own adequacy and acceptance. The role must resolve with actual runtime permissions; do not substitute a worker pass when unavailable.
 
 For each selected subagent define:
 
@@ -146,7 +147,7 @@ Process:
 1. Discovery agent maps facts.
 2. Planner or parent turns facts into an implementation path.
 3. Worker executes.
-4. Reviewer or tester validates.
+4. `$swe-test` requests execution from the tester; an independent qualified reviewer or validator judges adequacy and acceptance.
 5. Parent integrates and finalizes.
 
 ### Fork-Join Implementation
@@ -158,7 +159,7 @@ Process:
 1. Parent defines shared constraints and disjoint write scopes.
 2. Spawn workers in parallel.
 3. Each worker edits only its owned scope.
-4. Parent reviews changes, resolves integration, and runs final validation.
+4. Parent reviews changes, resolves integration, requests required checks through `$swe-test`, and collects independent validation when required.
 
 ### Critic Loop
 
@@ -256,6 +257,7 @@ Name skills explicitly so subagents can trigger them.
 - For document outputs, assign `$documents`, `$pdf`, `$Presentations`, or `$Spreadsheets` as applicable.
 - For frontend apps, websites, prototypes, or games, assign an available UI or site-building skill or specialist; do not invent a skill name.
 - For creating or revising skills, assign `$new-skill`.
+- For SWE V3 repository check execution, invoke `$swe-test` and resolve `test-runner` at Luna/medium. This is execution delegation, not another coordinator; preserve author-owned fixes and independent acceptance. If unavailable, report the required capability and block that check.
 - For OpenAI platform, Codex, Agents SDK, or API behavior, assign `$openai-docs`.
 - For GitHub PRs, issues, CI, publishing, or review comments, assign the relevant GitHub skill if available.
 - For image or audio generation, assign `$imagegen` or the appropriate speech tool only when requested.
@@ -277,6 +279,10 @@ Optimize for strong outcomes with low overhead.
 - Do not wait repeatedly with short polling intervals; wait only when blocked.
 - In complex mode, checkpoint after each major phase and prune stale assumptions.
 
+For governed work schedule by explicit approved-contract/design versus validated-behavior prerequisites and their Design/Implementation entry phases. Unknown dependencies or risk block affected work; unrelated eligible assignments may proceed. Implementation-complete with pending checks never satisfies a validated-behavior dependency. One coordinator owns a checkout, overlapping writes are serialized, and shared output/dependency closures have one active builder until its receipt/generation is released. Separate repositories do not alone prove build isolation.
+
+Batch reviews only across scopes for which reviewers are qualified and authorized. Freeze substantive bytes or use immutable snapshots, verify correspondence before acceptance, and retain a decision for each artifact. Preserve durable review-cycle counts across resume, packets, executors and successors for the same unresolved decision. Governed limits override generic repair-loop defaults; exhaustion requires human disposition. A recovery view never resets counts.
+
 ## Validation
 
 Before finalizing, verify:
@@ -287,7 +293,7 @@ Before finalizing, verify:
 - Relevant skills were named with `$skill-name`.
 - Workflow shape matched the actual dependency graph.
 - Parallel write scopes were disjoint.
-- No task-planning files were created.
+- No scratch/task-planning files were created; any permitted recovery view is disposable, fingerprinted and subordinate to canonical artifacts.
 - Tool, file, network, and destructive-action boundaries were respected.
 - Tests, citations, or inspections were actually performed before claiming them.
 - Remaining uncertainty is stated plainly.

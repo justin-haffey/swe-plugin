@@ -41,7 +41,7 @@ owners:
   - "[VALIDATOR]"
 created: "[YYYY_MM_DD]"
 updated: "[YYYY_MM_DD]"
-template_version: "2.0.0"
+template_version: "3.0.0"
 ---
 
 # [FEATURE_TITLE] Validation
@@ -50,9 +50,17 @@ template_version: "2.0.0"
 
 [ACCEPTED_REJECTED_BLOCKED]: [RATIONALE]
 
+- Validator and independence from author, implementer, and material repairer: [IDENTITY_AND_FINDING]
+- Authority: [SOLUTION_LOCAL_OR_PORTFOLIO_INTEGRATION]
+- Reviewed source/test/dependency generation: [FINGERPRINTS_AND_RECEIPT_LOCATORS]
+- Evidence completeness and remaining obligations: [COMPLETE_FINDING_OR_BLOCKER]
+- Risk/deferral eligibility and required early gates: [INDEPENDENT_JUDGMENT]
+
+A green tester receipt is an observation, not acceptance. Verify real fixture/participant/operation attribution and criterion adequacy. Accepted delivery requires all required checks passed for the relevant generation with no deferred, missing, blocked, failed, or stale obligations. The validator controls any independent `$swe-test` invocation and may require additional checks; the tester never approves delivery. Solution acceptance does not grant portfolio integration acceptance.
+
 ## Coverage
 
-| Criterion | Assignment | Evidence | Independent check | Result |
+| Criterion | Assignment | Immutable receipt and evidence | Validator-controlled check or inspection | Independent result |
 |---|---|---|---|---|
 | AC-001 | [OWNER] | [REFERENCE] | [CHECK] | [PASS_FAIL_BLOCKED] |
 
@@ -71,6 +79,14 @@ template_version: "2.0.0"
 ## Residual Risk
 
 - [RISK_OR_NONE]
+
+## Review Packet
+
+- Decision bytes or immutable snapshot: [INPUT_AND_DECISION_FINGERPRINT_LOCATORS]
+- Effective policy and named approver: [POLICY_LOCATOR_AND_APPROVER]
+- Paired decisions and order: [PAIRED_ARTIFACT_LOCATORS_OR_NONE]
+- Review cycle history: [DURABLE_HISTORY_LOCATOR]; repair cycles consumed: [COUNT]
+- Correspondence at decision time: [VERIFIED_MATCH_OR_BLOCKER]
 
 ## Approval Record
 

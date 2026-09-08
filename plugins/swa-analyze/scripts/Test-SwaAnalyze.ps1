@@ -84,8 +84,10 @@ function Test-AgentAllocations {
 
         $expected = @($AllocationMap[$relativePath])
         if ($expected.Count -eq 1 -and $expected[0] -eq 'None') {
-            if ($agentText -notmatch '(?m)^-\s+None:') {
-                Add-Failure "Agent must explicitly state that it has no default allocation: $agentPath"
+            $allocationSection = [regex]::Match($agentText, '(?ms)^## Allocated skills\s*\r?\n(?<body>.*?)(?=^#|\z)').Groups['body'].Value
+            $procedures = @([regex]::Matches($allocationSection, '\$([a-z][a-z0-9-]+)') | Where-Object { $_.Groups[1].Value -ne 'swe-test' })
+            if ($procedures.Count -gt 0) {
+                Add-Failure "Role without a default authoring allocation gained a procedure: $agentPath"
             }
         } else {
             foreach ($skill in $expected) {
@@ -99,21 +101,13 @@ function Test-AgentAllocations {
     }
 }
 
-$expectedSkills = @(
-    'swa-abstraction',
-    'swa-analyze',
-    'swa-boundary',
-    'swa-constraint',
-    'swa-dialectic',
-    'swa-first-principles',
-    'swa-interface',
-    'swa-inversion',
-    'swa-leverage-point',
-    'swa-metaphor',
-    'swa-pattern',
-    'swa-perspective',
-    'swa-scenario'
-)
+$catalogHelper = Join-Path $RepositoryRoot 'plugins\swe-process\scripts\Get-SweCatalog.ps1'
+if (-not (Test-Path -LiteralPath $catalogHelper -PathType Leaf)) { throw "Missing catalog helper: $catalogHelper" }
+$null = & $catalogHelper -Check
+$catalog = Get-Content -Raw -LiteralPath (Join-Path $RepositoryRoot 'plugins\swe-process\references\SKILL-CATALOG.json') | ConvertFrom-Json
+$package = @($catalog.packages | Where-Object name -eq 'swa-analyze')
+if ($package.Count -ne 1) { throw 'Catalog lacks unique SWA package.' }
+$expectedSkills = @($package[0].skills | ForEach-Object name)
 $strategySkills = @($expectedSkills | Where-Object { $_ -ne 'swa-analyze' })
 $skillsRoot = Join-Path $PluginRoot 'skills'
 $actualSkills = @(Get-ChildItem -LiteralPath $skillsRoot -Directory | ForEach-Object Name | Sort-Object)
@@ -125,7 +119,7 @@ $manifestPath = Join-Path $PluginRoot '.codex-plugin\plugin.json'
 try {
     $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
     if ($manifest.name -ne 'swa-analyze') { Add-Failure "Manifest name must be swa-analyze: $manifestPath" }
-    if ($manifest.version -ne '2.0.2') { Add-Failure "Manifest version must be 2.0.2: $manifestPath" }
+    if ($manifest.version -ne '3.1.0') { Add-Failure "Manifest version must be 3.1.0: $manifestPath" }
     if ($manifest.author.name -ne 'Ghostworx.ai, LLC' -or $manifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
         Add-Failure "Manifest publisher must be Ghostworx.ai, LLC: $manifestPath"
     }
@@ -138,8 +132,8 @@ foreach ($pluginName in @('swe-process', 'swe-codex', 'swe-utility', 'swa-analyz
     $packageManifestPath = Join-Path $RepositoryRoot "plugins\$pluginName\.codex-plugin\plugin.json"
     try {
         $packageManifest = Get-Content -Raw -LiteralPath $packageManifestPath | ConvertFrom-Json
-        if ($packageManifest.version -ne '2.0.2') {
-            Add-Failure "Package manifest version must be 2.0.2: $packageManifestPath"
+        if ($packageManifest.version -ne '3.1.0') {
+            Add-Failure "Package manifest version must be 3.1.0: $packageManifestPath"
         }
     } catch {
         Add-Failure "Invalid package manifest: $packageManifestPath"
@@ -236,6 +230,7 @@ $allSwaSkills = @('$swa-analyze') + @($strategySkills | ForEach-Object { '$' + $
 $portfolioAllocations = [ordered]@{
     'codex\codex-engineer.toml' = @('$new-plugin', '$new-skill', '$new-agent')
     'swe\repo-author.toml' = @('None')
+    'swe\test-runner.toml' = @('$swe-test')
     'swe\platform-engineer.toml' = @('$swe-new-epic', '$swe-plan-features', '$swe-plan-implementation', '$swa-analyze')
     'swe\research-engineer.toml' = @('$swe-research') + $allSwaSkills
     'swe\platform-architect.toml' = @('$swe-conceptualize', '$swe-assess-architecture', '$swe-architect', '$swe-plan-features', '$swe-plan-implementation') + $allSwaSkills
@@ -247,6 +242,7 @@ $solutionDelivery = @('$swe-design', '$swe-implement', '$swe-bugfix', '$swe-enha
 $solutionAllocations = [ordered]@{
     'codex\codex-engineer.toml' = @('$new-plugin', '$new-skill', '$new-agent')
     'swe\repo-author.toml' = @('None')
+    'swe\test-runner.toml' = @('$swe-test')
     'swe\solution-architect.toml' = @('$swe-architect')
     'swe\package-architect.toml' = @('$swe-architect', '$swe-design')
     'swe\module-architect.toml' = @('$swe-architect', '$swe-design')
@@ -283,7 +279,7 @@ if (-not (Test-Path -LiteralPath $analysisReadmePath -PathType Leaf)) {
 }
 
 if ($failures.Count -gt 0) {
-    $failures | ForEach-Object { Write-Error $_ }
+    $failures | ForEach-Object { [Console]::Error.WriteLine($_) }
     exit 1
 }
 

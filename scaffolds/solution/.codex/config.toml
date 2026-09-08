@@ -77,6 +77,10 @@ config_file = "agents/swe/ui-designer.toml"
 description = "Improve code-local documentation without changing runtime behavior."
 config_file = "agents/swe/code-commenter.toml"
 
+[agents.test_runner]
+description = "Execute bounded repository checks through swe-test using Luna at medium."
+config_file = "agents/swe/test-runner.toml"
+
 [features]
 multi_agent = true
 multi_agent_v2 = true

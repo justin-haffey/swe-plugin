@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swe:check-receipt:v1",
+  "type": "object",
+  "required": ["schema","execution_id","request_digest","request","repository","assignment","executor","started_utc","finished_utc","risk","timing","prerequisites","shared_outputs","before","after","changed_during_run","reusable","outcome","attempts","missing_coverage","blockers","result_directory"],
+  "properties": {
+    "schema": {"const":"swe-check-receipt/v1"},
+    "execution_id": {"type":"string","format":"uuid"},
+    "request_digest": {"$ref":"#/$defs/hash"},
+    "request": {"$ref":"#/$defs/log"},
+    "repository": {"type":"string"},
+    "assignment": {"type":"object"},
+    "executor": {"type":"object"},
+    "started_utc": {"type":"string","format":"date-time"},
+    "finished_utc": {"type":"string","format":"date-time"},
+    "risk": {"type":"string"}, "timing": {"type":"string"},
+    "prerequisites": {"type":"array"}, "shared_outputs": {"type":"array"},
+    "before": {"$ref":"#/$defs/snapshot"}, "after": {"$ref":"#/$defs/snapshot"},
+    "changed_during_run": {"type":"boolean"}, "reusable": {"type":"boolean"},
+    "outcome": {"enum":["Passed","Failed","Blocked"]},
+    "missing_coverage": {"type":"array","items":{"type":"string"}},
+    "blockers": {"type":"array","items":{"type":"string"}},
+    "result_directory": {"type":"string"},
+    "attempts": {"type":"array","items":{"type":"object","required":["check_id","attempt","executable","arguments","working_directory","criteria","started_utc","finished_utc","timeout_seconds","timed_out","exit_code","outcome","failure_excerpt","launch_error","transient_launch_failure","stdout","stderr","counts","cases","observation"],"properties":{"check_id":{"type":"string"},"attempt":{"type":"integer","minimum":1,"maximum":2},"executable":{"type":"string"},"arguments":{"type":"array","items":{"type":"string"}},"working_directory":{"type":"string"},"criteria":{"type":"array","items":{"type":"string"}},"started_utc":{"type":"string"},"finished_utc":{"type":"string"},"timeout_seconds":{"type":"integer"},"timed_out":{"type":"boolean"},"exit_code":{"type":["integer","null"]},"outcome":{"enum":["Passed","Failed","Blocked"]},"failure_excerpt":{"type":"string"},"launch_error":{"type":["string","null"]},"transient_launch_failure":{"type":"boolean"},"stdout":{"$ref":"#/$defs/log"},"stderr":{"$ref":"#/$defs/log"},"counts":{"type":["object","null"]},"cases":{"type":"array"},"observation":{"oneOf":[{"type":"null"},{"$ref":"#/$defs/log"}]}},"additionalProperties":false}}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "hash": {"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "log": {"type":"object","required":["path","digest"],"properties":{"path":{"type":"string"},"digest":{"$ref":"#/$defs/hash"}},"additionalProperties":false},
+    "tree": {
+      "type": "object",
+      "required": ["digest", "files"],
+      "properties": {
+        "digest": {"$ref": "#/$defs/hash"},
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "digest", "state"],
+            "properties": {
+              "path": {"type": "string"},
+              "digest": {"type": ["string", "null"]},
+              "state": {"enum": ["Missing", "Present", "EmptyDirectory"]}
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "snapshot": {"oneOf":[{"type":"null"},{"type":"object","required":["source","tests","configuration","fixtures","dependencies","runtime","digest"],"properties":{"source":{"$ref":"#/$defs/tree"},"tests":{"$ref":"#/$defs/tree"},"configuration":{"$ref":"#/$defs/tree"},"fixtures":{"$ref":"#/$defs/tree"},"dependencies":{"$ref":"#/$defs/tree"},"runtime":{"type":"object","required":["identity","powershell","os","path_digest","environment","files"],"properties":{"identity":{"type":"string"},"powershell":{"type":"string"},"os":{"type":"string"},"path_digest":{"$ref":"#/$defs/hash"},"environment":{"type":"object","additionalProperties":{"$ref":"#/$defs/hash"}},"files":{"$ref":"#/$defs/tree"}},"additionalProperties":false},"digest":{"$ref":"#/$defs/hash"}},"additionalProperties":false}]}
+  }
+}

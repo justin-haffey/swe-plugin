@@ -2,7 +2,7 @@
 title: "[RESEARCH_TITLE]"
 artifact_type: "research"
 id: "RESEARCH-[TOPIC]"
-status: "Complete"
+status: "Draft"
 authority: "portfolio"
 scope: "[EPIC_ID]"
 parent: "[EPIC_ID]"
@@ -15,7 +15,7 @@ owners:
   - "[RESEARCHER]"
 created: "[YYYY_MM_DD]"
 updated: "[YYYY_MM_DD]"
-template_version: "2.0.0"
+template_version: "3.0.0"
 ---
 
 # [RESEARCH_TITLE]
@@ -27,6 +27,12 @@ template_version: "2.0.0"
 ## Method and Boundaries
 
 [METHOD_SCOPE_AND_FRESHNESS]
+
+- Reused research: [SOURCE_LOCATORS_OR_NONE]
+- Applicability and freshness: [VERIFIED_SCOPE_DATE_AND_LIMITATIONS]
+- New unresolved questions covered: [DECISION_RELEVANT_GAPS]
+
+Keep Draft while the scoped investigation is unfinished. Complete records the finished investigation, including bounded unknowns; it is not approval of the resulting engineering decisions.
 
 ## Findings
 

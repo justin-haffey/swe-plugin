@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swe:check-request:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "allOf": [{"if":{"properties":{"scope":{"anyOf":[{"properties":{"source":{"maxItems":0}}},{"properties":{"tests":{"maxItems":0}}},{"properties":{"configuration":{"maxItems":0}}},{"properties":{"fixtures":{"maxItems":0}}},{"properties":{"dependencies":{"maxItems":0}}}]}}},"then":{"required":["scope_rationale"],"properties":{"scope_rationale":{"type":"string","pattern":"\\S"}}}}],
+  "required": ["schema","execution_role","executor","repository","assignment","criteria","scope","runtime","risk","timing","prerequisites","result_directory","shared_outputs","checks"],
+  "properties": {
+    "schema": {"const":"swe-check-request/v1"},
+    "execution_role": {"const":"test-runner"},
+    "executor": {"type":"object","required":["role","model","reasoning_effort","session_id"],"properties":{"role":{"const":"test-runner"},"model":{"const":"gpt-5.6-luna"},"reasoning_effort":{"const":"medium"},"session_id":{"type":"string","minLength":1}},"additionalProperties":false},
+    "repository": {"type":"string","minLength":1},
+    "assignment": {"type":"object","required":["repository","artifact_id","path"],"properties":{"repository":{"type":"string"},"artifact_id":{"type":"string"},"path":{"type":"string"},"revision":{"type":"string"}},"additionalProperties":false},
+    "criteria": {"$ref":"#/$defs/strings"},
+    "scope": {"type":"object","required":["source","tests","configuration","fixtures","dependencies"],"properties":{"source":{"$ref":"#/$defs/strings"},"tests":{"$ref":"#/$defs/strings"},"configuration":{"$ref":"#/$defs/strings"},"fixtures":{"$ref":"#/$defs/strings"},"dependencies":{"$ref":"#/$defs/strings"}},"additionalProperties":false},
+    "scope_rationale": {"type":"string"},
+    "runtime": {"type":"object","required":["identity","paths"],"properties":{"identity":{"type":"string","minLength":1},"paths":{"$ref":"#/$defs/strings"},"environment":{"$ref":"#/$defs/strings"}},"additionalProperties":false},
+    "risk": {"enum":["Minimal","Standard","Major"]},
+    "timing": {"type":"string","minLength":1},
+    "prerequisites": {"type":"array","items":{"type":"object"}},
+    "result_directory": {"type":"string","minLength":1},
+    "shared_outputs": {"type":"array","items":{"type":"object","required":["path","generation"],"properties":{"path":{"type":"string","minLength":1},"generation":{"type":"string","minLength":1}},"additionalProperties":false}},
+    "expected_fingerprint": {"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "checks": {"type":"array","minItems":1,"items":{"type":"object","required":["id","executable","arguments","working_directory","timeout_seconds","criteria"],"properties":{"id":{"type":"string","pattern":"^[A-Za-z0-9._-]+$"},"executable":{"type":"string","minLength":1},"arguments":{"$ref":"#/$defs/strings"},"working_directory":{"type":"string","minLength":1},"timeout_seconds":{"type":"integer","minimum":1,"maximum":3600},"criteria":{"$ref":"#/$defs/strings"},"observation_path":{"type":"string"},"cases":{"type":"array","items":{"$ref":"#/$defs/case"}},"blocked_reason":{"type":"string"},"replay_safe":{"type":"boolean"}},"additionalProperties":false}}
+  },
+  "$defs": {
+    "strings": {"type":"array","items":{"type":"string"}},
+    "case": {"type":"object","required":["id","participant","operation","fixture","expected"],"properties":{"id":{"type":"string"},"participant":{"type":"string"},"operation":{"type":"string"},"fixture":{"type":"string"},"expected":{"type":"string"}},"additionalProperties":false}
+  }
+}

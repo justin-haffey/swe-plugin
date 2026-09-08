@@ -13,7 +13,7 @@ Execute a complex task with as many distinct, relevant subagents as practical wh
 - Maximize useful specialist coverage, not raw agent count. Use every available custom agent whose expertise maps to a material workstream, then fill genuine gaps with `@explorer`, `@worker`, or `@default`.
 - Run independent work concurrently up to the runtime's current capacity. Schedule remaining relevant agents in later waves rather than dropping useful coverage.
 - Give every subagent 1-3 concrete tasks, a bounded scope, required skills, an output contract, and a stop condition.
-- Keep orchestration state in memory. Do not create scratch plans or orchestration manifests on disk.
+- Keep orchestration state in memory. Do not create scratch plans or orchestration manifests. Only a governing caller's explicitly permitted disposable recovery view may persist canonical fingerprints, active handles and receipt/cycle-history locators; revalidate artifacts, dirty state and live workers before resume.
 - The parent owns task decomposition, wave scheduling, decisions, integration, final validation, and the user-facing response.
 
 ## Trigger and Non-Trigger Rules
@@ -74,14 +74,14 @@ Compose only the waves the task needs, but prefer full lifecycle coverage for bu
 ### Wave 4: Independent Verification
 
 - Use agents not responsible for the implementation to inspect correctness, regressions, safety, maintainability, and task-specific quality.
-- Run mapped tests and validation commands. Never claim a test, review, citation, visual inspection, or external check that did not occur.
+- For SWE V3, request mapped build/lint/test/integration/security/browser checks through `$swe-test` -> effective `test-runner` (`gpt-5.6-luna`, `medium`). Authors own source/test fixes; independent reviewers judge adequacy and acceptance. Never claim a check or visual inspection that did not occur, or substitute acceptance for a green receipt.
 - For high-risk or user-facing artifacts, include an adversarial or negative-path reviewer when a relevant agent exists.
 
 ### Wave 5: Repair and Integration
 
 - Triage review findings by severity and evidence.
 - Run at most one targeted repair wave by default. A second repair wave is allowed only for a remaining blocking defect with a clear, bounded fix.
-- Re-run affected validation after any repair or integration edit.
+- Request affected checks through `$swe-test` after repair/integration and reconfirm independent decisions. Preserve failing receipts and reject stale source/dependency generations.
 - Integrate results into one coherent outcome; do not expose a pile of conflicting subagent handoffs.
 
 ## Concurrency and Capacity
@@ -92,6 +92,8 @@ Compose only the waves the task needs, but prefer full lifecycle coverage for bu
 - Prefer reusing an agent when follow-up depends on its local context. Prefer a fresh independent agent for review.
 - Do not spawn duplicate agents merely to vote. Parallel agents must contribute distinct evidence, ownership, or review dimensions.
 - Stop spawning when every material workstream has an owner and additional agents would be redundant or unable to act within permissions.
+- Schedule eligible assignments by explicit Design/Implementation prerequisites; unrelated waiting Plans do not block them. Unknown dependencies/risk remain gates, and implementation-complete never satisfies a validated-behavior dependency.
+- One coordinator owns each checkout. Serialize overlapping mutations and shared build-output/dependency closures until the builder releases an attributable receipt and actual generation, unless supported isolation is proven.
 
 ## Subagent Prompt Contract
 
@@ -133,8 +135,10 @@ Do not send the full parent transcript when a smaller context package is suffici
 - Explicitly name an available `$skill-name` in a subagent prompt when that workflow applies.
 - Use document, PDF, presentation, spreadsheet, image, website, OpenAI documentation, Gmail, Calendar, or repository-retrieval skills only for matching workstreams.
 - Use repository-local authoring skills for skills, agents, plugins, and governed SWE artifacts.
+- For SWE V3 execution of tests, builds, lint, browser and related checks, use `$swe-test` and resolve `test-runner` at Luna/medium with real host permissions. Missing required skill/role/tool blocks the check; never silently replace it with a developer or reviewer execution.
 - Do not invent skill or tool names. If a needed capability is unavailable, assign the nearest safe role and state the limitation.
 - A skill may narrow permissions or prescribe validation; orchestration never overrides it.
+- This optional utility does not acquire lifecycle authority. Preserve frozen review fingerprints, separate decisions for each artifact, reviewer qualification/independence and canonical cycle-history counts. A renamed packet, executor change, successor for the same unresolved decision or resume cannot reset the two-cycle limit; exhaustion requires human disposition.
 
 ## Tool, Retry, and Safety Rules
 
