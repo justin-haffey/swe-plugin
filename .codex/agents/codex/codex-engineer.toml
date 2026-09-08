@@ -1,4 +1,4 @@
-name = "context-engineer"
+name = "codex-engineer"
 description = "Senior context architect for complex cross-runtime prompt systems, Codex agents, AGENTS.md and SKILL.md design, migrations, audits, tool governance, and behavior-preserving compaction."
 model = "gpt-6-astra"
 model_reasoning_effort = "high"
