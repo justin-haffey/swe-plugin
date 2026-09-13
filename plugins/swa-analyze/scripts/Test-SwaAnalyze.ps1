@@ -119,7 +119,7 @@ $manifestPath = Join-Path $PluginRoot '.codex-plugin\plugin.json'
 try {
     $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
     if ($manifest.name -ne 'swa-analyze') { Add-Failure "Manifest name must be swa-analyze: $manifestPath" }
-    if ($manifest.version -ne '3.1.0') { Add-Failure "Manifest version must be 3.1.0: $manifestPath" }
+    if ($manifest.version -ne '3.2.0') { Add-Failure "Manifest version must be 3.2.0: $manifestPath" }
     if ($manifest.author.name -ne 'Ghostworx.ai, LLC' -or $manifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
         Add-Failure "Manifest publisher must be Ghostworx.ai, LLC: $manifestPath"
     }
@@ -132,8 +132,8 @@ foreach ($pluginName in @('swe-process', 'swe-codex', 'swe-utility', 'swa-analyz
     $packageManifestPath = Join-Path $RepositoryRoot "plugins\$pluginName\.codex-plugin\plugin.json"
     try {
         $packageManifest = Get-Content -Raw -LiteralPath $packageManifestPath | ConvertFrom-Json
-        if ($packageManifest.version -ne '3.1.0') {
-            Add-Failure "Package manifest version must be 3.1.0: $packageManifestPath"
+        if ($packageManifest.version -ne '3.2.0') {
+            Add-Failure "Package manifest version must be 3.2.0: $packageManifestPath"
         }
     } catch {
         Add-Failure "Invalid package manifest: $packageManifestPath"

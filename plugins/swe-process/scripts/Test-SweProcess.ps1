@@ -177,7 +177,7 @@ $manifestPath = Join-Path $PluginRoot '.codex-plugin\plugin.json'
 try {
     $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
     if ($manifest.name -ne 'swe-process') { Add-Failure "Manifest name must be swe-process: $manifestPath" }
-    if ($manifest.version -ne '3.1.0') { Add-Failure "Manifest version must be 3.1.0: $manifestPath" }
+    if ($manifest.version -ne '3.2.0') { Add-Failure "Manifest version must be 3.2.0: $manifestPath" }
     if ($manifest.author.name -ne 'Ghostworx.ai, LLC' -or $manifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
         Add-Failure "Manifest publisher must be Ghostworx.ai, LLC: $manifestPath"
     }
@@ -548,7 +548,7 @@ if (Test-Path -LiteralPath (Split-Path -Parent $prototypeSkillRoot) -PathType Co
     if (Test-Path -LiteralPath $utilityManifestPath -PathType Leaf) {
         try {
             $utilityManifest = Get-Content -Raw -LiteralPath $utilityManifestPath | ConvertFrom-Json
-            if ($utilityManifest.version -ne '3.1.0' -or $utilityManifest.author.name -ne 'Ghostworx.ai, LLC' -or $utilityManifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
+            if ($utilityManifest.version -ne '3.2.0' -or $utilityManifest.author.name -ne 'Ghostworx.ai, LLC' -or $utilityManifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
                 Add-Failure "SWE Utility manifest version or publisher is invalid: $utilityManifestPath"
             }
             if (($utilityManifest.interface.defaultPrompt -join "`n") -notmatch [regex]::Escape('$prototype -on')) {

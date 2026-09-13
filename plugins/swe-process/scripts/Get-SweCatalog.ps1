@@ -38,7 +38,7 @@ $packages = @(Get-ChildItem -LiteralPath $packagesRoot -Directory | Sort-Object 
 if (($packages.name -join ',') -ne 'swa-analyze,swe-codex,swe-process,swe-utility') {
     throw 'The release must contain the four supported SWE packages.'
 }
-$catalog = [ordered]@{ schema_version = 3; release_version = '3.1.0'; packages = $packages }
+$catalog = [ordered]@{ schema_version = 3; release_version = '3.2.0'; packages = $packages }
 $json = ($catalog | ConvertTo-Json -Depth 10) + "`n"
 if ($Write) {
     [IO.File]::WriteAllText($catalogPath, $json, [Text.UTF8Encoding]::new($false))

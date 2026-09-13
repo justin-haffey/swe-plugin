@@ -42,7 +42,7 @@ foreach ($path in @($manifestPath, $hookConfigPath, $hookScriptPath, $skillPath,
 if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
     try {
         $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
-        if ($manifest.name -ne 'swe-codex' -or $manifest.version -ne '3.1.0') {
+        if ($manifest.name -ne 'swe-codex' -or $manifest.version -ne '3.2.0') {
             Add-Failure "SWE Codex manifest identity or version is invalid: $manifestPath"
         }
         if ($manifest.author.name -ne 'Ghostworx.ai, LLC' -or $manifest.interface.developerName -ne 'Ghostworx.ai, LLC') {

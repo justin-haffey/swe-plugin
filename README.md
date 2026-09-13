@@ -1,6 +1,6 @@
 # SWE Plugin
 
-SWE Plugin **3.1.0** provides portable engineering workflows for a portfolio and its child solutions. V3 reduces repeated artifact writing, starts work when its actual prerequisites permit it, and separates implementation progress from tested, independently accepted delivery.
+SWE Plugin **3.2.0** provides portable engineering workflows for a portfolio and its child solutions. V3 reduces repeated artifact writing, starts work when its actual prerequisites permit it, and separates implementation progress from tested, independently accepted delivery.
 
 ![1788841929240](plugins\swe-process\assets\icon.png)
 

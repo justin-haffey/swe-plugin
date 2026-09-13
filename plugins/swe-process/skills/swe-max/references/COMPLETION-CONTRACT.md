@@ -88,7 +88,7 @@ Allow at most two author-repair/independent-review cycles for the same unresolve
 | Required check unavailable or persistently failing | Record the command, environment, failure, affected criteria, and safe repairs attempted; never call it a pass. |
 | Major architectural finding | Enter governed remediation and add all successor work to the delivery set. |
 | Required prohibited action | Stop before the action. Explicit risk awareness does not authorize deployment, publishing, dependencies, credentials, destructive work, external mutation, or Git history changes. |
-| Selected child transport cannot dispatch, retrieve or integrate safely | Try a supported authorized transport that honors exact scope without duplicate dispatch. New user-visible tasks require user/host authority. If none works, preserve the handoff and use the blocker protocol. |
+| Selected child transport cannot establish the exact child project context, dispatch, retrieve or integrate safely | Try a supported authorized child-project task transport without duplicate dispatch. A parent-task subagent or changed working directory does not qualify. New user-visible tasks require user/host authority. If none works, preserve the handoff and use the blocker protocol. |
 
 ## Blocker Protocol
 
