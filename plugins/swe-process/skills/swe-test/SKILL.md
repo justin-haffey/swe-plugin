@@ -10,6 +10,8 @@ Dispatch a bounded request to `test-runner` using `gpt-5.6-luna`, `medium`, and 
 
 Run the smallest command union covering required behavior and dependencies. Respect early risk gates and shared-output ownership. Capture source, tests, configuration, fixtures, runtime, and actual dependency identities before and after execution, exact commands, exits, observations, and immutable logs/receipts using the [receipt helper](../../scripts/Invoke-SweChecks.ps1).
 
+Run in the actual owning child checkout, including dirty files. Keep one canonical fixture set there; consumers read it by path and digest. Never create source snapshots, copied checkouts, or per-run corpus copies. Bridge child test requests; portfolio work collects their receipt locators. Keep large generated data in bounded child-local scratch and retain compact observations only.
+
 Never edit source, tests, configuration, assertions, or snapshots; run fix/update modes; waive checks; or grant acceptance. Writes are limited to authorized command-generated scratch, receipts, and logs. Return failures to the developer. Permit one recorded retry only for a replay-safe transient launch failure. Preserve earlier attempts.
 
 Report Passed, Failed, or Blocked, stale evidence, missing coverage, pending obligations, and receipt/log locators. A green command cannot establish unrealized conformance cases. After repairs rerun affected checks; otherwise stop when required checks pass unless new changes or unresolved evidence justify more work. Independent Validation retains acceptance authority.

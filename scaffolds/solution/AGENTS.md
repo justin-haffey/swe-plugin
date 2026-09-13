@@ -29,7 +29,10 @@ The portfolio repository owns Epics, Concepts, platform architecture, cross-solu
 
 Systems are runtime or operational views within Platform or Solution architecture. They are not a separate architecture level. The hierarchy is `Platform -> Solution -> Package -> Module`.
 
+Tests run in the actual owning child checkout, including dirty files, against one canonical fixture set. Never copy repositories, source trees, prior results or whole corpora for verification. Bridge child test requests; retain compact receipts under the child and clean run-owned scratch after checking references. Follow `$swe-test` capture limits and rerun only affected checks.
+
 ## Prototype Mode
+
 
 `PROTOTYPE_MODE` is governed by `$prototype [-on|-off]` and is `Off` by default. `.swe/prototype/STATE.md` is its durable repository-local source of state; a missing state file means `Off`.
 

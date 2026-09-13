@@ -19,6 +19,26 @@ function Resolve-PathName([string]$Path, [string]$Base) {
     if ([IO.Path]::IsPathRooted($Path)) { return [IO.Path]::GetFullPath($Path) }
     return [IO.Path]::GetFullPath((Join-Path $Base $Path))
 }
+function Assert-LocalPath([string]$Path, [string]$Root) {
+    $base = $Root.TrimEnd('\','/')
+    if (-not $Path.Equals($base, [StringComparison]::OrdinalIgnoreCase) -and -not $Path.StartsWith($base + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'Checks and their results must stay in the declared child checkout; bridge a separate request to another repository.' }
+    $entry = $Path
+    while ($entry) {
+        if ((Test-Path -LiteralPath $entry) -and ((Get-Item -LiteralPath $entry -Force).Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw "Check path contains a reparse point: $entry" }
+        if ($entry.Equals($base, [StringComparison]::OrdinalIgnoreCase)) { break }
+        $entry = Split-Path -Parent $entry
+    }
+}
+function Assert-Checkout([string]$Root) {
+    $entry = $Root
+    while ($entry) {
+        if (Test-Path -LiteralPath (Join-Path $entry '.git')) {
+            if (-not $entry.Equals($Root, [StringComparison]::OrdinalIgnoreCase)) { throw 'repository must be the actual checkout root, not a copied source tree or package directory.' }
+            break
+        }
+        $entry = Split-Path -Parent $entry
+    }
+}
 function Get-TreeFingerprint {
     param([AllowNull()][AllowEmptyCollection()][string[]]$Paths, [string]$Base)
     $items = @()
@@ -82,7 +102,8 @@ function Assert-Array($Value, [string]$Label, [switch]$Strings) {
 }
 function Assert-RequestShape {
     $fields = @('schema','repository','assignment','criteria','scope','runtime','checks','risk','timing','prerequisites','result_directory','shared_outputs','execution_role','executor')
-    Assert-Object $request $fields ($fields + @('scope_rationale','expected_fingerprint')) 'request'
+    Assert-Object $request $fields ($fields + @('scope_rationale','expected_fingerprint','max_capture_bytes')) 'request'
+    if ($null -ne $request.PSObject.Properties['max_capture_bytes'] -and (($request.max_capture_bytes -isnot [int] -and $request.max_capture_bytes -isnot [long]) -or $request.max_capture_bytes -lt 1024)) { throw 'max_capture_bytes must be an integer of at least 1024 bytes.' }
     foreach ($field in @('schema','repository','risk','timing','result_directory','execution_role')) { Assert-String $request.$field "request.$field" }
     Assert-Object $request.assignment @('repository','artifact_id','path') @('repository','artifact_id','path','revision') 'assignment'
     foreach ($property in $request.assignment.PSObject.Properties) { Assert-String $property.Value "assignment.$($property.Name)" }
@@ -137,6 +158,9 @@ if ($FingerprintOnly) {
     Write-Output (ConvertTo-Json (Get-Snapshot) -Depth 30); return
 }
 $resultRoot = Resolve-PathName $request.result_directory $repository
+Assert-Checkout $repository
+Assert-LocalPath $resultRoot $repository
+$maxCaptureBytes = [long](Get-Value $request 'max_capture_bytes' (25MB))
 $executionId = [Guid]::NewGuid().ToString()
 $resultDirectory = Join-Path $resultRoot $executionId
 [void][IO.Directory]::CreateDirectory($resultDirectory)
@@ -158,6 +182,7 @@ try {
     }
     $checkIds = @{}
     foreach ($check in @($request.checks)) {
+        Assert-LocalPath (Resolve-PathName $check.working_directory $repository) $repository
         foreach ($field in @('id','executable','arguments','working_directory','timeout_seconds','criteria')) { if ($null -eq $check.PSObject.Properties[$field]) { throw "Check is missing $field" } }
         if ($check.id -notmatch '^[A-Za-z0-9._-]+$' -or $checkIds.ContainsKey($check.id)) { throw 'Check IDs must be unique safe file names.' }
         $checkIds[$check.id] = $true
@@ -210,6 +235,7 @@ try {
                 $observationPath = Get-Value $check 'observation_path'
                 if ($observationPath) {
                     $observationPath = Resolve-PathName $observationPath $attempt.working_directory
+                    Assert-LocalPath $observationPath $repository
                     if (Test-Path -LiteralPath $observationPath) { throw 'Observation output already exists; use a fresh per-execution path.' }
                 }
                 $launched = $process.Start()
@@ -233,6 +259,7 @@ try {
                     if ($attempt.exit_code -eq 0) { $attempt.outcome = 'Passed' } else { $attempt.outcome = 'Failed' }
                 }
                 if ($observationPath -and (Test-Path -LiteralPath $observationPath -PathType Leaf)) {
+                    if ((Get-Item -LiteralPath $observationPath).Length -gt $maxCaptureBytes) { throw 'Native observation exceeds max_capture_bytes; emit counts, hashes and locators instead of fixture payloads.' }
                     $observationText = Get-Content -LiteralPath $observationPath -Raw
                     $observation = $observationText | ConvertFrom-Json
                     if ($observation -isnot [pscustomobject]) { throw 'Native observation must be a JSON object.' }
@@ -265,18 +292,28 @@ try {
                 $attempt.transient_launch_failure = (-not $launched -and $nativeError -in @(11,32,33))
             } finally {
                 if ($null -ne $process) { $process.Dispose() }
+                if ([Text.Encoding]::UTF8.GetByteCount($stdout) + [Text.Encoding]::UTF8.GetByteCount($stderr) -gt $maxCaptureBytes) {
+                    $stdout = ''; $stderr = 'Log capture omitted: max_capture_bytes exceeded. Reduce native verbosity.'
+                    $attempt.outcome = 'Blocked'; $attempt.failure_excerpt = $stderr
+                    $receipt.blockers += $stderr
+                }
                 Write-NewText $stdoutPath $stdout
                 Write-NewText $stderrPath $stderr
                 $attempt.stdout = [ordered]@{ path = $stdoutPath; digest = (Get-FileHash -LiteralPath $stdoutPath -Algorithm SHA256).Hash.ToLowerInvariant() }
                 $attempt.stderr = [ordered]@{ path = $stderrPath; digest = (Get-FileHash -LiteralPath $stderrPath -Algorithm SHA256).Hash.ToLowerInvariant() }
                 if (-not $attempt.failure_excerpt -and $attempt.outcome -ne 'Passed') { $attempt.failure_excerpt = ($stderr + $stdout).Substring(0, [Math]::Min(1000, ($stderr + $stdout).Length)) }
                 $attempt.finished_utc = [DateTime]::UtcNow.ToString('o')
-                Write-NewText (Join-Path $resultDirectory "$attemptId.json") (ConvertTo-Json $attempt -Depth 25)
+                Write-NewText (Join-Path $resultDirectory "$attemptId.json") (ConvertTo-Json $attempt -Depth 25 -Compress)
                 $receipt.attempts += $attempt
             }
             $repeat = $attempt.transient_launch_failure -and $retry -eq 0 -and (Get-Value $check 'replay_safe' $false)
             $retry++
         } while ($repeat)
+        $capturedBytes = (Get-ChildItem -LiteralPath $resultDirectory -File -Recurse | Measure-Object Length -Sum).Sum
+        if ($capturedBytes -gt $maxCaptureBytes -or $receipt.blockers.Count -gt 0 -or $attempt.failure_excerpt -like '*max_capture_bytes*') {
+            $receipt.blockers += "Capture budget reached ($capturedBytes bytes); remaining checks were not run. Keep fixtures in their owning repository."
+            break
+        }
     }
 } catch { $receipt.blockers += $_.Exception.Message }
 finally {
@@ -298,7 +335,7 @@ finally {
     else { $receipt.outcome = 'Passed'; $receipt.reusable = $true }
     $receipt.finished_utc = [DateTime]::UtcNow.ToString('o')
     $receiptPath = Join-Path $resultDirectory 'receipt.json'
-    try { Write-NewText $receiptPath (ConvertTo-Json $receipt -Depth 35) }
+    try { Write-NewText $receiptPath (ConvertTo-Json $receipt -Depth 35 -Compress) }
     finally { foreach ($lease in $leases) { $lease.Dispose() } }
 }
 Write-Output $receiptPath

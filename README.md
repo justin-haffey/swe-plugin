@@ -44,6 +44,8 @@ Verify the exact checkout, dirty baseline, allowed files and upstream Feature/Pl
 
 Developers write source and tests and own repairs. `$swe-test` dispatches bounded execution to `test-runner` using **gpt-5.6-luna / medium**, including verification builds, static checks, browser checks and reruns. The tester saves actual outputs and attributable receipts, with no source, test, configuration or assertion repairs. The independent validator judges criterion coverage and can request a fresh tester execution; a green exit or test count alone does not establish acceptance.
 
+Tests run in their owning child checkout against one canonical fixture set. The recorder rejects copied checkout roots and working/result paths outside the declared repository. Capture defaults to 25 MiB (`max_capture_bytes`); oversized observations/logs block completion. Retain compact receipts and use bounded child-local scratch for generated data, with no source or corpus exports into portfolio check directories.
+
 Use these checkpoints precisely:
 
 **Implementation complete → Verification complete → Epic accepted**

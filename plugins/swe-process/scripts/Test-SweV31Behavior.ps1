@@ -75,7 +75,7 @@ $request = @{
     repository = $destination; assignment = @{ repository = $destination; artifact_id = 'HOST'; path = 'ADOPTION.md' }; criteria = @('HOST/AC-001')
     scope = @{ source = @('smoke.ps1', $skill); tests = @(); configuration = @('.codex/config.toml','.codex/agents/swe/test-runner.toml'); fixtures = @(); dependencies = @() }
     runtime = @{ identity = 'Current tester PowerShell'; paths = @($shell) }; scope_rationale = 'Isolated native fixture with no separate tests, fixtures or dependencies.'
-    risk = 'Standard'; timing = 'Preflight'; prerequisites = @(); shared_outputs = @(); result_directory = (Join-Path $scratch 'receipts')
+    risk = 'Standard'; timing = 'Preflight'; prerequisites = @(); shared_outputs = @(); result_directory = (Join-Path $destination 'receipts')
     checks = @(@{ id = 'smoke'; executable = $shell; arguments = @('-NoProfile','-File',$smoke); working_directory = '.'; timeout_seconds = 20; criteria = @('HOST/AC-001') })
 }
 $requestPath = Join-Path $scratch 'request.json'; Json $requestPath $request

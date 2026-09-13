@@ -56,7 +56,7 @@ function New-Request([string]$Script = $passScript) {
         scope = @{ source = @('src'); tests = @('tests'); configuration = @('config'); fixtures = @('fixtures'); dependencies = @('dependency') }
         runtime = @{ identity = $PSVersionTable.PSVersion.ToString(); paths = @($shell) }
         checks = @(@{ id = 'native'; executable = $shell; arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $Script); working_directory = '.'; timeout_seconds = 20; criteria = @('FEATURE-001/AC-001', 'FEATURE-003/AC-001') })
-        risk = 'Major'; timing = 'Early'; scope_rationale = 'Bounded fixture rehearsal; empty directories deliberately represent no additional configuration or fixtures.'; prerequisites = @(); result_directory = (Join-Path $fixtureRoot 'receipts'); shared_outputs = @()
+        risk = 'Major'; timing = 'Early'; scope_rationale = 'Bounded fixture rehearsal; empty directories deliberately represent no additional configuration or fixtures.'; prerequisites = @(); result_directory = (Join-Path $producer 'receipts'); shared_outputs = @()
         execution_role = 'test-runner'; executor = @{ role = 'test-runner'; model = 'gpt-5.6-luna'; reasoning_effort = 'medium'; session_id = $ExecutorSession }
     }
 }
@@ -79,7 +79,7 @@ $request.checks[0].executable = 'swe-intentionally-unavailable-tool-9f08'
 $unavailable = Invoke-Receipt $request
 Assert-True ($unavailable.outcome -eq 'Blocked' -and $unavailable.missing_coverage.Count -eq 2 -and -not $unavailable.reusable) 'Missing tool remains blocked with pending criteria'
 $request = New-Request
-$request.checks[0].observation_path = Join-Path $fixtureRoot 'unproduced-observation.json'
+$request.checks[0].observation_path = Join-Path $producer 'output/unproduced-observation.json'
 $unproduced = Invoke-Receipt $request
 Assert-True ($unproduced.outcome -eq 'Blocked') 'Requested native observation must exist even when no concrete cases were supplied'
 $request = New-Request
@@ -106,7 +106,7 @@ $expectedCase = @{ id = 'CASE-001'; participant = 'consumer'; operation = 'Execu
 foreach ($variant in @('correct', 'wrong-participant', 'wrong-operation', 'unrealized', 'duplicate')) {
     $request = New-Request
     $observationInput = Join-Path $producer ('fixtures\' + $variant + '.json')
-    $observationOutput = Join-Path $fixtureRoot ('observation-' + $variant + '.json')
+    $observationOutput = Join-Path $producer ('output/observation-' + $variant + '.json')
     $case = @{ id = 'CASE-001'; participant = 'consumer'; operation = 'Execute'; fixture = 'FIX-001'; expected = '42'; actual = '42'; outcome = 'Passed' }
     if ($variant -eq 'wrong-participant') { $case.participant = 'producer' }
     if ($variant -eq 'wrong-operation') { $case.operation = 'Compile' }
@@ -121,6 +121,38 @@ foreach ($variant in @('correct', 'wrong-participant', 'wrong-operation', 'unrea
     $expectedOutcome = if ($variant -eq 'correct') { 'Passed' } else { 'Blocked' }
     Assert-True ($receipt.outcome -eq $expectedOutcome) "Concrete case attribution: $variant"
 }
+# A canonical fixture is reused in place; only bounded observations are retained.
+$request = New-Request
+$request.checks[0].working_directory = $consumer
+$outside = Invoke-Receipt $request
+Assert-True ($outside.outcome -eq 'Blocked' -and $outside.attempts.Count -eq 0) 'Cross-checkout execution requires a bridged request'
+$request = New-Request
+$request.result_directory = Join-Path $fixtureRoot 'outside-receipts'
+$rejected = $false
+try { $null = Invoke-Receipt $request } catch { $rejected = $_.Exception.Message -like '*declared child checkout*' }
+Assert-True ($rejected -and -not (Test-Path $request.result_directory)) 'External result roots are rejected before writing'
+$fakeCheckout = Join-Path $fixtureRoot 'checkout'
+$copiedRoot = Join-Path $fakeCheckout 'copied-source'
+[void][IO.Directory]::CreateDirectory($copiedRoot)
+[void][IO.Directory]::CreateDirectory((Join-Path $fakeCheckout '.git'))
+$request = New-Request
+$request.repository = $copiedRoot
+$request.result_directory = Join-Path $copiedRoot 'receipts'
+$rejected = $false
+try { $null = Invoke-Receipt $request } catch { $rejected = $_.Exception.Message -like '*actual checkout root*' }
+Assert-True ($rejected) 'A copied tree inside another checkout is rejected'
+$largeInput = Join-Path $producer 'fixtures/oversized.json'
+Write-Json $largeInput @{ payload = ('x' * 4096) }
+$fixtureDigest = (Get-FileHash -LiteralPath $largeInput).Hash
+$request = New-Request
+$request.max_capture_bytes = 1024
+$largeOutput = Join-Path $producer 'output/oversized.json'
+$request.checks[0].arguments = @('-NoProfile','-File',$observeScript,$largeInput,$largeOutput)
+$request.checks[0].observation_path = $largeOutput
+$request.checks += @{ id='must-not-run'; executable=$shell; arguments=@('-NoProfile','-File',$passScript); working_directory='.'; timeout_seconds=20; criteria=@('FEATURE-001/AC-001') }
+$oversized = Invoke-Receipt $request
+Assert-True ($oversized.outcome -eq 'Blocked' -and $oversized.attempts.Count -eq 1 -and $null -eq $oversized.attempts[0].observation) 'Oversized capture blocks remaining commands without duplicating payload'
+Assert-True ((Get-FileHash -LiteralPath $largeInput).Hash -eq $fixtureDigest) 'The canonical fixture remains unchanged'
 $lockPath = Join-Path $producer 'output\.swe-check.lock'
 $lock = [IO.File]::Open($lockPath, [IO.FileMode]::OpenOrCreate, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
 try {
