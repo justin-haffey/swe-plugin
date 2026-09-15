@@ -132,8 +132,13 @@ foreach ($pluginName in @('swe-process', 'swe-codex', 'swe-utility', 'swa-analyz
     $packageManifestPath = Join-Path $RepositoryRoot "plugins\$pluginName\.codex-plugin\plugin.json"
     try {
         $packageManifest = Get-Content -Raw -LiteralPath $packageManifestPath | ConvertFrom-Json
-        if ($packageManifest.version -ne '3.2.0') {
-            Add-Failure "Package manifest version must be 3.2.0: $packageManifestPath"
+        $expectedPackageVersion = switch ($pluginName) {
+            'swe-utility' { '3.3.0' }
+            'swe-process' { '3.2.1' }
+            default { '3.2.0' }
+        }
+        if ($packageManifest.version -ne $expectedPackageVersion) {
+            Add-Failure "Package manifest version must be ${expectedPackageVersion}: $packageManifestPath"
         }
     } catch {
         Add-Failure "Invalid package manifest: $packageManifestPath"

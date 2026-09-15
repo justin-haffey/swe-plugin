@@ -1,0 +1,7 @@
+interface:
+  display_name: "Codex Update"
+  short_description: "Repair PowerShell launch after Codex updates"
+  default_prompt: "Use $codex-update to repair my PowerShell codex command after a desktop update."
+
+policy:
+  allow_implicit_invocation: true

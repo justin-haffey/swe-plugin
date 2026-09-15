@@ -16,6 +16,22 @@ $root = (Resolve-Path -LiteralPath $Destination).Path.TrimEnd('\','/')
 $issues = [Collections.Generic.List[string]]::new()
 $observations = [Collections.Generic.List[object]]::new()
 $packageNames = @('swa-analyze','swe-codex','swe-process','swe-utility')
+$packageVersions = @{}
+try {
+    $catalogPath = Resolve-SweLocalFile $pluginRoot 'references/SKILL-CATALOG.json'
+    $catalog = Get-Content -Raw -LiteralPath $catalogPath | ConvertFrom-Json
+    if ($catalog.schema_version -ne 3 -or $catalog.release_version -ne $expected) { throw 'Catalog process baseline does not match this process package.' }
+    foreach ($package in $catalog.packages) {
+        if ($package.name -notin $packageNames -or $packageVersions.ContainsKey($package.name) -or $package.version -notmatch '^\d+\.\d+\.\d+$') {
+            throw 'Unknown, duplicate, or invalid catalog package version.'
+        }
+        $packageVersions[$package.name] = $package.version
+    }
+    foreach ($name in $packageNames) { if (-not $packageVersions.ContainsKey($name)) { throw "Catalog package missing: $name" } }
+} catch {
+    $packageVersions = @{}
+    $issues.Add("Package catalog: $($_.Exception.Message)")
+}
 if (-not $PackageRoots) { $PackageRoots = @($packageNames | ForEach-Object { Join-Path (Split-Path -Parent $pluginRoot) $_ }) }
 $seen = @{}
 foreach ($packageRoot in $PackageRoots) {
@@ -25,7 +41,8 @@ foreach ($packageRoot in $PackageRoots) {
         if ($seen.ContainsKey($manifest.name) -or $manifest.name -notin $packageNames) { throw 'Unknown or duplicate package identity.' }
         $seen[$manifest.name] = $true
         $observations.Add([pscustomobject]@{ package = $manifest.name; version = $manifest.version; manifest = $manifestPath; sha256 = (Get-FileHash -LiteralPath $manifestPath).Hash })
-        if ($manifest.version -ne $expected -or -not $manifest.interface.displayName.EndsWith(" $expected")) { $issues.Add("Version mismatch: $($manifest.name), expected $expected.") }
+        $packageVersion = $packageVersions[$manifest.name]
+        if (-not $packageVersion -or $manifest.version -ne $packageVersion -or -not $manifest.interface.displayName.EndsWith(" $packageVersion")) { $issues.Add("Version mismatch: $($manifest.name), expected catalog version '$packageVersion'.") }
     } catch { $issues.Add("Package ${packageRoot}: $($_.Exception.Message)") }
 }
 foreach ($name in $packageNames) { if (-not $seen.ContainsKey($name)) { $issues.Add("Package unavailable: $name") } }

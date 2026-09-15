@@ -38,7 +38,7 @@ $packages = @(Get-ChildItem -LiteralPath $packagesRoot -Directory | Sort-Object 
 if (($packages.name -join ',') -ne 'swa-analyze,swe-codex,swe-process,swe-utility') {
     throw 'The release must contain the four supported SWE packages.'
 }
-$catalog = [ordered]@{ schema_version = 3; release_version = '3.2.0'; packages = $packages }
+$catalog = [ordered]@{ schema_version = 3; release_version = '3.2.1'; packages = $packages }
 $json = ($catalog | ConvertTo-Json -Depth 10) + "`n"
 if ($Write) {
     [IO.File]::WriteAllText($catalogPath, $json, [Text.UTF8Encoding]::new($false))
@@ -49,6 +49,9 @@ if ($Write) {
     if (($existing | ConvertTo-Json -Depth 10 -Compress) -cne ($catalog | ConvertTo-Json -Depth 10 -Compress)) {
         throw 'Skill catalog is stale. Run Get-SweCatalog.ps1 -Write after reviewing the package inventory.'
     }
-    if (@($packages | Where-Object version -ne $catalog.release_version).Count) { throw 'Package versions differ from the chosen release version.' }
-    Write-Output 'Skill catalog matches all four package inventories and release versions.'
+    # release_version records the process baseline; packages may release independently.
+    foreach ($package in $packages) {
+        if ($package.version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid package version: $($package.name)" }
+    }
+    Write-Output 'Skill catalog matches all four package inventories and manifest versions.'
 } else { [pscustomobject]$catalog }

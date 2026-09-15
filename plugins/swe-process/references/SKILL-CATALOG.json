@@ -1,6 +1,6 @@
 {
     "schema_version":  3,
-    "release_version":  "3.2.0",
+    "release_version":  "3.2.1",
     "packages":  [
                      {
                          "name":  "swa-analyze",
@@ -106,7 +106,7 @@
                      },
                      {
                          "name":  "swe-process",
-                         "version":  "3.2.0",
+                         "version":  "3.2.1",
                          "skills":  [
                                         {
                                             "name":  "swe-architect",
@@ -197,7 +197,7 @@
                      },
                      {
                          "name":  "swe-utility",
-                         "version":  "3.2.0",
+                         "version":  "3.3.0",
                          "skills":  [
                                         {
                                             "name":  "bridge",
@@ -207,6 +207,11 @@
                                         {
                                             "name":  "capture-style",
                                             "path":  "plugins/swe-utility/skills/capture-style/SKILL.md",
+                                            "visibility":  "public"
+                                        },
+                                        {
+                                            "name":  "codex-update",
+                                            "path":  "plugins/swe-utility/skills/codex-update/SKILL.md",
                                             "visibility":  "public"
                                         },
                                         {

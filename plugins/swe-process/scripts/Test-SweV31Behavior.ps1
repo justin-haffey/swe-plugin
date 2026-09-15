@@ -87,6 +87,16 @@ $hostPath = Join-Path $scratch 'host.json'; Json $hostPath $hostPacket
 $ready = (& $preflight -Destination $destination -Kind solution -Baseline $proposed -PolicyPath 'ADOPTION.md' -HostEvidencePath $hostPath) | ConvertFrom-Json
 Check ($ready.readiness -eq 'ReadyForReview' -and $ready.host_capability -eq 'AttestedSmokePassed') ('complete bound fixture preflight: ' + ($ready.reasons -join '; '))
 Check (-not $ready.policy_activated) 'complete preflight still cannot adopt'
+$mismatchRoot = Join-Path $scratch 'package-version-mismatch'
+[void][IO.Directory]::CreateDirectory((Join-Path $mismatchRoot '.codex-plugin'))
+$packagesParent = Split-Path -Parent $plugin
+$mismatchManifest = Get-Content -Raw (Join-Path $packagesParent 'swe-utility/.codex-plugin/plugin.json') | ConvertFrom-Json
+$mismatchManifest.version = '0.0.0'
+$mismatchManifest.interface.displayName = 'SWE Utilities 0.0.0'
+Json (Join-Path $mismatchRoot '.codex-plugin/plugin.json') $mismatchManifest
+$packageRoots = @('swa-analyze','swe-codex','swe-process' | ForEach-Object { Join-Path $packagesParent $_ }) + @($mismatchRoot)
+$mismatch = (& $preflight -Destination $destination -Kind solution -Baseline $proposed -PackageRoots $packageRoots -PolicyPath 'ADOPTION.md' -HostEvidencePath $hostPath) | ConvertFrom-Json
+Check ($mismatch.readiness -eq 'Blocked' -and ($mismatch.reasons -join '; ') -match 'Version mismatch: swe-utility') 'independent package version must still match the catalog'
 [IO.File]::WriteAllText((Join-Path $destination 'ADOPTION.md'), $policyText.Replace('status: Accepted','status: Draft') + "`nstatus: Accepted`n")
 $draftPolicy = (& $preflight -Destination $destination -Kind solution -Baseline $proposed -PolicyPath 'ADOPTION.md' -HostEvidencePath $hostPath) | ConvertFrom-Json
 Check ($draftPolicy.policy_compatibility -eq 'ReviewRequired') 'Draft metadata cannot be overridden by body text'
