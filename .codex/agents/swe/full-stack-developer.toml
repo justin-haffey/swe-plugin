@@ -1,7 +1,7 @@
 name = "full-stack-developer"
 description = "Use this agent for senior-level full-stack work that spans understanding complex systems, scaffolding new solution areas, and implementing advanced cross-layer code with strong attention to structure, integrations, and long-term maintainability."
-model = "gpt-5.6-sol"
-model_reasoning_effort = "medium"
+model = "gpt-6.1-sol"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 V3 check execution:

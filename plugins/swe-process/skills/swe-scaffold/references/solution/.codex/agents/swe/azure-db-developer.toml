@@ -1,6 +1,6 @@
 name = "azure-db-developer"
 description = "Implement Azure SQL and Cosmos DB designs, migrations, scripts, and validation within accepted data ownership boundaries."
-model = "gpt-5.6-terra"
+model = "gpt-6.1-sol"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 

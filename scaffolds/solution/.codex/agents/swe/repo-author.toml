@@ -1,6 +1,6 @@
 name = "repo-author"
 description = "Create, update, and maintain repository AGENTS.md and README.md files with clear agent workflow and human-facing project documentation."
-model = "gpt-5.6-terra"
+model = "gpt-6-luna"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 

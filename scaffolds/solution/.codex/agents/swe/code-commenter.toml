@@ -1,6 +1,6 @@
 name = "code-commenter"
 description = "Improve code-local documentation while preserving runtime behavior exactly."
-model = "gpt-5.6-luna"
+model = "gpt-6-luna"
 model_reasoning_effort = "low"
 sandbox_mode = "workspace-write"
 

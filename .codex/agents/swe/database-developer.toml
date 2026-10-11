@@ -1,6 +1,6 @@
 name = "azure-db-developer"
 description = "Use this agent for Azure SQL and Azure Cosmos DB data design, schema and container modeling, database scripting, and database-focused implementation guidance."
-model = "gpt-5.6-terra"
+model = "gpt-6.1-sol"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 developer_instructions = """

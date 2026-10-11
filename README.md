@@ -1,6 +1,6 @@
 # SWE Plugin
 
-SWE Plugin provides portable engineering workflows for a portfolio and its child solutions. The packages currently have independent versions: `swe-process` **3.2.1**, `swe-codex` **3.2.0**, `swe-utility` **3.3.0**, and `swa-analyze` **3.2.0**. The utility update adds `$codex-update` for the Windows Codex desktop CLI path repair. V3 reduces repeated artifact writing, starts work when its actual prerequisites permit it, and separates implementation progress from tested, independently accepted delivery.
+SWE Plugin provides portable engineering workflows for a portfolio and its child solutions. The packages currently have independent versions: `swe-process` **3.5.0**, `swe-codex` **3.5.0**, `swe-utility` **3.5.0**, and `swa-analyze` **3.5.0**. The utility update adds `$codex-update` for the Windows Codex desktop CLI path repair. V3 reduces repeated artifact writing, starts work when its actual prerequisites permit it, and separates implementation progress from tested, independently accepted delivery.
 
 ![1788841929240](plugins\swe-process\assets\icon.png)
 

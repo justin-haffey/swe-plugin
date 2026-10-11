@@ -1,6 +1,6 @@
 name = "ui-designer"
 description = "Use this agent to design modern, responsive web and app experiences, refine UX direction, and validate interface behavior through UI-focused testing."
-model = "gpt-5.6-terra"
+model = "gpt-6.1-sol"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """

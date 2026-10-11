@@ -1,7 +1,7 @@
 name = "csharp-developer"
 description = "Use this agent for fast, implementation-focused C#/.NET, Razor, and JavaScript work when the goal is to generate or modify project code quickly and pragmatically."
-model = "gpt-5.6-terra"
-model_reasoning_effort = "medium"
+model = "gpt-6.1-sol"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 V3 check execution:

@@ -1,6 +1,6 @@
 name = "maf-developer"
 description = "Implement Microsoft Agent Framework agents, tools, orchestration, memory, voice flows, and evaluations."
-model = "gpt-5.6-sol"
+model = "gpt-6-astra"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 

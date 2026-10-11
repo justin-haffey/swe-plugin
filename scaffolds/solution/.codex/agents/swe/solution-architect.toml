@@ -1,7 +1,7 @@
 name = "solution-architect"
 description = "Own solution architecture and coordinate package and module architecture within the active solution repository."
-model = "gpt-5.6-sol"
-model_reasoning_effort = "high"
+model = "gpt6.1-sol"
+model_reasoning_effort = "max"
 sandbox_mode = "workspace-write"
 
 developer_instructions = """

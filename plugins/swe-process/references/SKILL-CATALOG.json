@@ -1,10 +1,10 @@
 {
     "schema_version":  3,
-    "release_version":  "3.2.1",
+    "release_version":  "3.5.0",
     "packages":  [
                      {
                          "name":  "swa-analyze",
-                         "version":  "3.2.0",
+                         "version":  "3.5.0",
                          "skills":  [
                                         {
                                             "name":  "swa-abstraction",
@@ -75,7 +75,7 @@
                      },
                      {
                          "name":  "swe-codex",
-                         "version":  "3.2.0",
+                         "version":  "3.5.0",
                          "skills":  [
                                         {
                                             "name":  "new-agent",
@@ -106,7 +106,7 @@
                      },
                      {
                          "name":  "swe-process",
-                         "version":  "3.2.1",
+                         "version":  "3.5.0",
                          "skills":  [
                                         {
                                             "name":  "swe-architect",
@@ -197,7 +197,7 @@
                      },
                      {
                          "name":  "swe-utility",
-                         "version":  "3.3.0",
+                         "version":  "3.5.0",
                          "skills":  [
                                         {
                                             "name":  "bridge",

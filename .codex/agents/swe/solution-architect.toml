@@ -1,7 +1,7 @@
 name = "solution-architect"
 description = "Use this agent for deep architecture analysis, Azure and .NET solution design, multi-stack system decomposition, and selecting the best agentic design patterns from the local pattern library."
-model = "gpt-5.6-sol"
-model_reasoning_effort = "high"
+model = "gpt6.1-sol"
+model_reasoning_effort = "max"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 V3 check execution:
