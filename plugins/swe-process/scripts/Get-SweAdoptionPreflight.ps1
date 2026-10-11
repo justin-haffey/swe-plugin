@@ -46,7 +46,7 @@ foreach ($packageRoot in $PackageRoots) {
     } catch { $issues.Add("Package ${packageRoot}: $($_.Exception.Message)") }
 }
 foreach ($name in $packageNames) { if (-not $seen.ContainsKey($name)) { $issues.Add("Package unavailable: $name") } }
-$proposal = & (Join-Path $PSScriptRoot 'Get-SweMigrationDiff.ps1') -Destination $root -Baseline $Baseline -Proposed (Join-Path $pluginRoot "skills/swe-scaffold/references/$Kind") -IncludeContent:$IncludeContent
+$proposal = & (Join-Path $PSScriptRoot 'Get-SweMigrationDiff.ps1') -Destination $root -Baseline $Baseline -Proposed (Join-Path $pluginRoot "scaffolds/$Kind") -IncludeContent:$IncludeContent
 foreach ($change in $proposal.Changes) {
     if ($change.Action -eq 'ResolveOwnership') { $issues.Add("Migration requires resolution: $($change.Path) [$($change.Classification)]") }
 }

@@ -1,6 +1,6 @@
 {
     "schema_version":  3,
-    "release_version":  "3.5.0",
+    "release_version":  "3.5.1",
     "packages":  [
                      {
                          "name":  "swa-analyze",
@@ -106,7 +106,7 @@
                      },
                      {
                          "name":  "swe-process",
-                         "version":  "3.5.0",
+                         "version":  "3.5.1",
                          "skills":  [
                                         {
                                             "name":  "swe-architect",

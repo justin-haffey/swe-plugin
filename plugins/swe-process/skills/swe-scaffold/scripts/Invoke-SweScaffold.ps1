@@ -16,11 +16,12 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $skillRoot = Split-Path -Parent $PSScriptRoot
+$pluginRoot = Split-Path -Parent (Split-Path -Parent $skillRoot)
 $scaffoldName = if ($Portfolio) { 'portfolio' } else { 'solution' }
-$sourceRoot = Join-Path (Join-Path $skillRoot 'references') $scaffoldName
+$sourceRoot = Join-Path (Join-Path $pluginRoot 'scaffolds') $scaffoldName
 
 if (-not (Test-Path -LiteralPath $sourceRoot -PathType Container)) {
-    throw "Scaffold reference tree not found: $sourceRoot"
+    throw "Scaffold source tree not found: $sourceRoot"
 }
 if (-not (Test-Path -LiteralPath $Destination -PathType Container)) {
     throw "Destination directory not found: $Destination"

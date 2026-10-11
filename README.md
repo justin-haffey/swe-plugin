@@ -1,6 +1,6 @@
 # SWE Plugin
 
-SWE Plugin provides portable engineering workflows for a portfolio and its child solutions. The packages currently have independent versions: `swe-process` **3.5.0**, `swe-codex` **3.5.0**, `swe-utility` **3.5.0**, and `swa-analyze` **3.5.0**. The utility update adds `$codex-update` for the Windows Codex desktop CLI path repair. V3 reduces repeated artifact writing, starts work when its actual prerequisites permit it, and separates implementation progress from tested, independently accepted delivery.
+SWE Plugin provides portable engineering workflows for a portfolio and its child solutions. The packages currently have independent versions: `swe-process` **3.5.1**, `swe-codex` **3.5.0**, `swe-utility` **3.5.0**, and `swa-analyze` **3.5.0**. The utility update adds `$codex-update` for the Windows Codex desktop CLI path repair. V3 reduces repeated artifact writing, starts work when its actual prerequisites permit it, and separates implementation progress from tested, independently accepted delivery.
 
 ![1788841929240](plugins\swe-process\assets\icon.png)
 
@@ -72,11 +72,11 @@ The [artifact contract](plugins/swe-process/references/ARTIFACT-CONTRACT.md) sup
 
 ## Scaffolding and adoption
 
-The final sources are [portfolio](scaffolds/portfolio/) and [solution](scaffolds/solution/). Their packaged copies under `swe-scaffold/references/` must match byte for byte. The copier creates missing files and merges directories; every existing file is skipped. A copied tester alone does not activate V3 in older governance.
+The single source of truth is the plugin-level [portfolio](plugins/swe-process/scaffolds/portfolio/) and [solution](plugins/swe-process/scaffolds/solution/) scaffold trees. The scaffold copier and adoption helpers read these trees directly. The copier creates missing files and merges directories; every existing file is skipped. A copied tester alone does not activate V3 in older governance.
 
 Use the [migration and compatibility guide](plugins/swe-process/references/V3-MIGRATION.md) for a read-only proposed diff and separately authorized adoption, preferably at the next Epic or assignment revision. Retain customized agents, MCP registrations and settings. Re-running the scaffold is not a migration. Rollback requires draining V3 deferred obligations and a reviewable handoff; it does not undo code or historical approvals.
 
-Production templates live with their creating skill under `references/`. `scaffolds/_templates/` and `tmp/task-materials/` remain development evidence, not runtime template authorities. Generated coverage and metadata sections never author decisions or overwrite accepted content.
+Production templates live with their creating skill under `references/`. `tmp/task-materials/` remains development evidence, not runtime template authorities. Generated coverage and metadata sections never author decisions or overwrite accepted content.
 
 ## Maintainer commands
 
@@ -95,6 +95,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\swa-analyze\script
 git diff --check
 ```
 
-Validation covers inventory/version consistency, artifact metadata and locators, role routing, workflow boundaries, scaffold collisions and parity, hook behavior and the new helpers. Also parse affected JSON, YAML and TOML and resolve Markdown references. Static checks cannot prove live role discovery; run the supported-host tester smoke test and fixture rehearsal when changing dispatch or execution.
+Validation covers inventory/version consistency, artifact metadata and locators, role routing, workflow boundaries, scaffold structure and collision handling, hook behavior and the new helpers. Also parse affected JSON, YAML and TOML and resolve Markdown references. Static checks cannot prove live role discovery; run the supported-host tester smoke test and fixture rehearsal when changing dispatch or execution.
 
 The trusted `swe-codex` goal-completion hook requests `$repo-wrap-up`: a repository author reconciles documentation, routes checks through the tester and returns exact review paths. It does not stage, commit, publish, version or deploy. Read [AGENTS.md](AGENTS.md) before extending these packages.

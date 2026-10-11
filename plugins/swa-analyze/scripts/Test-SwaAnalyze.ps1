@@ -27,37 +27,6 @@ function Test-RequiredText {
     }
 }
 
-function Test-ScaffoldParity {
-    param(
-        [Parameter(Mandatory = $true)][string]$SourceRoot,
-        [Parameter(Mandatory = $true)][string]$ReferenceRoot
-    )
-
-    $sourceResolved = (Resolve-Path -LiteralPath $SourceRoot).Path.TrimEnd('\', '/')
-    $referenceResolved = (Resolve-Path -LiteralPath $ReferenceRoot).Path.TrimEnd('\', '/')
-    $sourceFiles = @{}
-    $referenceFiles = @{}
-
-    foreach ($file in Get-ChildItem -LiteralPath $sourceResolved -Recurse -Force -File) {
-        $relative = $file.FullName.Substring($sourceResolved.Length).TrimStart('\', '/')
-        $sourceFiles[$relative] = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
-    }
-    foreach ($file in Get-ChildItem -LiteralPath $referenceResolved -Recurse -Force -File) {
-        $relative = $file.FullName.Substring($referenceResolved.Length).TrimStart('\', '/')
-        $referenceFiles[$relative] = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
-    }
-
-    foreach ($relative in @($sourceFiles.Keys + $referenceFiles.Keys | Sort-Object -Unique)) {
-        if (-not $sourceFiles.ContainsKey($relative)) {
-            Add-Failure "Scaffold reference has no source counterpart: $ReferenceRoot\$relative"
-        } elseif (-not $referenceFiles.ContainsKey($relative)) {
-            Add-Failure "Scaffold source has no reference counterpart: $SourceRoot\$relative"
-        } elseif ($sourceFiles[$relative] -ne $referenceFiles[$relative]) {
-            Add-Failure "Scaffold source/reference content differs: $relative"
-        }
-    }
-}
-
 function Test-AgentAllocations {
     param(
         [Parameter(Mandatory = $true)][string]$ScaffoldRoot,
@@ -134,7 +103,7 @@ foreach ($pluginName in @('swe-process', 'swe-codex', 'swe-utility', 'swa-analyz
         $packageManifest = Get-Content -Raw -LiteralPath $packageManifestPath | ConvertFrom-Json
         $expectedPackageVersion = switch ($pluginName) {
             'swe-utility' { '3.5.0' }
-            'swe-process' { '3.5.0' }
+            'swe-process' { '3.5.1' }
             default { '3.5.0' }
         }
         if ($packageManifest.version -ne $expectedPackageVersion) {
@@ -266,14 +235,11 @@ $solutionAllocations = [ordered]@{
     'swe\code-commenter.toml' = @('None')
 }
 
-$portfolioRoot = Join-Path $RepositoryRoot 'scaffolds\portfolio'
-$solutionRoot = Join-Path $RepositoryRoot 'scaffolds\solution'
+$portfolioRoot = Join-Path $RepositoryRoot 'plugins\swe-process\scaffolds\portfolio'
+$solutionRoot = Join-Path $RepositoryRoot 'plugins\swe-process\scaffolds\solution'
 Test-AgentAllocations -ScaffoldRoot $portfolioRoot -AllocationMap $portfolioAllocations
 Test-AgentAllocations -ScaffoldRoot $solutionRoot -AllocationMap $solutionAllocations -RejectSwa
 
-$scaffoldReferencesRoot = Join-Path $RepositoryRoot 'plugins\swe-process\skills\swe-scaffold\references'
-Test-ScaffoldParity -SourceRoot $portfolioRoot -ReferenceRoot (Join-Path $scaffoldReferencesRoot 'portfolio')
-Test-ScaffoldParity -SourceRoot $solutionRoot -ReferenceRoot (Join-Path $scaffoldReferencesRoot 'solution')
 
 $analysisReadmePath = Join-Path $portfolioRoot 'architecture\analysis\README.md'
 if (-not (Test-Path -LiteralPath $analysisReadmePath -PathType Leaf)) {

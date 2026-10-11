@@ -54,7 +54,7 @@ Check (-not $contradiction.ready_for_audit -and ($contradiction.unresolved -join
 # Adoption uses a disposable destination. Fixture decisions/dispatch text are explicitly
 # test data; only the separate real host forward-test can establish live routing.
 $destination = Join-Path $scratch 'destination'; [void][IO.Directory]::CreateDirectory($destination)
-$proposed = Join-Path $plugin 'skills/swe-scaffold/references/solution'
+$proposed = Join-Path $plugin 'scaffolds/solution'
 Copy-Item -Path (Join-Path $proposed '*') -Destination $destination -Recurse -Force
 # Copy hidden .codex explicitly on hosts whose wildcard provider omits it.
 if (-not (Test-Path (Join-Path $destination '.codex'))) { Copy-Item -LiteralPath (Join-Path $proposed '.codex') -Destination $destination -Recurse -Force }

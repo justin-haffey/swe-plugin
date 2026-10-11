@@ -467,7 +467,7 @@ Later, lightweight optional receipts can record active input/output sizes where 
 - [Coordinator](../plugins/swe-process/skills/swe-max/SKILL.md), [orchestration](../plugins/swe-process/skills/swe-max/references/ORCHESTRATION.md), and [completion contract](../plugins/swe-process/skills/swe-max/references/COMPLETION-CONTRACT.md).
 - [Bridge](../plugins/swe-process/skills/swe-bridge/SKILL.md) and [assignment prompt](../plugins/swe-process/skills/swe-bridge/references/BRIDGE-PROMPT.md).
 - [Implementation](../plugins/swe-process/skills/swe-implement/SKILL.md), [validation](../plugins/swe-process/skills/swe-validate/SKILL.md), and [architecture](../plugins/swe-process/skills/swe-architect/SKILL.md).
-- [Portfolio scaffold](../scaffolds/portfolio/AGENTS.md), [solution scaffold](../scaffolds/solution/AGENTS.md), and [scaffold procedure](../plugins/swe-process/skills/swe-scaffold/SKILL.md).
+- [Portfolio scaffold](../plugins/swe-process/scaffolds/portfolio/AGENTS.md), [solution scaffold](../plugins/swe-process/scaffolds/solution/AGENTS.md), and [scaffold procedure](../plugins/swe-process/skills/swe-scaffold/SKILL.md).
 - [Process validator](../plugins/swe-process/scripts/Test-SweProcess.ps1).
 - Original design evidence: [structure](../tmp/task-materials/STRUCTURE.md), [skill transformations](../tmp/task-materials/SWE-PROCESS-SKILLS.md), and [agent/context model](../tmp/task-materials/SWE-AGENTS.md). These remain development references, not shipped runtime authority.
 - [EPIC-002 continuation evidence](../../../.swe/CONTINUE-EPIC-002.md); current artifact read, historical task review scoped to the task IDs in section 3.

@@ -17,18 +17,6 @@ function Add-Failure {
     $failures.Add($Message)
 }
 
-function Get-RelativeFileRecords {
-    param([Parameter(Mandatory = $true)][string]$Root)
-
-    $resolvedRoot = (Resolve-Path -LiteralPath $Root).Path.TrimEnd('\', '/')
-    @(Get-ChildItem -LiteralPath $resolvedRoot -Recurse -Force -File | ForEach-Object {
-        [pscustomobject]@{
-            Relative = $_.FullName.Substring($resolvedRoot.Length).TrimStart('\', '/')
-            Hash = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
-        }
-    })
-}
-
 function Test-AgentRegistry {
     param(
         [Parameter(Mandatory = $true)][string]$ScaffoldRoot,
@@ -177,7 +165,7 @@ $manifestPath = Join-Path $PluginRoot '.codex-plugin\plugin.json'
 try {
     $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
     if ($manifest.name -ne 'swe-process') { Add-Failure "Manifest name must be swe-process: $manifestPath" }
-    if ($manifest.version -ne '3.5.0') { Add-Failure "Manifest version must be 3.5.0: $manifestPath" }
+    if ($manifest.version -ne '3.5.1') { Add-Failure "Manifest version must be 3.5.1: $manifestPath" }
     if ($manifest.author.name -ne 'Ghostworx.ai, LLC' -or $manifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
         Add-Failure "Manifest publisher must be Ghostworx.ai, LLC: $manifestPath"
     }
@@ -302,9 +290,9 @@ if (-not ($sweBridgeResourcePaths | Where-Object { -not (Test-Path -LiteralPath 
         Add-Failure 'Internal bridge must identify itself and remain explicit-only.'
     }
 }
-$scaffoldReferences = Join-Path $skillsRoot 'swe-scaffold\references'
+$scaffoldsRoot = Join-Path $PluginRoot 'scaffolds'
 $actualTemplates = @(Get-ChildItem -LiteralPath $skillsRoot -Recurse -File -Filter '*TEMPLATE.md' |
-    Where-Object { -not $_.FullName.StartsWith($scaffoldReferences, [System.StringComparison]::OrdinalIgnoreCase) } |
+    Where-Object { -not $_.FullName.StartsWith($scaffoldsRoot, [System.StringComparison]::OrdinalIgnoreCase) } |
     ForEach-Object { $_.FullName.Substring($PluginRoot.Length).TrimStart('\', '/') -replace '/', '\' } | Sort-Object)
 $expectedTemplates = @($templateContract.Keys | Sort-Object)
 if (Compare-Object -ReferenceObject $expectedTemplates -DifferenceObject $actualTemplates) {
@@ -438,7 +426,7 @@ foreach ($fastPathTemplate in $fastPathTemplates) {
 
 # Assignment gates are exercised by Test-SweV3Behavior.ps1.
 $nonScaffoldFiles = @(Get-ChildItem -LiteralPath $PluginRoot -Recurse -File | Where-Object {
-    -not $_.FullName.StartsWith($scaffoldReferences, [System.StringComparison]::OrdinalIgnoreCase)
+    -not $_.FullName.StartsWith($scaffoldsRoot, [System.StringComparison]::OrdinalIgnoreCase)
 })
 $processText = ($nonScaffoldFiles | Where-Object { $_.Extension -in '.md', '.yaml' } | ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }) -join "`n"
 if ($processText -match '(?i)[A-Z]:\\Users\\|/Users/[^/]+/') { Add-Failure 'Process resources contain a machine-specific absolute user path.' }
@@ -450,7 +438,7 @@ foreach ($canonicalName in @('PLATFORM-ARCHITECTURE.md', 'SOLUTION-ARCHITECTURE.
 $portfolioRoster = @('codex_engineer', 'repo_author', 'platform_engineer', 'research_engineer', 'platform_architect', 'feature_validator', 'architecture_reviewer', 'integration_engineer', 'test_runner')
 $solutionRoster = @('codex_engineer', 'repo_author', 'solution_architect', 'package_architect', 'module_architect', 'solution_developer', 'package_developer', 'module_developer', 'integration_engineer', 'architecture_reviewer', 'solution_validator', 'azure_engineer', 'azure_db_developer', 'csharp_developer', 'full_stack_developer', 'maf_developer', 'ui_designer', 'code_commenter', 'test_runner')
 foreach ($scaffoldName in @('portfolio', 'solution')) {
-    $referenceRoot = Join-Path $scaffoldReferences $scaffoldName
+    $referenceRoot = Join-Path $scaffoldsRoot $scaffoldName
     $roster = if ($scaffoldName -eq 'portfolio') { $portfolioRoster } else { $solutionRoster }
     Test-AgentRegistry -ScaffoldRoot $referenceRoot -ExpectedRoster $roster
     Test-ContextLayout -ScaffoldRoot $referenceRoot -ScaffoldName $scaffoldName
@@ -474,7 +462,7 @@ if (-not (Test-Path -LiteralPath $repositoryReadmePath -PathType Leaf)) {
         Add-Failure "Repository README does not link the skill catalog with swe-max and swe-comment: $repositoryReadmePath"
     }
 }
-$sourceScaffoldsRoot = Join-Path $workspaceRoot 'scaffolds'
+$sourceScaffoldsRoot = $scaffoldsRoot
 $prototypeSkillRoot = Join-Path $workspaceRoot 'plugins\swe-utility\skills\prototype'
 if (Test-Path -LiteralPath (Split-Path -Parent $prototypeSkillRoot) -PathType Container) {
     $prototypeResourcePaths = @(
@@ -564,29 +552,10 @@ if (Test-Path -LiteralPath (Split-Path -Parent $prototypeSkillRoot) -PathType Co
 }
 
 if (Test-Path -LiteralPath $sourceScaffoldsRoot -PathType Container) {
-    foreach ($scaffoldName in @('portfolio', 'solution')) {
-        $sourceRoot = Join-Path $sourceScaffoldsRoot $scaffoldName
-        $referenceRoot = Join-Path $scaffoldReferences $scaffoldName
-        if (-not (Test-Path -LiteralPath $sourceRoot -PathType Container)) {
-            Add-Failure "Source scaffold is missing: $sourceRoot"
-            continue
-        }
-        $roster = if ($scaffoldName -eq 'portfolio') { $portfolioRoster } else { $solutionRoster }
-        Test-AgentRegistry -ScaffoldRoot $sourceRoot -ExpectedRoster $roster
-        Test-ContextLayout -ScaffoldRoot $sourceRoot -ScaffoldName $scaffoldName
-        $sourceRecords = @(Get-RelativeFileRecords -Root $sourceRoot | Sort-Object Relative)
-        $referenceRecords = @(Get-RelativeFileRecords -Root $referenceRoot | Sort-Object Relative)
-        if (Compare-Object -ReferenceObject $sourceRecords -DifferenceObject $referenceRecords -Property Relative, Hash) {
-            Add-Failure "Source/reference scaffold parity failed: $scaffoldName"
-        }
-    }
-
     $configPaths = @(
         (Join-Path $workspaceRoot '.codex\config.toml'),
         (Join-Path $sourceScaffoldsRoot 'portfolio\.codex\config.toml'),
-        (Join-Path $sourceScaffoldsRoot 'solution\.codex\config.toml'),
-        (Join-Path $scaffoldReferences 'portfolio\.codex\config.toml'),
-        (Join-Path $scaffoldReferences 'solution\.codex\config.toml')
+        (Join-Path $sourceScaffoldsRoot 'solution\.codex\config.toml')
     )
     foreach ($configPath in $configPaths) {
         if (-not (Test-Path -LiteralPath $configPath -PathType Leaf)) { continue }
@@ -755,4 +724,4 @@ if ($failures.Count -gt 0) {
 }
 
 $behaviorSummary = if ($SkipBehaviorTests) { 'Behavioral execution was explicitly skipped.' } else { 'Scaffold and V3 behavioral fixtures passed.' }
-Write-Output "Validated V3 catalog, template metadata, role boundaries, lifecycle semantics and scaffold parity at $PluginRoot. $behaviorSummary"
+Write-Output "Validated V3 catalog, template metadata, role boundaries, lifecycle semantics and scaffold structure at $PluginRoot. $behaviorSummary"
