@@ -9,11 +9,19 @@ param(
     [Parameter()]
     [string]$Destination = (Get-Location).Path,
 
+    [Parameter(ParameterSetName = 'Solution')]
+    [switch]$Federated,
+
+    [Parameter(ParameterSetName = 'Solution')]
+    [string]$PortfolioRepository,
+
     [Parameter()]
     [switch]$AsJson
 )
 
 $ErrorActionPreference = 'Stop'
+if ($Federated -and ([string]::IsNullOrWhiteSpace($PortfolioRepository) -or $PortfolioRepository -match '[\r\n]')) { throw 'Federated mode requires a single-line PortfolioRepository identity.' }
+if ($PortfolioRepository -and -not $Federated) { throw 'PortfolioRepository requires Federated mode.' }
 
 $skillRoot = Split-Path -Parent $PSScriptRoot
 $pluginRoot = Split-Path -Parent (Split-Path -Parent $skillRoot)
@@ -113,7 +121,11 @@ foreach ($file in $sourceFiles) {
     try {
         $sourceStream = [System.IO.File]::Open($file.FullName, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::Read)
         $temporaryStream = [System.IO.File]::Open($temporaryPath, [System.IO.FileMode]::CreateNew, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
-        $sourceStream.CopyTo($temporaryStream)
+        if ($Federated -and $target.Relative -eq 'AGENTS.md') {
+            $guide = [IO.File]::ReadAllText($file.FullName).Replace('Delivery mode: Standalone', ('Delivery mode: Federated' + "`nPortfolio repository: " + $PortfolioRepository))
+            $bytes = [Text.UTF8Encoding]::new($false).GetBytes($guide)
+            $temporaryStream.Write($bytes, 0, $bytes.Length)
+        } else { $sourceStream.CopyTo($temporaryStream) }
         $temporaryStream.Flush()
         $temporaryStream.Dispose()
         $temporaryStream = $null
@@ -145,6 +157,8 @@ foreach ($file in $sourceFiles) {
 $report = [pscustomobject]@{
     SchemaVersion = '2.0'
     Scaffold = $scaffoldName
+    RequestedDeliveryMode = $(if ($Portfolio) { 'Portfolio' } elseif ($Federated) { 'Federated' } else { 'Standalone' })
+    GovernanceSkipped = ($skippedFiles -contains 'AGENTS.md')
     Destination = $resolvedDestination
     CreatedFiles = [string[]]$createdFiles
     SkippedExistingFiles = [string[]]$skippedFiles

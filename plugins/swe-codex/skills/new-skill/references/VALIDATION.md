@@ -1,6 +1,6 @@
 # Skill validation and forward testing
 
-The author defines these obligations and owns repairs. Route executable checks through `$swe-test` to `test-runner` on `gpt-5.6-luna` / `medium`; independent review owns adequacy and acceptance.
+The author defines these obligations and owns repairs. Route executable checks through `$swe-test` to `test-runner` on the native test-runner configuration; independent review owns adequacy and acceptance.
 
 Before finalizing:
 

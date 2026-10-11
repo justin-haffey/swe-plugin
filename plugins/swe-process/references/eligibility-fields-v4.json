@@ -1,0 +1,77 @@
+{
+  "schema": "swe-eligibility-fields/v2",
+  "packet_schema": "swe-eligibility/v2",
+  "required": [
+    "schema",
+    "assignment_id",
+    "repository",
+    "phase",
+    "feature",
+    "architecture",
+    "risk",
+    "dependencies",
+    "reviewed_independence",
+    "review",
+    "behavior_consumers",
+    "delivery_mode"
+  ],
+  "phases": [
+    "Design",
+    "Implementation",
+    "FeatureCompletion",
+    "EpicAcceptance",
+    "DeliveryAcceptance"
+  ],
+  "risk_flags": [
+    "isolated",
+    "reversible",
+    "reviewed_deferral",
+    "mandatory_early_checks",
+    "public_contract",
+    "cross_solution",
+    "security",
+    "persistence",
+    "concurrency",
+    "operational"
+  ],
+  "review_required": [
+    "consumed_cycles",
+    "cycle_history"
+  ],
+  "locators": [
+    "feature",
+    "plan",
+    "architecture",
+    "design",
+    "policy_adoption",
+    "run_authorization",
+    "major_approval",
+    "portfolio_validation"
+  ],
+  "phase_required": {
+    "Design": [],
+    "Implementation": [],
+    "FeatureCompletion": [
+      "implementation_complete",
+      "criteria",
+      "pending_checks",
+      "delivery"
+    ],
+    "EpicAcceptance": [
+      "design",
+      "implementation_complete",
+      "criteria",
+      "pending_checks",
+      "delivery",
+      "assignments_complete",
+      "architecture_reconciled",
+      "portfolio_validation"
+    ],
+    "DeliveryAcceptance": [
+      "implementation_complete",
+      "criteria",
+      "pending_checks",
+      "delivery"
+    ]
+  }
+}

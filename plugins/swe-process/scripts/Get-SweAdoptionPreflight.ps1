@@ -10,6 +10,8 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'Swe-ArtifactFields.ps1')
+. (Join-Path $PSScriptRoot 'Swe-TesterProfile.ps1')
+$testerProfile = $null
 $pluginRoot = Split-Path -Parent $PSScriptRoot
 $expected = (Get-Content -Raw -LiteralPath (Join-Path $pluginRoot '.codex-plugin/plugin.json') | ConvertFrom-Json).version
 $root = (Resolve-Path -LiteralPath $Destination).Path.TrimEnd('\','/')
@@ -53,6 +55,7 @@ foreach ($change in $proposal.Changes) {
 $configPath = $null; $rolePath = $null; $skillPath = $null; $governancePath = $null
 try {
     $configPath = Resolve-SweLocalFile $root '.codex/config.toml'
+    $testerProfile = Get-SweTesterProfile $root
     $configText = Get-Content -Raw -LiteralPath $configPath
     $sections = [regex]::Matches($configText, '(?ms)^\[agents\.test_runner\]\s*\r?\n(.*?)(?=^\[|\z)')
     if ($sections.Count -ne 1) { throw 'One agents.test_runner registration is required.' }
@@ -60,7 +63,7 @@ try {
     if ($registration.Count -ne 1) { throw 'Tester config_file is unresolved; use the host TOML resolver for other syntax.' }
     $rolePath = Resolve-SweLocalFile (Join-Path $root '.codex') $registration[0].Groups[1].Value
     $roleText = Get-Content -Raw -LiteralPath $rolePath
-    foreach ($setting in @(@('name','test-runner'), @('model','gpt-5.6-luna'), @('model_reasoning_effort','medium'))) {
+    foreach ($setting in @(@('name','test-runner'), @('model',$testerProfile.model), @('model_reasoning_effort',$testerProfile.reasoning_effort))) {
         $matches = [regex]::Matches($roleText, ('(?m)^' + $setting[0] + '\s*=\s*"([^"\r\n]+)"\s*$'))
         if ($matches.Count -ne 1 -or $matches[0].Groups[1].Value -cne $setting[1]) { throw "Tester setting mismatch: $($setting[0])" }
     }
@@ -87,8 +90,9 @@ try {
 $hostStatus = 'Unverified'
 try {
     if (-not $HostEvidencePath) { throw 'Actual host dispatch and a current real smoke receipt are required.' }
+    if (-not $testerProfile) { throw 'Native tester profile is unresolved.' }
     $hostRecord = Get-Content -Raw -LiteralPath $HostEvidencePath | ConvertFrom-Json
-    if ($hostRecord.schema -ne 'swe-host-preflight/v1' -or $hostRecord.repository -ne $root -or $hostRecord.model -cne 'gpt-5.6-luna' -or $hostRecord.reasoning_effort -cne 'medium' -or $hostRecord.role -cne 'test-runner' -or -not $hostRecord.session_id -or $hostRecord.route -notin @('NativeRole','ConfiguredFallback')) { throw 'Host identity, repository or exact tester route is invalid.' }
+    if ($hostRecord.schema -ne 'swe-host-preflight/v1' -or $hostRecord.repository -ne $root -or $hostRecord.model -cne $testerProfile.model -or $hostRecord.reasoning_effort -cne $testerProfile.reasoning_effort -or $hostRecord.role -cne 'test-runner' -or -not $hostRecord.session_id -or $hostRecord.route -notin @('NativeRole','ConfiguredFallback')) { throw 'Host identity, repository or exact tester route is invalid.' }
     foreach ($item in @(@('config',$configPath), @('role',$rolePath), @('skill',$skillPath))) {
         $bound = Get-SweField $hostRecord ($item[0] + '_file')
         if (-not $bound -or $bound.path -ne $item[1] -or (Get-FileHash -LiteralPath $item[1]).Hash -ne $bound.sha256) { throw "Host attestation does not bind current $($item[0]) bytes." }

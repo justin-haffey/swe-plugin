@@ -28,7 +28,7 @@ Reconcile a completed goal with the live repository, keep human and agent guidan
    - update `AGENTS.md` only for a durable governance change, never merely to summarize implementation;
    - make no documentation edit when the existing text is already accurate.
 5. Honor applicable repository-local documentation ownership, generated-file, and parity conventions. Do not assume a particular scaffold layout or run an ad hoc parity scan; rely on applicable repository instructions and repository-native checks.
-6. Request repository-native checks for the attributable change plus Markdown link/path checks and `git diff --check` through `$swe-test` -> `test-runner` (`gpt-5.6-luna`, `medium`). Reuse current applicable receipts and request only checks affected by final documentation edits or unresolved concerns. The documentation author fixes failures; the tester executes and returns attributable receipts. Missing tester/tool permission or required validation remains blocked.
+6. Request repository-native checks for the attributable change plus Markdown link/path checks and `git diff --check` through `$swe-test` -> `test-runner` (the model and reasoning effort configured in the native `test-runner` role). Reuse current applicable receipts and request only checks affected by final documentation edits or unresolved concerns. The documentation author fixes failures; the tester executes and returns attributable receipts. Missing tester/tool permission or required validation remains blocked.
 7. Read [the review handoff contract](references/REVIEW-HANDOFF.md), re-check the worktree without staging, and prepare the exact user-review handoff.
 8. Return the delegated role used, documentation decision, exact changed paths, validation evidence, preserved unrelated changes, and any blocker. Then pause for the user to review.
 
@@ -41,7 +41,7 @@ Use $repo-wrap-up to wrap up the completed goal in <repository-root>.
 Execution mode: <PRIMARY | BUILT_IN_WORKER_FALLBACK>.
 Completed goal: <summary>.
 Known changed paths and checks: <evidence>.
-Inspect the live Git diff and relevant change artifacts, reconcile README files, change AGENTS.md only for durable governance changes, follow repository-local documentation rules, request checks through $swe-test -> test-runner (gpt-5.6-luna, medium), and prepare an exact review handoff. Fix documentation yourself; do not delegate another wrap-up or execute checks outside the tester route. Do not stage or commit. Return exact changed paths, receipts, preserved unrelated changes or a precise blocker, then pause for user review. Do not call update_goal.
+Inspect the live Git diff and relevant change artifacts, reconcile README files, change AGENTS.md only for durable governance changes, follow repository-local documentation rules, request checks through $swe-test -> test-runner (configured native role), and prepare an exact review handoff. Fix documentation yourself; do not delegate another wrap-up or execute checks outside the tester route. Do not stage or commit. Return exact changed paths, receipts, preserved unrelated changes or a precise blocker, then pause for user review. Do not call update_goal.
 ```
 
 ## Safety and Permissions

@@ -35,7 +35,7 @@ Do not add a hash/version directory to PATH, edit Machine PATH, rewrite a PowerS
 
 ## Verify and stop
 
-Route command execution for verification through `$swe-test` to `test-runner` on `gpt-5.6-luna` at `medium`. Supply the exact working directory, permitted result directory, commands from the repair notes, and these criteria:
+Route command execution for verification through `$swe-test` to `test-runner` using its configured native model and effort. Supply the exact working directory, permitted result directory, commands from the repair notes, and these criteria:
 
 1. The absolute desktop executable and installed launcher both return a Codex version with exit code zero.
 2. A child PowerShell with PATH reconstructed from persistent Machine and User values resolves `codex` to the stable launcher and runs `codex --version` successfully.

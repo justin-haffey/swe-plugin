@@ -54,7 +54,8 @@ function Create-File([string]$Path, [string]$Text) {
     try { $bytes = $utf8.GetBytes($Text); $stream.Write($bytes, 0, $bytes.Length) } finally { $stream.Dispose() }
 }
 
-if ((Value $inputData 'schema_version') -ne 1) { throw 'Input schema_version must be 1.' }
+if ((Value $inputData 'schema_version') -notin @(1,4)) { throw 'Input schema_version must be 1 or 4.' }
+$compact = (Value $inputData 'schema_version') -eq 4
 
 if ($Mode -eq 'Recovery') {
     $lines = New-Object 'System.Collections.Generic.List[string]'
@@ -137,10 +138,32 @@ $metadata = Value $inputData 'metadata'
 $metaLines = New-Object 'System.Collections.Generic.List[string]'
 $artifactType = Require-Text $metadata 'artifact_type'
 if ($headerMatch.Groups['body'].Value -notmatch ('(?m)^artifact_type:\s*"?' + [regex]::Escape($artifactType) + '"?\s*$')) { throw 'Template and requested artifact_type differ.' }
-$allowedTypes = @('epic','research','concept','architecture_impact','feature','implementation_plan','design','implementation_evidence','validation','platform_architecture','solution_architecture','package_architecture','module_architecture','system_view','architecture_decision','architecture_contract')
+$allowedTypes = @('bugfix','enhancement','epic','research','concept','architecture_impact','feature','implementation_plan','design','implementation_evidence','validation','platform_architecture','solution_architecture','package_architecture','module_architecture','system_view','architecture_decision','architecture_contract')
 if ($artifactType -notin $allowedTypes) { throw "Unsupported artifact_type: $artifactType" }
-$status = if ($artifactType -match '_architecture$|^system_view$') { 'Target' } elseif ($artifactType -in @('architecture_decision', 'architecture_contract')) { 'Proposed' } else { 'Draft' }
+$status = if ($artifactType -match '_architecture$|^system_view$') { 'Target' } elseif ($artifactType -in @('architecture_decision', 'architecture_contract')) { 'Proposed' } elseif ($artifactType -in @('bugfix','enhancement')) { 'Active' } else { 'Draft' }
 if ($null -ne $metadata.PSObject.Properties['status']) { throw 'The helper sets initial lifecycle; metadata.status is not an input.' }
+if ($compact) {
+    foreach ($field in @('artifact_type','id')) { $metaLines.Add("${field}: $(Scalar (Require-Text $metadata $field))") }
+    if ((Require-Text $metadata 'id') -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$') { throw 'Invalid stable artifact ID.' }
+    $metaLines.Add("status: $(Scalar $status)")
+    $owners = @(Value $metadata 'owners' @())
+    if ($owners.Count -eq 0 -or @($owners | Where-Object { $_ -isnot [string] -or [string]::IsNullOrWhiteSpace($_) }).Count) { throw 'At least one named owner is required.' }
+    $metaLines.Add('owners: ' + (ConvertTo-Json -InputObject $owners -Compress))
+    $metaLines.Add('schema_version: 4')
+    $directLinks = @(Value $inputData 'artifact_links' @())
+    $linkRows = @(); $seenLinks = @{}
+    foreach ($link in $directLinks) {
+        $relation = Require-Text $link 'relation'
+        if ($relation -notmatch '^[a-z][a-z0-9_]*$') { throw 'Link relation must be snake_case.' }
+        $id = Require-Text $link 'artifact_id'; $path = Require-Text $link 'path'; Require-Relative $path
+        $row = [ordered]@{ relation = $relation; artifact_id = $id; path = $path }
+        foreach ($optional in @('repository','revision')) { if (Value $link $optional) { $row[$optional] = Require-Text $link $optional } }
+        $key = $relation + '|' + (Value $link 'repository' '.') + '|' + $path
+        if ($seenLinks.ContainsKey($key)) { throw 'Duplicate direct link.' }; $seenLinks[$key] = $true
+        $linkRows += $row
+    }
+    $metaLines.Add('links: ' + (ConvertTo-Json -InputObject @($linkRows) -Depth 8 -Compress))
+} else {
 foreach ($field in @('title', 'artifact_type', 'id')) { $metaLines.Add("${field}: $(Scalar (Require-Text $metadata $field))") }
 if ((Require-Text $metadata 'id') -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$') { throw 'Invalid stable artifact ID.' }
 $metaLines.Add("status: $(Scalar $status)")
@@ -168,6 +191,7 @@ foreach ($field in @('created', 'updated')) {
     $metaLines.Add("${field}: $(Scalar $date)")
 }
 $metaLines.Add('template_version: "3.0.0"')
+}
 $metadataBlock = New-Block 'metadata' ($metaLines -join "`n") -Yaml
 
 $indexLines = New-Object 'System.Collections.Generic.List[string]'
@@ -192,7 +216,7 @@ foreach ($assignment in @(Value $inputData 'assignments' @())) {
     foreach ($criterion in $assignedCriteria) { if (-not $criterionIds.ContainsKey([string]$criterion)) { throw "Assignment $id references unknown criterion: $criterion" } }
     $indexLines.Add("| $(Cell $id) | $(Cell (Require-Text $assignment 'repository')) | $(Cell $path) | $(Cell ($assignedCriteria -join ', ')) |")
 }
-$indexLines.Add(''); $indexLines.Add('Upstream locator: ' + (Cell (Require-Text (Value $inputData 'upstream') 'artifact_id')) + ' in ' + (Cell (Require-Text (Value $inputData 'upstream') 'repository')) + ', ' + (Cell (Require-Text (Value $inputData 'upstream') 'path')))
+if (-not $compact) { $indexLines.Add(''); $indexLines.Add('Upstream locator: ' + (Cell (Require-Text (Value $inputData 'upstream') 'artifact_id')) + ' in ' + (Cell (Require-Text (Value $inputData 'upstream') 'repository')) + ', ' + (Cell (Require-Text (Value $inputData 'upstream') 'path'))) }
 foreach ($link in @(Value $inputData 'links' @())) {
     $label = Require-Text $link 'label'
     $target = Require-Text $link 'target'
@@ -203,6 +227,7 @@ foreach ($link in @(Value $inputData 'links' @())) {
     $indexLines.Add("- [$safeLabel](<$($target.Replace('\', '/'))>)")
 }
 if ($isArchitecture) { $indexLines.Add("Profile: $profile. $(Cell $profileRationale)") }
+if ($compact -and @(Value $inputData 'criteria' @()).Count -eq 0 -and @(Value $inputData 'assignments' @()).Count -eq 0 -and @(Value $inputData 'links' @()).Count -eq 0 -and -not $isArchitecture) { $indexLines.Clear() }
 $traceabilityBlock = New-Block 'traceability' ($indexLines -join "`n")
 $body = $templateText.Substring($headerMatch.Length)
 if ($isArchitecture) {
@@ -225,7 +250,7 @@ $newText = "---`n$metadataBlock`n---`n`n$($body.TrimEnd())`n`n$traceabilityBlock
 if ($Mode -eq 'Create') { Create-File $outputFile $newText }
 else {
     $current = [IO.File]::ReadAllText($outputFile)
-    if ($current -match '(?m)^status:\s*["'']?(Accepted|Current|Implemented|Superseded|InReview)["'']?\s*$|(?m)^\|\s*Decision\s*\|\s*(Accepted|Bypassed)\s*\|') { throw 'Frozen lifecycle/approval cannot be regenerated; create an explicit successor or return an unaccepted review to Draft through governance.' }
+    if ($current -match '(?m)^status:\s*["'']?(Accepted|Current|Implemented|Superseded|InReview|Validated|Closed)["'']?\s*$|(?m)^\|\s*Decision\s*\|\s*(Accepted|Bypassed)\s*\|') { throw 'Frozen lifecycle/approval cannot be regenerated; create an explicit successor or return an unaccepted review to Draft through governance.' }
     if ($current -notmatch ('(?m)^id:\s*' + [regex]::Escape((Scalar (Value $metadata 'id'))) + '\s*$')) { throw 'Update identity mismatch or unsupported legacy metadata; preserve it and author an explicit successor.' }
     $updates = @(
         @{ Name = 'metadata'; Pattern = '(?ms)^# swe:generated metadata sha256=(?<hash>[a-f0-9]{64})\r?\n(?<body>.*?)^# swe:end metadata'; Block = $metadataBlock },

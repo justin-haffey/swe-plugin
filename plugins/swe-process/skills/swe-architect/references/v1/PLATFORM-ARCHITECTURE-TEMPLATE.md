@@ -1,21 +1,10 @@
 ---
-title: "[PLATFORM_NAME] Platform Architecture"
 artifact_type: "platform_architecture"
 id: "ARCH-PLATFORM-[PLATFORM_ID]"
 status: "Target"
-authority: "portfolio"
-scope: "[PLATFORM_ID]"
-parent: "[PORTFOLIO_ID_OR_NONE]"
-upstream:
-  repository: "[REPOSITORY_ID_OR_URL]"
-  artifact_id: "[SOURCE_ARTIFACT_ID]"
-  path: "[REPOSITORY_RELATIVE_PATH]"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[PLATFORM_ARCHITECT]"
-created: "[YYYY_MM_DD]"
-updated: "[YYYY_MM_DD]"
-template_version: "3.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # [PLATFORM_NAME] Platform Architecture
@@ -28,27 +17,9 @@ template_version: "3.0.0"
 
 [PLATFORM_BOUNDARY_AND_EXTERNAL_CONTEXT]
 
-### Platform Context and Solution Landscape
+### Optional view
 
-Use this view to show who depends on the Platform, its owned Solutions, and the most important external relationships. Keep Solution internals in their own architecture documents.
-
-```mermaid
-flowchart LR
-    Stakeholder["[PRIMARY_STAKEHOLDER]"]
-    External["[EXTERNAL_SYSTEM]"]
-
-    subgraph Platform["[PLATFORM_NAME]"]
-        SolutionA["[SOLUTION_A]"]
-        SolutionB["[SOLUTION_B]"]
-    end
-
-    Stakeholder -->|"[USES]"| SolutionA
-    SolutionA -->|"[CONTRACT_OR_FLOW]"| SolutionB
-    SolutionB -->|"[INTEGRATES_WITH]"| External
-```
-
-- Relationship meaning: [ARROW_SEMANTICS]
-- Scope and omissions: [DIAGRAM_SCOPE_AND_OMISSIONS]
+Add a diagram only when it clarifies a real boundary or interaction. Keep prose/tables authoritative; omit unused example views.
 
 ## Solution Decomposition
 
@@ -88,14 +59,6 @@ flowchart LR
 - Security and trust: [THREAT_BOUNDARY_AND_CONTROL]
 - Operations and compatibility: [OBSERVABILITY_DEPLOYMENT_MIGRATION_AND_REVERSAL]
 
-## Review Packet
-
-- Decision bytes or immutable snapshot: [INPUT_AND_DECISION_FINGERPRINT_LOCATORS]
-- Effective policy and named approver: [POLICY_LOCATOR_AND_APPROVER]
-- Paired decisions and order: [PAIRED_ARTIFACT_LOCATORS_OR_NONE]
-- Review cycle history: [DURABLE_HISTORY_LOCATOR]; repair cycles consumed: [COUNT]
-- Correspondence at decision time: [VERIFIED_MATCH_OR_BLOCKER]
-
 ## Approval Record
 
 | Field | Value |
@@ -107,3 +70,5 @@ flowchart LR
 | Recorded | [ISO_8601_TIMESTAMP_OR_PENDING] |
 | Evidence | [REVIEW_REFERENCE_OR_NONE] |
 | Bypass reason | [REQUIRED_FOR_FORCE_OR_NONE] |
+
+Review history: [REVIEWED_INPUT_AND_DECISION_FINGERPRINTS]; repair cycles consumed: [COUNT]. Record actual decisions and unresolved findings here; preserve history across resumes.

@@ -1,15 +1,7 @@
-# Solution Engineering Work
+# Solution engineering work
 
-Implementation work is keyed by the upstream Epic and Feature IDs:
+Standalone capabilities use `features/NNN-short-name/FEATURE.md` (outcome and approach), `EVIDENCE.md`, and `VALIDATION.md`. Add a separate Design only for material complexity. No portfolio or Epic is required.
 
-```text
-implementations/EPIC-001/FEATURE-001/
-  DESIGN.md
-  EVIDENCE.md
-  VALIDATION.md
-changes/
-  bugs/BUG-001-short-name/BUGFIX.md
-  enhancements/ENH-001-short-name/ENHANCEMENT.md
-```
+Federated assignments use `implementations/EPIC-NNN/FEATURE-NNN/` with local Design, Evidence and Validation. Link the actual portfolio Feature and allocation by repository, stable ID and path, plus known revision. Allocation may be in the Feature or a separate Implementation Plan; never copy it into this repository.
 
-Every implementation workspace links to the canonical portfolio `FEATURE.md` and adjacent `IMPLEMENTATION-PLAN.md` using repository, stable artifact ID, repository-relative path, and optional revision. Do not copy either upstream artifact locally. Fast paths remain local and bounded; escalate them when accepted architecture, a cross-solution contract, Feature intent, or portfolio allocation changes.
+Intentional fast paths use one `changes/bugs/BUG-NNN-name/BUGFIX.md` or `changes/enhancements/ENH-NNN-name/ENHANCEMENT.md`, including evidence and Validation/Closure. Escalate exceeded scope to the actual local or shared owner.

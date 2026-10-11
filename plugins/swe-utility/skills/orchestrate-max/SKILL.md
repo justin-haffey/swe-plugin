@@ -74,7 +74,7 @@ Compose only the waves the task needs, but prefer full lifecycle coverage for bu
 ### Wave 4: Independent Verification
 
 - Use agents not responsible for the implementation to inspect correctness, regressions, safety, maintainability, and task-specific quality.
-- For SWE V3, request mapped build/lint/test/integration/security/browser checks through `$swe-test` -> effective `test-runner` (`gpt-5.6-luna`, `medium`). Authors own source/test fixes; independent reviewers judge adequacy and acceptance. Never claim a check or visual inspection that did not occur, or substitute acceptance for a green receipt.
+- For SWE, request mapped build/lint/test/integration/security/browser checks through `$swe-test` -> effective `test-runner` (the model and reasoning effort configured in the native `test-runner` role). Authors own source/test fixes; independent reviewers judge adequacy and acceptance. Never claim a check or visual inspection that did not occur, or substitute acceptance for a green receipt.
 - For high-risk or user-facing artifacts, include an adversarial or negative-path reviewer when a relevant agent exists.
 
 ### Wave 5: Repair and Integration
@@ -135,7 +135,7 @@ Do not send the full parent transcript when a smaller context package is suffici
 - Explicitly name an available `$skill-name` in a subagent prompt when that workflow applies.
 - Use document, PDF, presentation, spreadsheet, image, website, OpenAI documentation, Gmail, Calendar, or repository-retrieval skills only for matching workstreams.
 - Use repository-local authoring skills for skills, agents, plugins, and governed SWE artifacts.
-- For SWE V3 execution of tests, builds, lint, browser and related checks, use `$swe-test` and resolve `test-runner` at Luna/medium with real host permissions. Missing required skill/role/tool blocks the check; never silently replace it with a developer or reviewer execution.
+- For SWE execution of tests, builds, lint, browser and related checks, use `$swe-test` and resolve `test-runner` with its native configured model/effort with real host permissions. Missing required skill/role/tool blocks the check; never silently replace it with a developer or reviewer execution.
 - Do not invent skill or tool names. If a needed capability is unavailable, assign the nearest safe role and state the limitation.
 - A skill may narrow permissions or prescribe validation; orchestration never overrides it.
 - This optional utility does not acquire lifecycle authority. Preserve frozen review fingerprints, separate decisions for each artifact, reviewer qualification/independence and canonical cycle-history counts. A renamed packet, executor change, successor for the same unresolved decision or resume cannot reset the two-cycle limit; exhaustion requires human disposition.

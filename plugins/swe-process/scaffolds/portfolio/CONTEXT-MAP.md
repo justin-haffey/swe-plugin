@@ -1,21 +1,10 @@
 ---
-title: "[PLATFORM_NAME] Context Map"
 artifact_type: "context-map"
 id: "CONTEXT-MAP-[PLATFORM_ID]"
 status: "draft"
-authority: "portfolio"
-scope: "[PLATFORM_ID]"
-parent: "[PORTFOLIO_ARTIFACT_ID_OR_NONE]"
-upstream:
-  repository: "[REPOSITORY_ID_OR_URL]"
-  artifact_id: "[ARTIFACT_ID_OR_NONE]"
-  path: "[REPOSITORY_RELATIVE_PATH_OR_NONE]"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[CONTEXT_OWNER]"
-created: "[YYYY-MM-DD]"
-updated: "[YYYY-MM-DD]"
-template_version: "2.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # [PLATFORM_NAME] Context Map

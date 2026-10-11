@@ -1,4 +1,4 @@
 interface:
   display_name: "Design SWE Implementation"
-  short_description: "Create an implementation-ready solution design"
-  default_prompt: "Use $swe-design to design this repository's assigned Feature work."
+  short_description: "Prepare or review the implementation approach"
+  default_prompt: "Use $swe-design for an approach in a local Feature or a separate Design when needed."

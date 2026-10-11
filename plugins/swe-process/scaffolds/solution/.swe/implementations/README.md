@@ -1,3 +1,3 @@
-# Feature Implementations
+# Federated assignments
 
-Create solution-owned `DESIGN.md`, `EVIDENCE.md`, and `VALIDATION.md` records under `EPIC-###/FEATURE-###/`. The directory locates the work; the upstream portfolio `FEATURE.md` remains the source of intent and acceptance criteria, and its adjacent `IMPLEMENTATION-PLAN.md` remains the source of allocation. Link to both and do not copy them locally.
+Keep Design, Evidence and Validation under EPIC-NNN/FEATURE-NNN for actual portfolio allocations. Link canonical upstream Feature/allocation; never copy them. Locally owned standalone Features use ../features/ instead.

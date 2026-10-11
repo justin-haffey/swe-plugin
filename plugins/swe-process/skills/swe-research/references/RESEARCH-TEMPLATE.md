@@ -1,21 +1,10 @@
 ---
-title: "[RESEARCH_TITLE]"
 artifact_type: "research"
 id: "RESEARCH-[TOPIC]"
 status: "Draft"
-authority: "portfolio"
-scope: "[EPIC_ID]"
-parent: "[EPIC_ID]"
-upstream:
-  repository: "[REPOSITORY_ID_OR_URL]"
-  artifact_id: "[EPIC_ID]"
-  path: ".swe/epics/[EPIC_DIRECTORY]/EPIC.md"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[RESEARCHER]"
-created: "[YYYY_MM_DD]"
-updated: "[YYYY_MM_DD]"
-template_version: "3.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # [RESEARCH_TITLE]

@@ -1,21 +1,10 @@
 ---
-title: "[SOLUTION_NAME] Solution Architecture"
 artifact_type: "solution_architecture"
 id: "ARCH-SOLUTION-[SOLUTION_ID]"
 status: "Target"
-authority: "solution"
-scope: "[SOLUTION_ID]"
-parent: "[PLATFORM_ARCHITECTURE_ID]"
-upstream:
-  repository: "[PORTFOLIO_REPOSITORY_ID_OR_URL]"
-  artifact_id: "[PLATFORM_ARCHITECTURE_ID]"
-  path: "architecture/PLATFORM-ARCHITECTURE.md"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[SOLUTION_ARCHITECT]"
-created: "[YYYY_MM_DD]"
-updated: "[YYYY_MM_DD]"
-template_version: "3.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # [SOLUTION_NAME] Solution Architecture
@@ -30,55 +19,17 @@ template_version: "3.0.0"
 |---|---|---|
 | [PACKAGE] | [RESPONSIBILITY] | [DEPENDENCIES] |
 
-### Container and Package View
+### Optional view
 
-Use this view to show the Solution's major runtime or deployable units and the Packages that implement them. Do not expand Packages into Modules here.
-
-```mermaid
-flowchart LR
-    Actor["[PRIMARY_ACTOR_OR_CALLER]"]
-    External["[EXTERNAL_SYSTEM]"]
-
-    subgraph Solution["[SOLUTION_NAME]"]
-        Entry["[ENTRY_POINT_OR_CONTAINER]"]
-        Service["[SERVICE_OR_WORKER]"]
-        Data[("[OWNED_DATA_STORE]")]
-    end
-
-    Actor -->|"[REQUEST_OR_TRIGGER]"| Entry
-    Entry -->|"[INTERNAL_CONTRACT]"| Service
-    Service -->|"[READS_OR_WRITES]"| Data
-    Service -->|"[EXTERNAL_CONTRACT]"| External
-```
-
-- Element-to-Package mapping: [ELEMENT_TO_PACKAGE_MAPPING]
-- Relationship meaning: [ARROW_SEMANTICS]
-- Scope and omissions: [DIAGRAM_SCOPE_AND_OMISSIONS]
+Add a diagram only when it clarifies a real boundary or interaction. Keep prose/tables authoritative; omit unused example views.
 
 ## Runtime and Integration Views
 
 [COMPONENTS_FLOWS_AND_CONTRACTS]
 
-### Key Runtime Interaction
+### Optional view
 
-Use this sequence for the most architecturally significant end-to-end interaction. Add another sequence only when it explains a materially different collaboration or failure path.
-
-```mermaid
-sequenceDiagram
-    actor Actor as [PRIMARY_ACTOR]
-    participant Entry as [ENTRY_POINT]
-    participant Service as [INTERNAL_SERVICE]
-    participant External as [EXTERNAL_COLLABORATOR]
-
-    Actor->>Entry: [REQUEST_OR_TRIGGER]
-    Entry->>Service: [VALIDATED_COMMAND_OR_QUERY]
-    Service->>External: [CONTRACT_OPERATION]
-    External-->>Service: [RESULT_OR_EVENT]
-    Service-->>Actor: [OUTCOME]
-```
-
-- Scenario and architectural significance: [SCENARIO_AND_SIGNIFICANCE]
-- Failure or asynchronous behavior omitted: [RUNTIME_OMISSIONS]
+Add a diagram only when it clarifies a real boundary or interaction. Keep prose/tables authoritative; omit unused example views.
 
 ## Data, Security, Qualities, and Operations
 
@@ -104,14 +55,6 @@ sequenceDiagram
 - Security and trust: [THREAT_BOUNDARY_AND_CONTROL]
 - Operations and compatibility: [OBSERVABILITY_DEPLOYMENT_MIGRATION_AND_REVERSAL]
 
-## Review Packet
-
-- Decision bytes or immutable snapshot: [INPUT_AND_DECISION_FINGERPRINT_LOCATORS]
-- Effective policy and named approver: [POLICY_LOCATOR_AND_APPROVER]
-- Paired decisions and order: [PAIRED_ARTIFACT_LOCATORS_OR_NONE]
-- Review cycle history: [DURABLE_HISTORY_LOCATOR]; repair cycles consumed: [COUNT]
-- Correspondence at decision time: [VERIFIED_MATCH_OR_BLOCKER]
-
 ## Approval Record
 
 | Field | Value |
@@ -123,3 +66,5 @@ sequenceDiagram
 | Recorded | [ISO_8601_TIMESTAMP_OR_PENDING] |
 | Evidence | [REVIEW_REFERENCE_OR_NONE] |
 | Bypass reason | [REQUIRED_FOR_FORCE_OR_NONE] |
+
+Review history: [REVIEWED_INPUT_AND_DECISION_FINGERPRINTS]; repair cycles consumed: [COUNT]. Record actual decisions and unresolved findings here; preserve history across resumes.

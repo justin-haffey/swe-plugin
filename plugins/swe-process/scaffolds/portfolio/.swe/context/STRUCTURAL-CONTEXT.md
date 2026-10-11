@@ -1,21 +1,10 @@
 ---
-title: "[PLATFORM_NAME] Structural Context"
 artifact_type: "context-vocabulary"
 id: "CONTEXT-STRUCTURAL-[PLATFORM_ID]"
 status: "draft"
-authority: "portfolio"
-scope: "[PLATFORM_ID]"
-parent: "CONTEXT-MAP-[PLATFORM_ID]"
-upstream:
-  repository: "[REPOSITORY_ID_OR_URL]"
-  artifact_id: "CONTEXT-MAP-[PLATFORM_ID]"
-  path: "CONTEXT-MAP.md"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[CONTEXT_OWNER]"
-created: "[YYYY-MM-DD]"
-updated: "[YYYY-MM-DD]"
-template_version: "2.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # Structural Context

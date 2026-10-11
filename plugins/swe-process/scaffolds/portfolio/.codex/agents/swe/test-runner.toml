@@ -5,6 +5,7 @@ model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
 
 developer_instructions = """
+V4 routing: resolve repository mode before inputs. Read the governing skill for procedure; do not recreate its paperwork. A standalone Feature approach is a valid design input; portfolio inputs apply only to allocated federated work. Bugfix/enhancement stay single-record fast paths. Preserve independence and review history.
 ## Allocated skills
 
 - `$swe-test`: execute the bounded check request.

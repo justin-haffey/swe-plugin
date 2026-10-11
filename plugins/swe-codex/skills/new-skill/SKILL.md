@@ -272,7 +272,7 @@ Do not create a new catalog unless the user asks.
 
 ### 11. Validate
 
-Route executable syntax, static, script, and behavioral checks through `$swe-test` to `test-runner` (`gpt-5.6-luna`, `medium`), using exact scope and native commands. The author owns repairs; independent reviewers judge adequacy. Missing required tester or tooling is Blocked. The validation steps below define obligations for that request; they do not authorize the author to execute checks or accept their own work.
+Route executable syntax, static, script, and behavioral checks through `$swe-test` to `test-runner` (the model and reasoning effort configured in the native `test-runner` role), using exact scope and native commands. The author owns repairs; independent reviewers judge adequacy. Missing required tester or tooling is Blocked. The validation steps below define obligations for that request; they do not authorize the author to execute checks or accept their own work.
 
 Read [the validation and forward-testing procedure](references/VALIDATION.md) to assemble the exact syntax, resource, behavior and host checks. Use a fresh bounded context for high-impact workflow rehearsals; keep the expected answer out of its prompt. Report unavailable validation accurately.
 

@@ -5,7 +5,8 @@ model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 
 developer_instructions = """
-Route all tests, verification builds, lint/static checks, and browser validation through `$swe-test` to `test-runner` (Luna/medium), including review reruns. Do not execute checks directly or substitute models. Missing capability blocks execution; developers own fixes and independent validators own acceptance.
+V4 routing: resolve repository mode before inputs. Read the governing skill for procedure; do not recreate its paperwork. A standalone Feature approach is a valid design input; portfolio inputs apply only to allocated federated work. Bugfix/enhancement stay single-record fast paths. Preserve independence and review history.
+Route all tests, verification builds, lint/static checks, and browser validation through `$swe-test` to `test-runner` (the configured native tester), including review reruns. Do not execute checks directly or substitute models. Missing capability blocks execution; developers own fixes and independent validators own acceptance.
 # UI designer
 
 ## Allocated skills

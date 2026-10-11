@@ -4,7 +4,8 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'Swe-ArtifactFields.ps1')
 $fields = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot '../references/eligibility-fields.json') | ConvertFrom-Json
 $inputRecord = Get-Content -Raw -LiteralPath $InputPath | ConvertFrom-Json
-if ($inputRecord.schema -ne 'swe-packet-source/v1') { throw 'Unsupported packet source schema.' }
+if ($inputRecord.schema -eq 'swe-packet-source/v2') { $fields = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot '../references/eligibility-fields-v4.json') | ConvertFrom-Json }
+if ($inputRecord.schema -notin @('swe-packet-source/v1','swe-packet-source/v2')) { throw 'Unsupported packet source schema.' }
 $missing = [Collections.Generic.List[string]]::new()
 $sources = [Collections.Generic.List[object]]::new()
 $packet = [ordered]@{ schema = $fields.packet_schema; assignment_id = $inputRecord.assignment_id; repository = $inputRecord.repository; phase = $inputRecord.phase }

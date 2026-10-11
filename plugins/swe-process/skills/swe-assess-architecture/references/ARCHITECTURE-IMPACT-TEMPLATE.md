@@ -1,21 +1,10 @@
 ---
-title: "[EPIC_TITLE] Architecture Impact"
 artifact_type: "architecture_impact"
 id: "ARCH-IMPACT-[EPIC_NNN]"
 status: "Draft"
-authority: "portfolio"
-scope: "[EPIC_ID]"
-parent: "[EPIC_ID]"
-upstream:
-  repository: "[REPOSITORY_ID_OR_URL]"
-  artifact_id: "[EPIC_ID]"
-  path: ".swe/epics/[EPIC_DIRECTORY]/EPIC.md"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[OWNER]"
-created: "[YYYY_MM_DD]"
-updated: "[YYYY_MM_DD]"
-template_version: "3.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # Architecture Impact
@@ -41,14 +30,6 @@ template_version: "3.0.0"
 
 - [RISK_OR_DECISION]
 
-## Review Packet
-
-- Decision bytes or immutable snapshot: [INPUT_AND_DECISION_FINGERPRINT_LOCATORS]
-- Effective policy and named approver: [POLICY_LOCATOR_AND_APPROVER]
-- Paired decisions and order: [PAIRED_ARTIFACT_LOCATORS_OR_NONE]
-- Review cycle history: [DURABLE_HISTORY_LOCATOR]; repair cycles consumed: [COUNT]
-- Correspondence at decision time: [VERIFIED_MATCH_OR_BLOCKER]
-
 ## Approval Record
 
 | Field | Value |
@@ -60,3 +41,5 @@ template_version: "3.0.0"
 | Recorded | [ISO_8601_TIMESTAMP_OR_PENDING] |
 | Evidence | [REVIEW_REFERENCE_OR_NONE] |
 | Bypass reason | [REQUIRED_FOR_FORCE_OR_NONE] |
+
+Review history: [REVIEWED_INPUT_AND_DECISION_FINGERPRINTS]; repair cycles consumed: [COUNT]. Record actual decisions and unresolved findings here; preserve history across resumes.

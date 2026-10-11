@@ -1,21 +1,10 @@
 ---
-title: "[EPIC_TITLE]"
 artifact_type: "epic"
 id: "EPIC-[NNN]"
 status: "Draft"
-authority: "portfolio"
-scope: "[PORTFOLIO_SCOPE]"
-parent: "[PORTFOLIO_ARTIFACT_OR_NONE]"
-upstream:
-  repository: "[REPOSITORY_ID_OR_URL]"
-  artifact_id: "[ARTIFACT_ID_OR_NONE]"
-  path: "[REPOSITORY_RELATIVE_PATH_OR_NONE]"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[OWNER]"
-created: "[YYYY_MM_DD]"
-updated: "[YYYY_MM_DD]"
-template_version: "2.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # [EPIC_TITLE]

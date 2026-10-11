@@ -14,7 +14,9 @@ Accept only this signature from the primary `$swe-max` coordinator owning the ac
 $swe-bridge -portfolio "<EXACT_PORTFOLIO_REPOSITORY_PATH>" -feature <FEATURE_ID> -plan "<PORTFOLIO_RELATIVE_IMPLEMENTATION_PLAN_PATH>" -solution "<EXACT_CHILD_SOLUTION_REPOSITORY_PATH>" -assignment "<ASSIGNMENT_KEY>"
 ```
 
-Reject missing, extra, conflicting or ambiguous arguments and direct user invocation. Require this assignment's Accepted Feature, portfolio Plan/allocation, affected architecture and Design-entry prerequisites, exact criterion coverage, accessible preflighted child checkout and inherited authority. Unrelated unapproved Plans do not block this assignment. Unknown dependencies/risk block affected dispatch.
+The `-plan` locator names the canonical allocation: a Feature with an Allocation section or a separate Plan. Do not create a Plan solely for transport.
+
+Reject missing, extra, conflicting or ambiguous arguments and direct user invocation. Require this assignment's Accepted Feature, portfolio allocation, affected architecture and Design-entry prerequisites, exact criterion coverage, accessible preflighted child checkout and inherited authority. Unrelated unapproved Plans do not block this assignment. Unknown dependencies/risk block affected dispatch.
 
 ## Workflow
 
@@ -40,6 +42,6 @@ Read legacy `Complete` by inspecting existing Evidence/Validation. Map to `Valid
 
 ## Boundaries
 
-The parent alone owns the Goal; children must not create, replace, update, complete or block it. Preserve sandbox, approval, repository, dependency, destructive-action, external-mutation, deployment, publishing, credential and Git restrictions. No child-owned artifacts in the portfolio or semantic edits to Accepted upstream artifacts. All checks use `$swe-test` -> `test-runner` at Luna/medium; developers fix failures and independent validators own acceptance. Preserve durable review counts across resume, packets and executors.
+The parent alone owns the Goal; children must not create, replace, update, complete or block it. Preserve sandbox, approval, repository, dependency, destructive-action, external-mutation, deployment, publishing, credential and Git restrictions. No child-owned artifacts in the portfolio or semantic edits to Accepted upstream artifacts. All checks use `$swe-test` -> `test-runner` with its native configured model/effort; developers fix failures and independent validators own acceptance. Preserve durable review counts across resume, packets and executors.
 
 If no transport can honor exact destination, permissions and result retrieval, return a concrete blocker with the packet and any captured handle. Do not repeat dispatch blindly or claim work started.

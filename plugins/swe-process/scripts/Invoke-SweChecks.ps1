@@ -149,7 +149,9 @@ if ($request.schema -ne 'swe-check-request/v1') { throw 'Unsupported request sch
 foreach ($field in @('repository','assignment','criteria','scope','runtime','checks','risk','timing','prerequisites','result_directory','shared_outputs','execution_role','executor')) {
     if ($null -eq $request.PSObject.Properties[$field]) { throw "Missing request field: $field" }
 }
-if ($request.execution_role -ne 'test-runner' -or $request.executor.role -ne 'test-runner' -or $request.executor.model -ne 'gpt-5.6-luna' -or $request.executor.reasoning_effort -ne 'medium' -or -not $request.executor.session_id) { throw 'The request must identify the actual Luna/medium test-runner session.' }
+. (Join-Path $PSScriptRoot 'Swe-TesterProfile.ps1')
+$testerProfile = Get-SweTesterProfile $request.repository
+if ($request.execution_role -ne 'test-runner' -or $request.executor.role -ne $testerProfile.role -or $request.executor.model -ne $testerProfile.model -or $request.executor.reasoning_effort -ne $testerProfile.reasoning_effort -or -not $request.executor.session_id) { throw 'The request must identify the actual configured native test-runner session.' }
 $repository = Resolve-PathName $request.repository (Get-Location).Path
 if (-not (Test-Path -LiteralPath $repository -PathType Container)) { throw 'Exact repository directory is unavailable.' }
 if ($FingerprintOnly) {
@@ -321,7 +323,9 @@ finally {
         $receipt.after = Get-Snapshot
         if ($null -ne $receipt.before) { $receipt.changed_during_run = $receipt.before.digest -ne $receipt.after.digest }
     } catch { $receipt.blockers += "After fingerprint unavailable: $($_.Exception.Message)" }
-    $lastAttempts = @($receipt.attempts | Group-Object check_id | ForEach-Object { $_.Group[-1] })
+    # PowerShell 5 groups dictionary entries by a missing adapted property.
+    # Project keys to real properties before choosing each check's final attempt.
+    $lastAttempts = @($receipt.attempts | ForEach-Object { [pscustomobject]$_ } | Group-Object check_id | ForEach-Object { $_.Group[-1] })
     $pending = @()
     foreach ($criterion in @($request.criteria)) {
         $requiredChecks = @($request.checks | Where-Object { $criterion -in @($_.criteria) })

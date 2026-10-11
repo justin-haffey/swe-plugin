@@ -1,727 +1,89 @@
 [CmdletBinding()]
-param(
-    [string]$PluginRoot,
-    [switch]$SkipBehaviorTests
-)
-
+param([string]$PluginRoot, [switch]$SkipBehaviorTests)
 $ErrorActionPreference = 'Stop'
-if ([string]::IsNullOrWhiteSpace($PluginRoot)) {
-    $PluginRoot = Split-Path -Parent $PSScriptRoot
-}
+if (-not $PluginRoot) { $PluginRoot = Split-Path -Parent $PSScriptRoot }
 $PluginRoot = (Resolve-Path -LiteralPath $PluginRoot).Path
-$workspaceRoot = Split-Path -Parent (Split-Path -Parent $PluginRoot)
-$failures = [System.Collections.Generic.List[string]]::new()
-
-function Add-Failure {
-    param([Parameter(Mandatory = $true)][string]$Message)
-    $failures.Add($Message)
+$repositoryRoot = Split-Path -Parent (Split-Path -Parent $PluginRoot)
+$failures = [Collections.Generic.List[string]]::new()
+$count = 0
+function Check([bool]$Condition, [string]$Message) {
+    $script:count++
+    if (-not $Condition) { $failures.Add($Message) }
 }
-
-function Test-AgentRegistry {
-    param(
-        [Parameter(Mandatory = $true)][string]$ScaffoldRoot,
-        [Parameter(Mandatory = $true)][string[]]$ExpectedRoster
-    )
-
-    $configPath = Join-Path $ScaffoldRoot '.codex\config.toml'
-    if (-not (Test-Path -LiteralPath $configPath -PathType Leaf)) {
-        Add-Failure "Missing scaffold Codex registry: $configPath"
-        return
+$null = & (Join-Path $PSScriptRoot 'Get-SweCatalog.ps1') -Check
+$catalog = Get-Content -Raw -LiteralPath (Join-Path $PluginRoot 'references/SKILL-CATALOG.json') | ConvertFrom-Json
+foreach ($package in $catalog.packages) {
+    $packageRoot = Join-Path $repositoryRoot "plugins/$($package.name)"
+    $manifest = Get-Content -Raw -LiteralPath (Join-Path $packageRoot '.codex-plugin/plugin.json') | ConvertFrom-Json
+    Check ($manifest.version -eq '4.0.0' -and $manifest.interface.displayName.EndsWith(' 4.0.0')) "Version/display drift: $($package.name)"
+    Check ($manifest.author.name -eq 'Ghostworx.ai, LLC' -and $manifest.interface.developerName -eq 'Ghostworx.ai, LLC') "Publisher drift: $($package.name)"
+    foreach ($asset in @($manifest.skills,$manifest.interface.logo,$manifest.interface.composerIcon)) {
+        Check ($asset.StartsWith('./') -and (Test-Path -LiteralPath (Join-Path $packageRoot $asset))) "Missing/nonrelative manifest asset: $asset"
     }
-    $configText = Get-Content -Raw -LiteralPath $configPath
-    if ($configText -match '(?i)[A-Z]:\\Users\\|/Users/[^/]+/') {
-        Add-Failure "Scaffold registry contains a machine-specific path: $configPath"
-    }
-    $actualRoster = @([regex]::Matches($configText, '(?m)^\[agents\.([a-z0-9_]+)\]\s*$') | ForEach-Object { $_.Groups[1].Value } | Sort-Object)
-    $expectedSorted = @($ExpectedRoster | Sort-Object)
-    if (Compare-Object -ReferenceObject $expectedSorted -DifferenceObject $actualRoster) {
-        Add-Failure "Agent roster mismatch: $configPath"
-    }
-
-    foreach ($match in [regex]::Matches($configText, '(?m)^config_file\s*=\s*"([^"]+)"\s*$')) {
-        $relative = $match.Groups[1].Value -replace '/', '\'
-        if ([System.IO.Path]::IsPathRooted($relative)) {
-            Add-Failure "Agent config_file must be relative: $configPath -> $relative"
-            continue
-        }
-        $agentPath = Join-Path (Join-Path $ScaffoldRoot '.codex') $relative
-        if (-not (Test-Path -LiteralPath $agentPath -PathType Leaf)) {
-            Add-Failure "Registered agent file is missing: $agentPath"
-            continue
-        }
-        $agentText = Get-Content -Raw -LiteralPath $agentPath
-        foreach ($field in @('name', 'description', 'developer_instructions')) {
-            if ($agentText -notmatch "(?m)^$([regex]::Escape($field))\s*=") {
-                Add-Failure "Agent TOML missing '$field': $agentPath"
-            }
-        }
-        if ((Split-Path -Leaf $agentPath) -eq 'test-runner.toml') {
-            if ($agentText -notmatch '(?m)^model\s*=\s*"gpt-6-luna"\s*$' -or $agentText -notmatch '(?m)^model_reasoning_effort\s*=\s*"medium"\s*$') {
-                Add-Failure "Tester must resolve to Luna/medium: $agentPath"
-            }
-            if ($agentText -notmatch [regex]::Escape('$swe-test') -or $agentText -match [regex]::Escape('$swe-validate')) { Add-Failure "Tester allocation must execute checks without owning acceptance: $agentPath" }
-        }
+    foreach ($skill in $package.skills) {
+        $path = Join-Path $repositoryRoot $skill.path
+        $text = [IO.File]::ReadAllText($path)
+        Check ($text -match ('(?ms)\A---\r?\nname: ' + [regex]::Escape($skill.name) + '\r?\ndescription: [^\r\n]+\r?\n.*?---')) "Skill front matter: $path"
+        $skillRoot = Split-Path -Parent $path
+        Check (Test-Path -LiteralPath (Join-Path $skillRoot 'agents/openai.yaml')) "Missing skill UI: $path"
     }
 }
-
-function Test-ContextLayout {
-    param(
-        [Parameter(Mandatory = $true)][string]$ScaffoldRoot,
-        [Parameter(Mandatory = $true)][ValidateSet('portfolio', 'solution')][string]$ScaffoldName
-    )
-
-    if ($ScaffoldName -eq 'portfolio') {
-        $mapPath = Join-Path $ScaffoldRoot 'CONTEXT-MAP.md'
-        if (-not (Test-Path -LiteralPath $mapPath -PathType Leaf)) {
-            Add-Failure "Portfolio scaffold lacks root context map: $mapPath"
-            return
-        }
-        $mapText = Get-Content -Raw -LiteralPath $mapPath
-        foreach ($contextName in @('WORK-CONTEXT.md', 'STRUCTURAL-CONTEXT.md', 'ENGINEERING-CONTEXT.md')) {
-            $contextPath = Join-Path $ScaffoldRoot ('.swe\context\' + $contextName)
-            if (-not (Test-Path -LiteralPath $contextPath -PathType Leaf)) {
-                Add-Failure "Portfolio context vocabulary is missing: $contextPath"
-            }
-            $legacyPath = Join-Path $ScaffoldRoot $contextName
-            if (Test-Path -LiteralPath $legacyPath) {
-                Add-Failure "Portfolio context vocabulary must not remain at the root: $legacyPath"
-            }
-            $expectedLink = './.swe/context/' + $contextName
-            if ($mapText -notmatch [regex]::Escape($expectedLink)) {
-                Add-Failure "Portfolio context map does not link '$expectedLink': $mapPath"
-            }
-        }
-        return
-    }
-
-    $singleContextPath = Join-Path $ScaffoldRoot 'CONTEXT.md'
-    $mapPath = Join-Path $ScaffoldRoot 'CONTEXT-MAP.md'
-    if (-not (Test-Path -LiteralPath $singleContextPath -PathType Leaf)) {
-        Add-Failure "Initial solution scaffold lacks root single-context vocabulary: $singleContextPath"
-    }
-    if (Test-Path -LiteralPath $mapPath) {
-        Add-Failure "Initial solution scaffold must not contain both root context forms: $mapPath"
-    }
-}
-
-$catalogHelper = Join-Path $PSScriptRoot 'Get-SweCatalog.ps1'
-if (-not (Test-Path -LiteralPath $catalogHelper -PathType Leaf)) { throw "Missing catalog helper: $catalogHelper" }
-$null = & $catalogHelper -Check
-$catalog = Get-Content -Raw -LiteralPath (Join-Path $PluginRoot 'references\SKILL-CATALOG.json') | ConvertFrom-Json
-$processPackage = @($catalog.packages | Where-Object name -eq 'swe-process')
-if ($catalog.schema_version -ne 3 -or $processPackage.Count -ne 1) { throw 'Invalid V3 process catalog identity.' }
-$expectedSkills = @($processPackage[0].skills | ForEach-Object name)
-$templateContract = [ordered]@{
-    'skills\swe-new-epic\references\EPIC-TEMPLATE.md' = @('epic', 'Draft')
-    'skills\swe-research\references\RESEARCH-TEMPLATE.md' = @('research', 'Draft')
-    'skills\swe-conceptualize\references\CONCEPT-TEMPLATE.md' = @('concept', 'Draft')
-    'skills\swe-assess-architecture\references\ARCHITECTURE-IMPACT-TEMPLATE.md' = @('architecture_impact', 'Draft')
-    'skills\swe-architect\references\PLATFORM-ARCHITECTURE-TEMPLATE.md' = @('platform_architecture', 'Target')
-    'skills\swe-architect\references\SOLUTION-ARCHITECTURE-TEMPLATE.md' = @('solution_architecture', 'Target')
-    'skills\swe-architect\references\PACKAGE-ARCHITECTURE-TEMPLATE.md' = @('package_architecture', 'Target')
-    'skills\swe-architect\references\MODULE-ARCHITECTURE-TEMPLATE.md' = @('module_architecture', 'Target')
-    'skills\swe-architect\references\SYSTEM-VIEW-TEMPLATE.md' = @('system_view', 'Target')
-    'skills\swe-architect\references\ADR-TEMPLATE.md' = @('architecture_decision', 'Proposed')
-    'skills\swe-architect\references\CONTRACT-TEMPLATE.md' = @('architecture_contract', 'Proposed')
-    'skills\swe-plan-features\references\FEATURE-TEMPLATE.md' = @('feature', 'Draft')
-    'skills\swe-plan-implementation\references\IMPLEMENTATION-PLAN-TEMPLATE.md' = @('implementation_plan', 'Draft')
-    'skills\swe-design\references\DESIGN-TEMPLATE.md' = @('design', 'Draft')
-    'skills\swe-implement\references\EVIDENCE-TEMPLATE.md' = @('implementation_evidence', 'Draft')
-    'skills\swe-validate\references\VALIDATION-TEMPLATE.md' = @('validation', 'Draft')
-    'skills\swe-bugfix\references\BUGFIX-TEMPLATE.md' = @('bugfix', 'Active')
-    'skills\swe-enhancement\references\ENHANCEMENT-TEMPLATE.md' = @('enhancement', 'Active')
-}
-$architectureKeys = @($templateContract.Keys | Where-Object { $_ -like 'skills\swe-architect\references\*' })
-foreach ($key in $architectureKeys) {
-    $metadata = $templateContract[$key]
-    $templateContract.Remove($key)
-    foreach ($profile in @('v1', 'v2')) {
-        $templateContract[('skills\swe-architect\references\' + $profile + '\' + (Split-Path -Leaf $key))] = $metadata
-    }
-}
-$decisionTemplates = @(
-    'EPIC-TEMPLATE.md', 'CONCEPT-TEMPLATE.md', 'ARCHITECTURE-IMPACT-TEMPLATE.md',
-    'PLATFORM-ARCHITECTURE-TEMPLATE.md', 'SOLUTION-ARCHITECTURE-TEMPLATE.md',
-    'PACKAGE-ARCHITECTURE-TEMPLATE.md', 'MODULE-ARCHITECTURE-TEMPLATE.md', 'SYSTEM-VIEW-TEMPLATE.md',
-    'ADR-TEMPLATE.md', 'CONTRACT-TEMPLATE.md', 'FEATURE-TEMPLATE.md',
-    'IMPLEMENTATION-PLAN-TEMPLATE.md', 'DESIGN-TEMPLATE.md', 'VALIDATION-TEMPLATE.md'
-)
-$traceabilityContract = [ordered]@{
-    'FEATURE-TEMPLATE.md' = @('epic')
-    'IMPLEMENTATION-PLAN-TEMPLATE.md' = @('epic', 'feature')
-    'DESIGN-TEMPLATE.md' = @('epic', 'feature', 'implementation_plan')
-    'EVIDENCE-TEMPLATE.md' = @('epic', 'feature', 'implementation_plan', 'design')
-    'VALIDATION-TEMPLATE.md' = @('epic', 'feature', 'implementation_plan', 'design', 'evidence')
-}
-$diagramContract = [ordered]@{
-    'PLATFORM-ARCHITECTURE-TEMPLATE.md' = @('flowchart')
-    'SOLUTION-ARCHITECTURE-TEMPLATE.md' = @('flowchart', 'sequenceDiagram')
-    'PACKAGE-ARCHITECTURE-TEMPLATE.md' = @('flowchart')
-    'MODULE-ARCHITECTURE-TEMPLATE.md' = @('flowchart')
-    'SYSTEM-VIEW-TEMPLATE.md' = @('flowchart', 'sequenceDiagram')
-}
-
-$manifestPath = Join-Path $PluginRoot '.codex-plugin\plugin.json'
-try {
-    $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
-    if ($manifest.name -ne 'swe-process') { Add-Failure "Manifest name must be swe-process: $manifestPath" }
-    if ($manifest.version -ne '3.5.1') { Add-Failure "Manifest version must be 3.5.1: $manifestPath" }
-    if ($manifest.author.name -ne 'Ghostworx.ai, LLC' -or $manifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
-        Add-Failure "Manifest publisher must be Ghostworx.ai, LLC: $manifestPath"
-    }
-    if (($manifest.interface.defaultPrompt -join "`n") -notmatch [regex]::Escape('$swe-max')) {
-        Add-Failure "Manifest defaultPrompt must advertise swe-max: $manifestPath"
-    }
-    if (($manifest.interface.defaultPrompt -join "`n") -notmatch [regex]::Escape('$swe-comment')) {
-        Add-Failure "Manifest defaultPrompt must advertise swe-comment: $manifestPath"
-    }
-} catch {
-    Add-Failure "Invalid plugin manifest: $($_.Exception.Message)"
-}
-
-$skillsRoot = Join-Path $PluginRoot 'skills'
-$actualSkills = @(Get-ChildItem -LiteralPath $skillsRoot -Directory | ForEach-Object Name | Sort-Object)
-if (Compare-Object -ReferenceObject @($expectedSkills | Sort-Object) -DifferenceObject $actualSkills) {
-    Add-Failure 'Skill roster does not exactly match the catalog roster.'
-}
-
-foreach ($skillName in $expectedSkills) {
-    $skillRoot = Join-Path $skillsRoot $skillName
-    $skillPath = Join-Path $skillRoot 'SKILL.md'
-    $uiPath = Join-Path $skillRoot 'agents\openai.yaml'
-    $referencesPath = Join-Path $skillRoot 'references'
-    foreach ($requiredPath in @($skillPath, $uiPath, $referencesPath)) {
-        if (-not (Test-Path -LiteralPath $requiredPath)) { Add-Failure "Missing required skill resource: $requiredPath" }
-    }
-    if (Test-Path -LiteralPath $skillPath -PathType Leaf) {
-        $skillText = Get-Content -Raw -LiteralPath $skillPath
-        if ($skillText -notmatch "(?ms)^---\s*.*?^name:\s*$([regex]::Escape($skillName))\s*$.*?^description:\s*\S+.*?^---\s*$") {
-            Add-Failure "Invalid SKILL.md frontmatter: $skillPath"
-        }
-    }
-    if (Test-Path -LiteralPath $uiPath -PathType Leaf) {
-        $uiText = Get-Content -Raw -LiteralPath $uiPath
-        if ($uiText -notmatch [regex]::Escape("`$$skillName")) { Add-Failure "default_prompt must mention `${skillName}: $uiPath" }
-        $shortMatch = [regex]::Match($uiText, '(?m)^\s*short_description:\s*"([^"]+)"\s*$')
-        if (-not $shortMatch.Success -or $shortMatch.Groups[1].Value.Length -lt 25 -or $shortMatch.Groups[1].Value.Length -gt 64) {
-            Add-Failure "short_description must be 25-64 characters: $uiPath"
-        }
-    }
-}
-
-$sweCommentRoot = Join-Path $skillsRoot 'swe-comment'
-$sweCommentSkillPath = Join-Path $sweCommentRoot 'SKILL.md'
-$sweCommentGuidePath = Join-Path $sweCommentRoot 'references\COMMENTING-GUIDE.md'
-if (Test-Path -LiteralPath $sweCommentSkillPath -PathType Leaf) {
-    $sweCommentText = Get-Content -Raw -LiteralPath $sweCommentSkillPath
-    foreach ($commentRule in @('$swe-comment', 'git status --short', 'git diff --name-status -M', 'git log -n 5 --follow', '`spawn_agent` operation', '`code-commenter` role', 'built-in `worker` subagent', 'behavior-preserving')) {
-        if ($sweCommentText -notmatch [regex]::Escape($commentRule)) { Add-Failure "swe-comment contract lacks '$commentRule'." }
-    }
-    if ($sweCommentText -notmatch [regex]::Escape('references/COMMENTING-GUIDE.md')) { Add-Failure 'swe-comment does not route to its commenting guide.' }
-}
-if (Test-Path -LiteralPath $sweCommentGuidePath -PathType Leaf) {
-    $sweCommentGuideText = Get-Content -Raw -LiteralPath $sweCommentGuidePath
-    foreach ($guideRule in @('public APIs', 'current implementation', 'do not guess', 'only comments, doc comments, or docstrings')) {
-        if ($sweCommentGuideText -notmatch [regex]::Escape($guideRule)) { Add-Failure "swe-comment guide lacks '$guideRule'." }
-    }
-}
-
-$sweMaxRoot = Join-Path $skillsRoot 'swe-max'
-$sweMaxSkillPath = Join-Path $sweMaxRoot 'SKILL.md'
-$sweMaxUiPath = Join-Path $sweMaxRoot 'agents\openai.yaml'
-$sweMaxOrchestrationPath = Join-Path $sweMaxRoot 'references\ORCHESTRATION.md'
-$sweMaxCompletionPath = Join-Path $sweMaxRoot 'references\COMPLETION-CONTRACT.md'
-$sweMaxResourcePaths = @($sweMaxSkillPath, $sweMaxUiPath, $sweMaxOrchestrationPath, $sweMaxCompletionPath)
-foreach ($sweMaxResourcePath in $sweMaxResourcePaths) {
-    if (-not (Test-Path -LiteralPath $sweMaxResourcePath -PathType Leaf)) {
-        Add-Failure "Missing swe-max resource: $sweMaxResourcePath"
-    }
-}
-
-if (-not ($sweMaxResourcePaths | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })) {
-    $sweMaxSkillText = Get-Content -Raw -LiteralPath $sweMaxSkillPath
-    $sweMaxUiText = Get-Content -Raw -LiteralPath $sweMaxUiPath
-    $sweMaxOrchestrationText = Get-Content -Raw -LiteralPath $sweMaxOrchestrationPath
-    $sweMaxCompletionText = Get-Content -Raw -LiteralPath $sweMaxCompletionPath
-    $sweMaxText = @($sweMaxSkillText, $sweMaxUiText, $sweMaxOrchestrationText, $sweMaxCompletionText) -join "`n"
-
-    $frontmatter = [regex]::Match($sweMaxSkillText, '(?ms)^---\s*\r?\n(?<header>.*?)\r?\n---\s*\r?\n')
-    if (-not $frontmatter.Success) {
-        Add-Failure "swe-max SKILL.md lacks bounded frontmatter: $sweMaxSkillPath"
-    } else {
-        $frontmatterKeys = @([regex]::Matches($frontmatter.Groups['header'].Value, '(?m)^([A-Za-z0-9_-]+):') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
-        if (Compare-Object -ReferenceObject @('description', 'name') -DifferenceObject $frontmatterKeys) {
-            Add-Failure "swe-max frontmatter must contain only name and description: $sweMaxSkillPath"
-        }
-    }
-
-    if ($sweMaxUiText -notmatch '(?m)^\s*allow_implicit_invocation:\s*false\s*$') { Add-Failure 'swe-max must remain explicit-only.' }
-    foreach ($capability in @('get_goal', 'create_goal', 'update_goal')) {
-        if ($sweMaxText -notmatch [regex]::Escape($capability)) { Add-Failure "Coordinator lacks Goal capability $capability." }
-    }
-}
-$sweBridgeRoot = Join-Path $workspaceRoot 'plugins\swe-process\skills\swe-bridge'
-$sweBridgeSkillPath = Join-Path $sweBridgeRoot 'SKILL.md'
-$sweBridgeUiPath = Join-Path $sweBridgeRoot 'agents\openai.yaml'
-$sweBridgePromptPath = Join-Path $sweBridgeRoot 'references\BRIDGE-PROMPT.md'
-$sweBridgeResourcePaths = @($sweBridgeSkillPath, $sweBridgeUiPath, $sweBridgePromptPath)
-foreach ($sweBridgeResourcePath in $sweBridgeResourcePaths) {
-    if (-not (Test-Path -LiteralPath $sweBridgeResourcePath -PathType Leaf)) {
-        Add-Failure "Missing swe-bridge resource: $sweBridgeResourcePath"
-    }
-}
-
-if (-not ($sweBridgeResourcePaths | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })) {
-    $sweBridgeSkillText = Get-Content -Raw -LiteralPath $sweBridgeSkillPath
-    $sweBridgeUiText = Get-Content -Raw -LiteralPath $sweBridgeUiPath
-    $sweBridgePromptText = Get-Content -Raw -LiteralPath $sweBridgePromptPath
-
-    $sweBridgeFrontmatter = [regex]::Match($sweBridgeSkillText, '(?ms)^---\s*\r?\n(?<header>.*?)\r?\n---\s*\r?\n')
-    if (-not $sweBridgeFrontmatter.Success) {
-        Add-Failure "swe-bridge SKILL.md lacks bounded frontmatter: $sweBridgeSkillPath"
-    } else {
-        $sweBridgeFrontmatterKeys = @([regex]::Matches($sweBridgeFrontmatter.Groups['header'].Value, '(?m)^([A-Za-z0-9_-]+):') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
-        if (Compare-Object -ReferenceObject @('description', 'name') -DifferenceObject $sweBridgeFrontmatterKeys) {
-            Add-Failure "swe-bridge frontmatter must contain only name and description: $sweBridgeSkillPath"
-        }
-    }
-
-    if ($sweBridgeUiText -notmatch [regex]::Escape('$swe-bridge') -or $sweBridgeUiText -notmatch '(?m)^\s*allow_implicit_invocation:\s*false\s*$') {
-        Add-Failure 'Internal bridge must identify itself and remain explicit-only.'
-    }
-}
-$scaffoldsRoot = Join-Path $PluginRoot 'scaffolds'
-$actualTemplates = @(Get-ChildItem -LiteralPath $skillsRoot -Recurse -File -Filter '*TEMPLATE.md' |
-    Where-Object { -not $_.FullName.StartsWith($scaffoldsRoot, [System.StringComparison]::OrdinalIgnoreCase) } |
-    ForEach-Object { $_.FullName.Substring($PluginRoot.Length).TrimStart('\', '/') -replace '/', '\' } | Sort-Object)
-$expectedTemplates = @($templateContract.Keys | Sort-Object)
-if (Compare-Object -ReferenceObject $expectedTemplates -DifferenceObject $actualTemplates) {
-    Add-Failure 'Canonical process template set must match supported metadata and profiles.'
-}
-
-$commonFields = @('title', 'artifact_type', 'id', 'status', 'authority', 'scope', 'parent', 'upstream', 'owners', 'created', 'updated', 'template_version')
-foreach ($relativeTemplate in $templateContract.Keys) {
-    $templatePath = Join-Path $PluginRoot $relativeTemplate
-    if (-not (Test-Path -LiteralPath $templatePath -PathType Leaf)) { continue }
-    $templateText = Get-Content -Raw -LiteralPath $templatePath
-    $frontmatterMatch = [regex]::Match($templateText, '(?ms)^---\s*\r?\n(?<header>.*?)\r?\n---\s*\r?\n')
-    if (-not $frontmatterMatch.Success) {
-        Add-Failure "Template lacks bounded YAML frontmatter: $templatePath"
-        continue
-    }
-    $header = $frontmatterMatch.Groups['header'].Value
-    foreach ($field in $commonFields) {
-        if ($header -notmatch "(?m)^$([regex]::Escape($field)):\s*") { Add-Failure "Template missing '$field': $templatePath" }
-    }
-    $expectedArtifactType = $templateContract[$relativeTemplate][0]
-    $expectedStatus = $templateContract[$relativeTemplate][1]
-    $artifactTypePattern = '(?m)^artifact_type:\s*"{0}"\s*$' -f [regex]::Escape($expectedArtifactType)
-    if ($header -notmatch $artifactTypePattern) {
-        Add-Failure "Template artifact_type must be '$expectedArtifactType': $templatePath"
-    }
-    $statusPattern = '(?m)^status:\s*"{0}"\s*$' -f [regex]::Escape($expectedStatus)
-    if ($header -notmatch $statusPattern) {
-        Add-Failure "Template initial status must be '$expectedStatus': $templatePath"
-    }
-    if ($header -notmatch '(?ms)^upstream:\s*\r?\n\s{2}repository:\s*.+\r?\n\s{2}artifact_id:\s*.+\r?\n\s{2}path:\s*.+\r?\n\s{2}revision:\s*.+') {
-        Add-Failure "Template upstream locator is incomplete: $templatePath"
-    }
-    if ($templateText -match '\{\{' -or $templateText -match '\[NNN-SHORT_NAME\]') {
-        Add-Failure "Template uses a forbidden placeholder form: $templatePath"
-    }
-    foreach ($placeholder in [regex]::Matches($templateText, '\[([A-Za-z0-9_-]+)\]')) {
-        # A one-element YAML criterion list contains a real stable ID, not a
-        # replacement placeholder. All other placeholder spellings stay strict.
-        $linePrefix = $templateText.Substring(0, $placeholder.Index)
-        $linePrefix = $linePrefix.Substring($linePrefix.LastIndexOf("`n") + 1)
-        if ($placeholder.Groups[1].Value -cmatch '^AC-[0-9]{3}$' -and $linePrefix -match '^\s*criteria:\s*$') { continue }
-        if ($placeholder.Groups[1].Value -cnotmatch '^[A-Z0-9_]+$') {
-            Add-Failure "Template placeholder must be UPPER_SNAKE_CASE: $templatePath -> $($placeholder.Value)"
-        }
-    }
-    if ($decisionTemplates -contains (Split-Path -Leaf $templatePath)) {
-        foreach ($approvalField in @('Mode', 'Author', 'Approver', 'Decision', 'Recorded', 'Evidence', 'Bypass reason')) {
-            if ($templateText -notmatch "(?m)^\|\s*$([regex]::Escape($approvalField))\s*\|") {
-                Add-Failure "Decision template approval record missing '$approvalField': $templatePath"
-            }
-        }
-    }
-    $leaf = Split-Path -Leaf $templatePath
-    if ($diagramContract.Contains($leaf)) {
-        $mermaidBlocks = @([regex]::Matches($templateText, '(?ms)```mermaid\s*\r?\n(?<body>.*?)\r?\n```'))
-        if ($mermaidBlocks.Count -lt $diagramContract[$leaf].Count) {
-            Add-Failure "Architecture template lacks its core Mermaid views: $templatePath"
-        }
-        foreach ($mermaidBlock in $mermaidBlocks) {
-            if ($mermaidBlock.Groups['body'].Value -notmatch '\[[A-Z0-9_]+\]') {
-                Add-Failure "Architecture Mermaid view lacks a replaceable sample placeholder: $templatePath"
-            }
-        }
-        foreach ($diagramType in $diagramContract[$leaf]) {
-            if (-not ($mermaidBlocks | Where-Object { $_.Groups['body'].Value -match "(?m)^$([regex]::Escape($diagramType))(?:\s|$)" })) {
-                Add-Failure "Architecture template lacks a '$diagramType' Mermaid view: $templatePath"
-            }
-        }
-    }
-    if ($traceabilityContract.Contains($leaf)) {
-        if ($header -notmatch '(?m)^traceability:\s*$') { Add-Failure "Template lacks traceability map: $templatePath" }
-        foreach ($locatorName in $traceabilityContract[$leaf]) {
-            $locatorPattern = "(?ms)^\s{2}$([regex]::Escape($locatorName)):\s*\r?\n\s{4}repository:\s*.+\r?\n\s{4}artifact_id:\s*.+\r?\n\s{4}path:\s*.+\r?\n\s{4}revision:\s*.+"
-            if ($header -notmatch $locatorPattern) { Add-Failure "Traceability locator '$locatorName' is incomplete: $templatePath" }
-        }
-        if ($templateText -notmatch 'AC-001') { Add-Failure "Traceability template lacks stable acceptance criterion IDs: $templatePath" }
-    }
-}
-
-$contractPath = Join-Path $PluginRoot 'references\ARTIFACT-CONTRACT.md'
-if (-not (Test-Path -LiteralPath $contractPath -PathType Leaf)) {
-    Add-Failure "Missing artifact contract: $contractPath"
-} else {
-    $contractText = Get-Content -Raw -LiteralPath $contractPath
-    foreach ($requiredText in @('Draft -> InReview -> Accepted -> Superseded', 'Target -> Implemented -> Current -> Superseded', 'Proposed -> Accepted -> Superseded', 'auto-approve', 'force', 'Prototype Mode', 'workflow-sequencing exception', '.swe/prototype/runs/')) {
-        if ($contractText -notmatch [regex]::Escape($requiredText)) { Add-Failure "Artifact contract missing semantic rule '$requiredText'." }
-    }
-    foreach ($requiredText in @('EO-001', 'Active -> Implemented -> Validated -> Closed', 'Decision: Waived', 'named independent validator')) {
-        if ($contractText -notmatch [regex]::Escape($requiredText)) { Add-Failure "Artifact contract missing fast-path or identifier rule '$requiredText'." }
-    }
-}
-
-$epicTemplatePath = Join-Path $skillsRoot 'swe-new-epic\references\EPIC-TEMPLATE.md'
-if (Test-Path -LiteralPath $epicTemplatePath -PathType Leaf) {
-    $epicTemplateText = Get-Content -Raw -LiteralPath $epicTemplatePath
-    if ($epicTemplateText -notmatch 'EO-001') { Add-Failure "Epic template must use stable Epic-local EO-001 outcomes: $epicTemplatePath" }
-    if ($epicTemplateText -match 'AC-001') { Add-Failure "Epic template must reserve AC-001 for Feature-local criteria: $epicTemplatePath" }
-}
-
-$lifecycleSkills = [ordered]@{
-    'swe-architect\SKILL.md' = @('Target', 'Implemented', 'Current')
-    'swe-validate\SKILL.md' = @('Accepted', 'Rejected', 'Blocked', 'Target', 'Implemented', 'Current')
-}
-foreach ($relativeSkill in $lifecycleSkills.Keys) {
-    $skillPath = Join-Path $skillsRoot $relativeSkill
-    if (-not (Test-Path -LiteralPath $skillPath -PathType Leaf)) { continue }
-    $skillText = Get-Content -Raw -LiteralPath $skillPath
-    foreach ($requiredToken in $lifecycleSkills[$relativeSkill]) {
-        if ($skillText -notmatch [regex]::Escape('`' + $requiredToken + '`')) {
-            Add-Failure "Lifecycle skill lacks canonical token '$requiredToken': $skillPath"
-        }
-        $illegalToken = '`' + $requiredToken.ToLowerInvariant() + '`'
-        if ($skillText -cmatch [regex]::Escape($illegalToken)) {
-            Add-Failure "Lifecycle skill contains illegal lowercase token '$illegalToken': $skillPath"
-        }
-    }
-}
-
-$fastPathTemplates = @(
-    (Join-Path $skillsRoot 'swe-bugfix\references\BUGFIX-TEMPLATE.md'),
-    (Join-Path $skillsRoot 'swe-enhancement\references\ENHANCEMENT-TEMPLATE.md')
-)
-foreach ($fastPathTemplate in $fastPathTemplates) {
-    if (-not (Test-Path -LiteralPath $fastPathTemplate -PathType Leaf)) { continue }
-    $fastPathText = Get-Content -Raw -LiteralPath $fastPathTemplate
-    foreach ($requiredField in @('Validation and Closure', 'Independent validation required', 'Implemented recorded', 'Validator', 'Independence', 'Decision', 'Validation recorded', 'Evidence', 'Closure owner', 'Closure recorded', 'Waiver rationale')) {
-        if ($fastPathText -notmatch [regex]::Escape($requiredField)) { Add-Failure "Fast-path template lacks '$requiredField': $fastPathTemplate" }
-    }
-}
-
-# Assignment gates are exercised by Test-SweV3Behavior.ps1.
-$nonScaffoldFiles = @(Get-ChildItem -LiteralPath $PluginRoot -Recurse -File | Where-Object {
-    -not $_.FullName.StartsWith($scaffoldsRoot, [System.StringComparison]::OrdinalIgnoreCase)
-})
-$processText = ($nonScaffoldFiles | Where-Object { $_.Extension -in '.md', '.yaml' } | ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }) -join "`n"
-if ($processText -match '(?i)[A-Z]:\\Users\\|/Users/[^/]+/') { Add-Failure 'Process resources contain a machine-specific absolute user path.' }
-if ($processText -cmatch 'research/') { Add-Failure 'Process resources must use the canonical RESEARCH/ directory casing.' }
-foreach ($canonicalName in @('PLATFORM-ARCHITECTURE.md', 'SOLUTION-ARCHITECTURE.md', 'PACKAGE-ARCHITECTURE.md', 'MODULE-ARCHITECTURE.md')) {
-    if ($processText -notmatch [regex]::Escape($canonicalName)) { Add-Failure "Canonical architecture filename is not represented: $canonicalName" }
-}
-
-$portfolioRoster = @('codex_engineer', 'repo_author', 'platform_engineer', 'research_engineer', 'platform_architect', 'feature_validator', 'architecture_reviewer', 'integration_engineer', 'test_runner')
-$solutionRoster = @('codex_engineer', 'repo_author', 'solution_architect', 'package_architect', 'module_architect', 'solution_developer', 'package_developer', 'module_developer', 'integration_engineer', 'architecture_reviewer', 'solution_validator', 'azure_engineer', 'azure_db_developer', 'csharp_developer', 'full_stack_developer', 'maf_developer', 'ui_designer', 'code_commenter', 'test_runner')
-foreach ($scaffoldName in @('portfolio', 'solution')) {
-    $referenceRoot = Join-Path $scaffoldsRoot $scaffoldName
-    $roster = if ($scaffoldName -eq 'portfolio') { $portfolioRoster } else { $solutionRoster }
-    Test-AgentRegistry -ScaffoldRoot $referenceRoot -ExpectedRoster $roster
-    Test-ContextLayout -ScaffoldRoot $referenceRoot -ScaffoldName $scaffoldName
-}
-
-$repositoryAgentGuidePath = Join-Path $workspaceRoot 'AGENTS.md'
-$repositoryReadmePath = Join-Path $workspaceRoot 'README.md'
-if (-not (Test-Path -LiteralPath $repositoryAgentGuidePath -PathType Leaf)) {
-    Add-Failure "Repository agent guide is missing: $repositoryAgentGuidePath"
-} else {
-    $repositoryAgentGuideText = Get-Content -Raw -LiteralPath $repositoryAgentGuidePath
-    if ($repositoryAgentGuideText -notmatch [regex]::Escape('swe-max') -or $repositoryAgentGuideText -notmatch [regex]::Escape('swe-comment')) {
-        Add-Failure "Repository agent guide does not include swe-max and swe-comment in the authoritative roster: $repositoryAgentGuidePath"
-    }
-}
-if (-not (Test-Path -LiteralPath $repositoryReadmePath -PathType Leaf)) {
-    Add-Failure "Repository README is missing: $repositoryReadmePath"
-} else {
-    $repositoryReadmeText = Get-Content -Raw -LiteralPath $repositoryReadmePath
-    if ($repositoryReadmeText -notmatch [regex]::Escape('SKILL-CATALOG.json') -or $repositoryReadmeText -notmatch [regex]::Escape('$swe-max') -or $repositoryReadmeText -notmatch [regex]::Escape('$swe-comment')) {
-        Add-Failure "Repository README does not link the skill catalog with swe-max and swe-comment: $repositoryReadmePath"
-    }
-}
-$sourceScaffoldsRoot = $scaffoldsRoot
-$prototypeSkillRoot = Join-Path $workspaceRoot 'plugins\swe-utility\skills\prototype'
-if (Test-Path -LiteralPath (Split-Path -Parent $prototypeSkillRoot) -PathType Container) {
-    $prototypeResourcePaths = @(
-        (Join-Path $prototypeSkillRoot 'SKILL.md'),
-        (Join-Path $prototypeSkillRoot 'agents\openai.yaml'),
-        (Join-Path $prototypeSkillRoot 'references\MODE-CONTRACT.md'),
-        (Join-Path $prototypeSkillRoot 'references\BACKTRACKING.md'),
-        (Join-Path $prototypeSkillRoot 'references\STATE-TEMPLATE.md'),
-        (Join-Path $prototypeSkillRoot 'references\RUN-TEMPLATE.md')
-    )
-    foreach ($prototypeResourcePath in $prototypeResourcePaths) {
-        if (-not (Test-Path -LiteralPath $prototypeResourcePath -PathType Leaf)) {
-            Add-Failure "Prototype skill resource is missing: $prototypeResourcePath"
-        }
-    }
-
-    $prototypeSkillPath = Join-Path $prototypeSkillRoot 'SKILL.md'
-    if (Test-Path -LiteralPath $prototypeSkillPath -PathType Leaf) {
-        $prototypeSkillText = Get-Content -Raw -LiteralPath $prototypeSkillPath
-        if ($prototypeSkillText -notmatch '(?ms)^---\s*.*?^name:\s*prototype\s*$.*?^description:\s*\S+.*?^---\s*$') {
-            Add-Failure "Prototype skill frontmatter is invalid: $prototypeSkillPath"
-        }
-        foreach ($requiredText in @('$prototype [-on|-off]', 'IGNORE Approval Governance', '.swe/prototype/STATE.md', '<<<<<PROTOTYPE_MODE_ON>>>>>', '<<<<<PROTOTYPE_MODE_OFF>>>>>', 'Closing', 'references/BACKTRACKING.md')) {
-            if ($prototypeSkillText -notmatch [regex]::Escape($requiredText)) {
-                Add-Failure "Prototype skill is missing '$requiredText': $prototypeSkillPath"
-            }
-        }
-    }
-
-    $prototypeUiPath = Join-Path $prototypeSkillRoot 'agents\openai.yaml'
-    if (Test-Path -LiteralPath $prototypeUiPath -PathType Leaf) {
-        $prototypeUiText = Get-Content -Raw -LiteralPath $prototypeUiPath
-        if ($prototypeUiText -notmatch [regex]::Escape('$prototype -on') -or $prototypeUiText -notmatch '(?m)^\s*allow_implicit_invocation:\s*false\s*$') {
-            Add-Failure "Prototype skill must be explicitly invoked: $prototypeUiPath"
-        }
-    }
-
-    $prototypeBacktrackingPath = Join-Path $prototypeSkillRoot 'references\BACKTRACKING.md'
-    if (Test-Path -LiteralPath $prototypeBacktrackingPath -PathType Leaf) {
-        $prototypeBacktrackingText = Get-Content -Raw -LiteralPath $prototypeBacktrackingPath
-        foreach ($requiredText in @('$orchestrate code feature-001', 'solution-developer', 'integration-engineer', 'solution-architect', 'platform-engineer', 'platform-architect', 'architecture-reviewer', 'solution-validator', 'feature-validator', 'Draft', 'Target', 'Proposed')) {
-            if ($prototypeBacktrackingText -notmatch [regex]::Escape($requiredText)) {
-                Add-Failure "Prototype backtracking lacks '$requiredText': $prototypeBacktrackingPath"
-            }
-        }
-    }
-
-    foreach ($prototypeTemplateContract in @(
-        @('references\STATE-TEMPLATE.md', 'prototype_mode_state'),
-        @('references\RUN-TEMPLATE.md', 'prototype_run')
-    )) {
-        $prototypeTemplatePath = Join-Path $prototypeSkillRoot $prototypeTemplateContract[0]
-        if (-not (Test-Path -LiteralPath $prototypeTemplatePath -PathType Leaf)) { continue }
-        $prototypeTemplateText = Get-Content -Raw -LiteralPath $prototypeTemplatePath
-        $prototypeHeader = [regex]::Match($prototypeTemplateText, '(?ms)^---\s*\r?\n(?<header>.*?)\r?\n---\s*\r?\n')
-        if (-not $prototypeHeader.Success) {
-            Add-Failure "Prototype template lacks bounded YAML frontmatter: $prototypeTemplatePath"
-            continue
-        }
-        if ($prototypeHeader.Groups['header'].Value -notmatch ("(?m)^artifact_type:\s*`"{0}`"\s*$" -f [regex]::Escape($prototypeTemplateContract[1]))) {
-            Add-Failure "Prototype template artifact_type is invalid: $prototypeTemplatePath"
-        }
-        foreach ($field in @('title', 'artifact_type', 'id', 'status', 'authority', 'scope', 'updated', 'template_version')) {
-            if ($prototypeHeader.Groups['header'].Value -notmatch "(?m)^$([regex]::Escape($field)):\s*") {
-                Add-Failure "Prototype template missing '$field': $prototypeTemplatePath"
-            }
-        }
-    }
-
-    $utilityManifestPath = Join-Path $workspaceRoot 'plugins\swe-utility\.codex-plugin\plugin.json'
-    if (Test-Path -LiteralPath $utilityManifestPath -PathType Leaf) {
-        try {
-            $utilityManifest = Get-Content -Raw -LiteralPath $utilityManifestPath | ConvertFrom-Json
-            if ($utilityManifest.version -ne '3.5.0' -or $utilityManifest.author.name -ne 'Ghostworx.ai, LLC' -or $utilityManifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
-                Add-Failure "SWE Utility manifest version or publisher is invalid: $utilityManifestPath"
-            }
-            if (($utilityManifest.interface.defaultPrompt -join "`n") -notmatch [regex]::Escape('$prototype -on')) {
-                Add-Failure "SWE Utility manifest does not advertise prototype mode: $utilityManifestPath"
-            }
-            if (($utilityManifest.interface.defaultPrompt -join "`n") -match [regex]::Escape('$swe-bridge')) {
-                Add-Failure "SWE Utility manifest must not advertise internal-only swe-bridge: $utilityManifestPath"
-            }
-        } catch {
-            Add-Failure "Invalid SWE Utility manifest: $($_.Exception.Message)"
-        }
-    }
-}
-
-if (Test-Path -LiteralPath $sourceScaffoldsRoot -PathType Container) {
-    $configPaths = @(
-        (Join-Path $workspaceRoot '.codex\config.toml'),
-        (Join-Path $sourceScaffoldsRoot 'portfolio\.codex\config.toml'),
-        (Join-Path $sourceScaffoldsRoot 'solution\.codex\config.toml')
-    )
-    foreach ($configPath in $configPaths) {
-        if (-not (Test-Path -LiteralPath $configPath -PathType Leaf)) { continue }
-        $configText = Get-Content -Raw -LiteralPath $configPath
-        $featuresMatch = [regex]::Match($configText, '(?ms)^\[features\]\s*\r?\n(?<body>.*?)(?=^\[|\z)')
-        if (-not $featuresMatch.Success -or $featuresMatch.Groups['body'].Value -notmatch '(?m)^multi_agent\s*=\s*true\s*$' -or $featuresMatch.Groups['body'].Value -notmatch '(?m)^multi_agent_v2\s*=\s*true\s*$' -or $featuresMatch.Groups['body'].Value -notmatch '(?m)^shell_tool\s*=\s*true\s*$') {
-            Add-Failure "Codex config must enable multi_agent, the repository-required multi_agent_v2 workflow, and shell_tool: $configPath"
-        }
-    }
-    $rootConfigPath = Join-Path $workspaceRoot '.codex\config.toml'
-    if (Test-Path -LiteralPath $rootConfigPath -PathType Leaf) {
-        $rootConfigText = Get-Content -Raw -LiteralPath $rootConfigPath
-        $warningMatch = [regex]::Match($rootConfigText, '(?m)^suppress_unstable_features_warning\s*=\s*true\s*$')
-        $firstSectionMatch = [regex]::Match($rootConfigText, '(?m)^\[')
-        if (-not $warningMatch.Success -or ($firstSectionMatch.Success -and $warningMatch.Index -gt $firstSectionMatch.Index)) {
-            Add-Failure "Root warning-suppression setting must be a top-level key: $rootConfigPath"
-        }
-    }
-
-    $availableSkillNames = @(Get-ChildItem -LiteralPath (Join-Path $workspaceRoot 'plugins') -Directory | ForEach-Object {
-        $packageSkills = Join-Path $_.FullName 'skills'
-        if (Test-Path -LiteralPath $packageSkills -PathType Container) {
-            Get-ChildItem -LiteralPath $packageSkills -Directory | ForEach-Object Name
-        }
-    } | Sort-Object -Unique)
-    $sourceAgentFiles = @(Get-ChildItem -LiteralPath $sourceScaffoldsRoot -Recurse -File -Filter '*.toml' | Where-Object { $_.FullName -match '[\\/]\.codex[\\/]agents[\\/]' })
-    foreach ($agentFile in $sourceAgentFiles) {
-        $agentText = Get-Content -Raw -LiteralPath $agentFile.FullName
-        foreach ($allocation in [regex]::Matches($agentText, '\$([a-z][a-z0-9-]+)')) {
-            $allocatedSkill = $allocation.Groups[1].Value
-            if ($availableSkillNames -notcontains $allocatedSkill) { Add-Failure "Agent allocation references a missing skill '$allocatedSkill': $($agentFile.FullName)" }
-        }
-    }
-
-    $implementationAgentNames = @('solution-developer.toml', 'package-developer.toml', 'module-developer.toml', 'integration-engineer.toml', 'azure-engineer.toml', 'azure-db-developer.toml', 'csharp-developer.toml', 'full-stack-developer.toml', 'maf-developer.toml', 'ui-designer.toml')
-    $solutionAgentRoot = Join-Path $sourceScaffoldsRoot 'solution\.codex\agents\swe'
-    foreach ($agentName in $implementationAgentNames) {
-        $agentPath = Join-Path $solutionAgentRoot $agentName
-        if ((Get-Content -Raw -LiteralPath $agentPath) -match [regex]::Escape('$swe-validate')) { Add-Failure "Implementation role must not own formal validation: $agentPath" }
-    }
-    $solutionValidatorPath = Join-Path $solutionAgentRoot 'solution-validator.toml'
-    if (-not (Test-Path -LiteralPath $solutionValidatorPath -PathType Leaf) -or (Get-Content -Raw -LiteralPath $solutionValidatorPath) -notmatch [regex]::Escape('$swe-validate')) {
-        Add-Failure 'Solution scaffold must register an independent solution-validator allocated to $swe-validate.'
-    }
-
-    $portfolioPlatformPath = Join-Path $sourceScaffoldsRoot 'portfolio\.codex\agents\swe\platform-engineer.toml'
-    if ((Get-Content -Raw -LiteralPath $portfolioPlatformPath) -match [regex]::Escape('$swe-validate')) {
-        Add-Failure "Portfolio implementation role must not own formal validation: $portfolioPlatformPath"
-    }
-
-    foreach ($reviewerPath in @(
-        (Join-Path $sourceScaffoldsRoot 'portfolio\.codex\agents\swe\architecture-reviewer.toml'),
-        (Join-Path $sourceScaffoldsRoot 'solution\.codex\agents\swe\architecture-reviewer.toml')
-    )) {
-        $reviewerText = Get-Content -Raw -LiteralPath $reviewerPath
-        if ($reviewerText -notmatch [regex]::Escape('$swe-architect -review') -or $reviewerText -match [regex]::Escape('$swe-validate')) {
-            Add-Failure "Architecture reviewer must use `$swe-architect -review and must not use `$swe-validate: $reviewerPath"
-        }
-    }
-
-    $portfolioIntegrationPath = Join-Path $sourceScaffoldsRoot 'portfolio\.codex\agents\swe\integration-engineer.toml'
-    $portfolioIntegrationText = Get-Content -Raw -LiteralPath $portfolioIntegrationPath
-    foreach ($forbiddenAllocation in @('$swe-design', '$swe-implement', '$swe-validate')) {
-        if ($portfolioIntegrationText -match [regex]::Escape($forbiddenAllocation)) { Add-Failure "Portfolio integration role crosses child authority with ${forbiddenAllocation}: $portfolioIntegrationPath" }
-    }
-
-    foreach ($governancePath in @((Join-Path $sourceScaffoldsRoot 'portfolio\AGENTS.md'), (Join-Path $sourceScaffoldsRoot 'solution\AGENTS.md'))) {
-        $governanceText = Get-Content -Raw -LiteralPath $governancePath
-        if ($governanceText -notmatch [regex]::Escape('## Phase and Role Matrix')) { Add-Failure "Scaffold governance lacks the phase and role matrix: $governancePath" }
-        foreach ($requiredText in @('## Prototype Mode', '$prototype [-on|-off]', '.swe/prototype/STATE.md', '<<<<<PROTOTYPE_MODE_ON>>>>>', '<<<<<PROTOTYPE_MODE_OFF>>>>>', 'Closing', 'backtrack')) {
-            if ($governanceText -notmatch [regex]::Escape($requiredText)) { Add-Failure "Scaffold governance lacks Prototype Mode rule '$requiredText': $governancePath" }
-        }
-        foreach ($forbiddenText in @('behavier', 'recieve', '$prototype [on|off]', '**PROTOTYPE_MODE**')) {
-            if ($governanceText -match [regex]::Escape($forbiddenText)) { Add-Failure "Scaffold governance retains obsolete Prototype Mode text '$forbiddenText': $governancePath" }
-        }
-        $phaseMatrixMatch = [regex]::Match($governanceText, '(?ms)^## Phase and Role Matrix\s*\r?\n(?<body>.*?)(?=^## |\z)')
-        if ($phaseMatrixMatch.Success) {
-            $phaseTableLines = @($phaseMatrixMatch.Groups['body'].Value -split '\r?\n' | Where-Object { $_ -match '^\|' })
-            if ($phaseTableLines.Count -lt 3) {
-                Add-Failure "Scaffold phase matrix is incomplete: $governancePath"
-            } else {
-                $expectedPipes = ([regex]::Matches($phaseTableLines[0], '(?<!\\)\|')).Count
-                foreach ($phaseTableLine in $phaseTableLines) {
-                    if (([regex]::Matches($phaseTableLine, '(?<!\\)\|')).Count -ne $expectedPipes) {
-                        Add-Failure "Scaffold phase matrix has a malformed row: $governancePath -> $phaseTableLine"
-                    }
-                }
+Check (-not (Test-Path -LiteralPath (Join-Path $repositoryRoot 'scaffolds'))) 'Duplicate root scaffolds returned.'
+Check (-not (Test-Path -LiteralPath (Join-Path $PluginRoot 'skills/swe-scaffold/references/solution'))) 'Duplicate packaged scaffold returned.'
+Check (-not (Test-Path -LiteralPath (Join-Path $repositoryRoot 'plugins/swe-utility/skills/prototype'))) 'Retired Prototype Mode is shipped.'
+foreach ($kind in @('portfolio','solution')) {
+    $root = Join-Path $PluginRoot "scaffolds/$kind"
+    $guide = [IO.File]::ReadAllText((Join-Path $root 'AGENTS.md'))
+    Check ($guide -notmatch 'PROTOTYPE_MODE|\$prototype') "Retired sequencing in $kind guide."
+    if ($kind -eq 'solution') { Check ($guide -match 'Delivery mode: Standalone' -and $guide -match '\.swe/features/') 'Fresh solution is not independently complete.' }
+    else { Check ($guide -match 'Repository role: Portfolio' -and $guide -match 'integration acceptance') 'Portfolio ownership missing.' }
+    $configRoot = Join-Path $root '.codex'
+    $config = [IO.File]::ReadAllText((Join-Path $configRoot 'config.toml'))
+    foreach ($m in [regex]::Matches($config, '(?m)^config_file\s*=\s*"([^"\r\n]+)"')) {
+        $path = $m.Groups[1].Value
+        Check (-not [IO.Path]::IsPathRooted($path)) "Absolute native role path: $path"
+        $target = Join-Path $configRoot $path
+        Check (Test-Path -LiteralPath $target -PathType Leaf) "Missing registered role: $target"
+        if (Test-Path -LiteralPath $target) {
+            $agent = [IO.File]::ReadAllText($target)
+            foreach ($field in @('name','description','model','model_reasoning_effort','developer_instructions')) {
+                Check ($agent -match ('(?m)^' + $field + '\s*=')) "Missing role field $field in $target"
             }
         }
     }
 }
-
-$scaffoldScript = Join-Path $skillsRoot 'swe-scaffold\scripts\Invoke-SweScaffold.ps1'
-if (-not (Test-Path -LiteralPath $scaffoldScript -PathType Leaf)) {
-    Add-Failure "Missing scaffold merge script: $scaffoldScript"
-} elseif (-not $SkipBehaviorTests) {
-    $tempBase = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd('\', '/')
-    $tempRoot = Join-Path $tempBase ('swe-process-validation-' + [guid]::NewGuid().ToString('N'))
-    New-Item -ItemType Directory -Path $tempRoot | Out-Null
-    try {
-        $mergeDestination = Join-Path $tempRoot 'merge'
-        New-Item -ItemType Directory -Path $mergeDestination | Out-Null
-        $sentinelPath = Join-Path $mergeDestination 'README.md'
-        [System.IO.File]::WriteAllText($sentinelPath, 'preserve-me')
-        $firstReport = & $scaffoldScript -Solution -Destination $mergeDestination
-        if ($firstReport.SchemaVersion -ne '2.0' -or $firstReport.Scaffold -ne 'solution') { Add-Failure 'Scaffold report schema is not programmatically stable.' }
-        if ((Get-Content -Raw -LiteralPath $sentinelPath) -ne 'preserve-me') { Add-Failure 'Scaffold merge overwrote an existing file.' }
-        if ($firstReport.SkippedExistingFiles -notcontains 'README.md') { Add-Failure 'Scaffold merge did not report an existing file as skipped.' }
-        if (($firstReport.Counts.Created + $firstReport.Counts.SkippedExisting) -ne $firstReport.Counts.TotalSourceFiles) { Add-Failure 'Scaffold first-run accounting is incomplete.' }
-
-        $secondReport = & $scaffoldScript -Solution -Destination $mergeDestination
-        if ($secondReport.Counts.Created -ne 0 -or $secondReport.Counts.SkippedExisting -ne $secondReport.Counts.TotalSourceFiles) { Add-Failure 'Scaffold rerun is not no-clobber idempotent.' }
-        $jsonReport = (& $scaffoldScript -Solution -Destination $mergeDestination -AsJson) | Out-String | ConvertFrom-Json
-        if ($jsonReport.SchemaVersion -ne '2.0' -or $jsonReport.Counts.TotalSourceFiles -ne $secondReport.Counts.TotalSourceFiles) { Add-Failure 'Scaffold JSON report is invalid.' }
-
-        $portfolioDestination = Join-Path $tempRoot 'portfolio'
-        New-Item -ItemType Directory -Path $portfolioDestination | Out-Null
-        $portfolioReport = & $scaffoldScript -Portfolio -Destination $portfolioDestination
-        if ($portfolioReport.SchemaVersion -ne '2.0' -or $portfolioReport.Scaffold -ne 'portfolio') { Add-Failure 'Portfolio scaffold report schema is not programmatically stable.' }
-        Test-ContextLayout -ScaffoldRoot $portfolioDestination -ScaffoldName 'portfolio'
-
-        $legacyDestination = Join-Path $tempRoot 'legacy-portfolio'
-        New-Item -ItemType Directory -Path $legacyDestination | Out-Null
-        $legacyContextPath = Join-Path $legacyDestination 'WORK-CONTEXT.md'
-        [System.IO.File]::WriteAllText($legacyContextPath, 'legacy-context')
-        $legacyFailed = $false
-        $legacyFailureMessage = ''
-        try { $null = & $scaffoldScript -Portfolio -Destination $legacyDestination } catch {
-            $legacyFailed = $true
-            $legacyFailureMessage = $_.Exception.Message
-        }
-        if (-not $legacyFailed -or $legacyFailureMessage -notmatch 'Legacy portfolio context layout') { Add-Failure 'Portfolio scaffold did not clearly reject the legacy root context layout.' }
-        if ((Get-ChildItem -LiteralPath $legacyDestination -Force).Count -ne 1 -or (Get-Content -Raw -LiteralPath $legacyContextPath) -ne 'legacy-context') {
-            Add-Failure 'Legacy portfolio context preflight changed the destination or left partial output.'
-        }
-
-        $collisionDestination = Join-Path $tempRoot 'collision'
-        New-Item -ItemType Directory -Path $collisionDestination | Out-Null
-        [System.IO.File]::WriteAllText((Join-Path $collisionDestination '.codex'), 'file-collision')
-        $collisionFailed = $false
-        try { $null = & $scaffoldScript -Solution -Destination $collisionDestination } catch { $collisionFailed = $true }
-        if (-not $collisionFailed) { Add-Failure 'Scaffold merge did not fail on a directory/file type collision.' }
-        if ((Get-ChildItem -LiteralPath $collisionDestination -Force).Count -ne 1) { Add-Failure 'Scaffold collision preflight left partial output.' }
-    } finally {
-        $resolvedTempRoot = [System.IO.Path]::GetFullPath($tempRoot)
-        if ($resolvedTempRoot.StartsWith($tempBase, [System.StringComparison]::OrdinalIgnoreCase) -and (Split-Path -Leaf $resolvedTempRoot) -like 'swe-process-validation-*') {
-            [System.IO.Directory]::Delete($resolvedTempRoot, $true)
-        }
+foreach ($template in Get-ChildItem -LiteralPath (Join-Path $PluginRoot 'skills') -Recurse -File -Filter '*TEMPLATE.md') {
+    $text = [IO.File]::ReadAllText($template.FullName)
+    $header = [regex]::Match($text, '(?ms)\A---\r?\n(.*?)\r?\n---')
+    Check $header.Success "Template header missing: $template"
+    foreach ($field in @('artifact_type','id','status','owners','schema_version','links')) { Check ($header.Groups[1].Value -match ('(?m)^' + $field + ':')) "Missing V4 field $field in $template" }
+    Check (($header.Groups[1].Value -split '\r?\n').Count -le 10) "Header paperwork grew beyond ten lines: $template"
+    Check ($header.Groups[1].Value -notmatch '(?m)^(parent|upstream|traceability):') "Duplicated ancestry in $template"
+    Check ($header.Groups[1].Value -match '(?m)^schema_version: 4\r?$') "Template schema drift: $template"
+}
+# Validate PowerShell syntax without executing authored scripts.
+foreach ($scriptFile in Get-ChildItem -LiteralPath (Join-Path $repositoryRoot 'plugins') -Recurse -File -Filter '*.ps1') {
+    $tokens = $null; $errors = $null
+    $null = [Management.Automation.Language.Parser]::ParseFile($scriptFile.FullName, [ref]$tokens, [ref]$errors)
+    foreach ($error in $errors) { Check $false "PowerShell parse: $($scriptFile.FullName): $error" }
+}
+# Resolve literal local Markdown links; examples/placeholders and historical documents
+# do not establish shipped runtime dependencies.
+foreach ($file in Get-ChildItem -LiteralPath (Join-Path $repositoryRoot 'plugins') -Recurse -File -Filter '*.md') {
+    if ($file.Name -eq 'V3-MIGRATION.md') { continue }
+    $text = [regex]::Replace([IO.File]::ReadAllText($file.FullName), '(?ms)^```.*?^```\s*$', '')
+    foreach ($match in [regex]::Matches($text, '\[[^\]\r\n]+\]\(([^)]+)\)')) {
+        $target = $match.Groups[1].Value.Trim('<','>')
+        if ($target -match '^[a-zA-Z][a-zA-Z0-9+.-]*:|^#|[\[\]<>]' -or $target -match '\s"') { continue }
+        $target = ($target -split '#',2)[0]
+        if (-not $target) { continue }
+        Check (Test-Path -LiteralPath (Join-Path $file.DirectoryName $target)) "Broken Markdown link: $($file.FullName) -> $target"
     }
 }
-
-foreach ($schemaFile in @('skills/swe-test/references/check-request.schema.json', 'skills/swe-test/references/check-receipt.schema.json', 'references/eligibility-fields.json')) {
-    try { $null = Get-Content -Raw -LiteralPath (Join-Path $PluginRoot $schemaFile) | ConvertFrom-Json } catch { Add-Failure "Invalid process JSON contract ${schemaFile}: $($_.Exception.Message)" }
-}
+if ($failures.Count) { foreach ($failure in $failures) { Write-Output "ERROR: $failure" }; exit 1 }
+Write-Output "V4 structural contracts passed ($count observations)."
 if (-not $SkipBehaviorTests) {
-    try { & (Join-Path $PSScriptRoot 'Test-SweV31Behavior.ps1') } catch { Add-Failure "V3.1 behavioral fixtures failed: $($_.Exception.Message)" }
-    $v3Behavior = Join-Path $PSScriptRoot 'Test-SweV3Behavior.ps1'
-    if (-not (Test-Path -LiteralPath $v3Behavior -PathType Leaf)) { Add-Failure "Missing V3 behavioral fixtures: $v3Behavior" }
-    else {
-        try { & $v3Behavior -PluginRoot $PluginRoot } catch { Add-Failure "V3 behavioral fixtures failed: $($_.Exception.Message)" }
-    }
+    & (Join-Path $PSScriptRoot 'Test-SweV4Behavior.ps1')
+    & (Join-Path $PSScriptRoot 'Test-SweV3Behavior.ps1')
+    & (Join-Path $PSScriptRoot 'Test-SweV31Behavior.ps1')
 }
-if ($failures.Count -gt 0) {
-    foreach ($failure in $failures) { [Console]::Error.WriteLine("ERROR: $failure") }
-    exit 1
-}
-
-$behaviorSummary = if ($SkipBehaviorTests) { 'Behavioral execution was explicitly skipped.' } else { 'Scaffold and V3 behavioral fixtures passed.' }
-Write-Output "Validated V3 catalog, template metadata, role boundaries, lifecycle semantics and scaffold structure at $PluginRoot. $behaviorSummary"

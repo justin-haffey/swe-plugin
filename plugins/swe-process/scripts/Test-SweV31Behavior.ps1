@@ -71,7 +71,7 @@ $config = Join-Path $destination '.codex/config.toml'; $role = Join-Path $destin
 $shell = (Get-Process -Id $PID).Path
 $smoke = Join-Path $destination 'smoke.ps1'; [IO.File]::WriteAllText($smoke, 'Write-Output "V31 smoke"')
 $request = @{
-    schema = 'swe-check-request/v1'; execution_role = 'test-runner'; executor = @{ role = 'test-runner'; model = 'gpt-5.6-luna'; reasoning_effort = 'medium'; session_id = $ExecutorSession }
+    schema = 'swe-check-request/v1'; execution_role = 'test-runner'; executor = @{ role = 'test-runner'; model = 'gpt-6-luna'; reasoning_effort = 'medium'; session_id = $ExecutorSession }
     repository = $destination; assignment = @{ repository = $destination; artifact_id = 'HOST'; path = 'ADOPTION.md' }; criteria = @('HOST/AC-001')
     scope = @{ source = @('smoke.ps1', $skill); tests = @(); configuration = @('.codex/config.toml','.codex/agents/swe/test-runner.toml'); fixtures = @(); dependencies = @() }
     runtime = @{ identity = 'Current tester PowerShell'; paths = @($shell) }; scope_rationale = 'Isolated native fixture with no separate tests, fixtures or dependencies.'
@@ -82,7 +82,7 @@ $requestPath = Join-Path $scratch 'request.json'; Json $requestPath $request
 $receiptPath = & (Join-Path $PSScriptRoot 'Invoke-SweChecks.ps1') -RequestPath $requestPath
 function Bound([string]$Path) { return @{ path = $Path; sha256 = (Get-FileHash -LiteralPath $Path).Hash } }
 $dispatch = Join-Path $scratch 'fixture-dispatch.txt'; [IO.File]::WriteAllText($dispatch, 'FIXTURE DATA: supplied dispatch provenance mechanics, not live host attestation.')
-$hostPacket = @{ schema = 'swe-host-preflight/v1'; repository = $destination; role = 'test-runner'; model = 'gpt-5.6-luna'; reasoning_effort = 'medium'; session_id = $ExecutorSession; route = 'ConfiguredFallback'; config_file = (Bound $config); role_file = (Bound $role); skill_file = (Bound $skill); dispatch_evidence = (Bound $dispatch); receipt = (Bound $receiptPath) }
+$hostPacket = @{ schema = 'swe-host-preflight/v1'; repository = $destination; role = 'test-runner'; model = 'gpt-6-luna'; reasoning_effort = 'medium'; session_id = $ExecutorSession; route = 'ConfiguredFallback'; config_file = (Bound $config); role_file = (Bound $role); skill_file = (Bound $skill); dispatch_evidence = (Bound $dispatch); receipt = (Bound $receiptPath) }
 $hostPath = Join-Path $scratch 'host.json'; Json $hostPath $hostPacket
 $ready = (& $preflight -Destination $destination -Kind solution -Baseline $proposed -PolicyPath 'ADOPTION.md' -HostEvidencePath $hostPath) | ConvertFrom-Json
 Check ($ready.readiness -eq 'ReadyForReview' -and $ready.host_capability -eq 'AttestedSmokePassed') ('complete bound fixture preflight: ' + ($ready.reasons -join '; '))
@@ -103,7 +103,7 @@ Check ($draftPolicy.policy_compatibility -eq 'ReviewRequired') 'Draft metadata c
 [IO.File]::WriteAllText((Join-Path $destination 'ADOPTION.md'), $policyText)
 $hostPacket.model = 'wrong-model'; Json $hostPath $hostPacket
 Check ((& $preflight -Destination $destination -Kind solution -Baseline $proposed -PolicyPath 'ADOPTION.md' -HostEvidencePath $hostPath | ConvertFrom-Json).readiness -eq 'Blocked') 'wrong host model rejected'
-$hostPacket.model = 'gpt-5.6-luna'; Json $hostPath $hostPacket
+$hostPacket.model = 'gpt-6-luna'; Json $hostPath $hostPacket
 [IO.File]::AppendAllText($smoke, "`n# changed")
 $staleSmoke = (& $preflight -Destination $destination -Kind solution -Baseline $proposed -PolicyPath 'ADOPTION.md' -HostEvidencePath $hostPath) | ConvertFrom-Json
 Check ($staleSmoke.host_capability -eq 'Unverified') 'changed runtime/source generation blocks smoke reuse'

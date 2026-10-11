@@ -7,6 +7,8 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'Swe-ArtifactFields.ps1')
 $fieldContract = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot '../references/eligibility-fields.json') | ConvertFrom-Json
 $packet = Get-Content -Raw -LiteralPath $InputPath | ConvertFrom-Json
+$v4 = $packet.schema -eq 'swe-eligibility/v2'
+if ($v4) { $fieldContract = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot '../references/eligibility-fields-v4.json') | ConvertFrom-Json }
 $reasons = [Collections.Generic.List[string]]::new()
 $allowAgentApproval = $false
 function Field($Object, [string]$Name, $Default = $null) {
@@ -97,8 +99,24 @@ try {
         if ($null -eq (Field $packet.review 'human_disposition')) { throw 'Two repair cycles exhausted; explicit human disposition required.' }
         Test-Decision $packet.review.human_disposition -Human
     }
-    foreach ($name in @('feature','plan','architecture')) { Test-Decision $packet.$name }
-    if ($packet.phase -ne 'Design') { Test-Decision (Field $packet 'design') }
+    if ($v4) {
+        if ($packet.delivery_mode -notin @('Standalone','Federated')) { throw 'Explicit V4 delivery mode required.' }
+        Test-Decision $packet.feature
+        Test-Decision $packet.architecture
+        if (Field $packet 'plan') { Test-Decision $packet.plan }
+        if ($packet.phase -ne 'Design') {
+            if (Field $packet 'design') { Test-Decision $packet.design }
+            elseif ($packet.delivery_mode -eq 'Federated') { throw 'Federated implementation requires accepted local Design.' }
+            else {
+                $featureText = Read-Frozen $packet.feature
+                if ($featureText -notmatch '(?m)^## Approach(?: and change scope)?\s*$') { throw 'Standalone combined Feature requires an approved Approach section.' }
+            }
+        }
+        if ($packet.phase -eq 'EpicAcceptance' -and $packet.delivery_mode -eq 'Standalone') { throw 'Use DeliveryAcceptance for standalone delivery; no fabricated portfolio acceptance.' }
+    } else {
+        foreach ($name in @('feature','plan','architecture')) { Test-Decision $packet.$name }
+        if ($packet.phase -ne 'Design') { Test-Decision (Field $packet 'design') }
+    }
     Require-Fields $packet.risk (@('class','rationale') + @($fieldContract.risk_flags)) 'risk'
     if ($packet.risk.class -notin @('Minimal','Standard','Major') -or -not $packet.risk.rationale) { throw 'Risk is unresolved.' }
     foreach ($flag in $fieldContract.risk_flags) { if ($packet.risk.$flag -isnot [bool]) { throw "Risk flag $flag must be boolean." } }
@@ -122,7 +140,7 @@ try {
         if ($null -eq $policy -or -not (Field $packet 'epic_id')) { $deferral = $false }
         else { Test-Decision $policy -Human }
     }
-    if ($packet.phase -in @('FeatureCompletion','EpicAcceptance')) {
+    if ($packet.phase -in @('FeatureCompletion','DeliveryAcceptance','EpicAcceptance')) {
         if ((Field $packet 'implementation_complete') -ne $true) { throw 'Implementation obligations are incomplete.' }
         # Delivery completion is always independently verified, even when an
         # implementation milestone was allowed to carry deferred checks.

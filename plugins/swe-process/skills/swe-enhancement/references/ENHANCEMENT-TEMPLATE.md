@@ -1,21 +1,10 @@
 ---
-title: "[ENHANCEMENT_TITLE]"
 artifact_type: "enhancement"
 id: "ENH-[NNN]"
 status: "Active"
-authority: "solution"
-scope: "[SOLUTION_PACKAGE_OR_MODULE_ID]"
-parent: "[EXISTING_CAPABILITY_OR_ARCHITECTURE_ID]"
-upstream:
-  repository: "[REPOSITORY_ID_OR_URL]"
-  artifact_id: "[SOURCE_ARTIFACT_ID]"
-  path: "[REPOSITORY_RELATIVE_PATH]"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[OWNER]"
-created: "[YYYY_MM_DD]"
-updated: "[YYYY_MM_DD]"
-template_version: "3.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # [ENHANCEMENT_TITLE]
@@ -51,7 +40,7 @@ template_version: "3.0.0"
 |---|---|---|
 | [CHECK] | [PASS_FAIL_BLOCKED] | [REFERENCE] |
 
-- Execution route: `$swe-test` -> `test-runner` (`gpt-5.6-luna`, `medium`).
+- Execution route: `$swe-test` -> `test-runner` (the model and reasoning effort configured in the native `test-runner` role).
 - Immutable receipt and actual source/dependency generation: [RECEIPT_LOCATOR_AND_GENERATION]
 - Remaining required checks and closure gate: [NONE_OR_PENDING_OBLIGATIONS]
 - Standalone closure requires all required checks; no deferral to an absent Epic checkpoint.

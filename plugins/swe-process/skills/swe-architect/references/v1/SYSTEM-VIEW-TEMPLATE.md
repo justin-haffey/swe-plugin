@@ -1,21 +1,10 @@
 ---
-title: "[SYSTEM_NAME] System View"
 artifact_type: "system_view"
 id: "VIEW-SYSTEM-[SYSTEM_ID]"
 status: "Target"
-authority: "[PORTFOLIO_OR_SOLUTION]"
-scope: "[SYSTEM_ID]"
-parent: "[PLATFORM_OR_SOLUTION_ARCHITECTURE_ID]"
-upstream:
-  repository: "[REPOSITORY_ID_OR_URL]"
-  artifact_id: "[PLATFORM_OR_SOLUTION_ARCHITECTURE_ID]"
-  path: "[PARENT_ARCHITECTURE_PATH]"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[SYSTEM_VIEW_OWNER]"
-created: "[YYYY_MM_DD]"
-updated: "[YYYY_MM_DD]"
-template_version: "3.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # [SYSTEM_NAME] System View
@@ -91,14 +80,6 @@ sequenceDiagram
 - [ADR_CONTRACT_DESIGN_OR_FEATURE_LINK]
 - [DIVERGENCE_OR_NONE]
 
-## Review Packet
-
-- Decision bytes or immutable snapshot: [INPUT_AND_DECISION_FINGERPRINT_LOCATORS]
-- Effective policy and named approver: [POLICY_LOCATOR_AND_APPROVER]
-- Paired decisions and order: [PAIRED_ARTIFACT_LOCATORS_OR_NONE]
-- Review cycle history: [DURABLE_HISTORY_LOCATOR]; repair cycles consumed: [COUNT]
-- Correspondence at decision time: [VERIFIED_MATCH_OR_BLOCKER]
-
 ## Approval Record
 
 | Field | Value |
@@ -110,3 +91,5 @@ sequenceDiagram
 | Recorded | [ISO_8601_TIMESTAMP_OR_PENDING] |
 | Evidence | [REVIEW_REFERENCE_OR_NONE] |
 | Bypass reason | [REQUIRED_FOR_FORCE_OR_NONE] |
+
+Review history: [REVIEWED_INPUT_AND_DECISION_FINGERPRINTS]; repair cycles consumed: [COUNT]. Record actual decisions and unresolved findings here; preserve history across resumes.

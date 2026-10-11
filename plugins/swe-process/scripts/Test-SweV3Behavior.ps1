@@ -57,7 +57,7 @@ function New-Request([string]$Script = $passScript) {
         runtime = @{ identity = $PSVersionTable.PSVersion.ToString(); paths = @($shell) }
         checks = @(@{ id = 'native'; executable = $shell; arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $Script); working_directory = '.'; timeout_seconds = 20; criteria = @('FEATURE-001/AC-001', 'FEATURE-003/AC-001') })
         risk = 'Major'; timing = 'Early'; scope_rationale = 'Bounded fixture rehearsal; empty directories deliberately represent no additional configuration or fixtures.'; prerequisites = @(); result_directory = (Join-Path $producer 'receipts'); shared_outputs = @()
-        execution_role = 'test-runner'; executor = @{ role = 'test-runner'; model = 'gpt-5.6-luna'; reasoning_effort = 'medium'; session_id = $ExecutorSession }
+        execution_role = 'test-runner'; executor = @{ role = 'test-runner'; model = 'gpt-6-luna'; reasoning_effort = 'medium'; session_id = $ExecutorSession }
     }
 }
 function Invoke-Receipt($Request) {
@@ -72,6 +72,14 @@ Assert-True ($passing.outcome -eq 'Passed' -and $passing.reusable) 'Scoped passi
 Assert-True ($passing.attempts.Count -eq 1 -and $passing.attempts[0].criteria.Count -eq 2) 'One native run preserves two Feature criterion locators'
 Assert-True ($passing.executor.session_id -eq $ExecutorSession -and $passing.before.digest -eq $passing.after.digest) 'Receipt identifies actual executor and exact unchanged generation'
 Assert-True ($null -eq $passing.PSObject.Properties['approval'] -and $null -eq $passing.PSObject.Properties['decision']) 'Green observations never create an acceptance decision'
+$multiRequest = New-Request
+$multiRequest.checks[0].criteria = @('FEATURE-001/AC-001')
+$multiRequest.checks += @{ id = 'second'; executable = $shell; arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $passScript); working_directory = '.'; timeout_seconds = 20; criteria = @('FEATURE-003/AC-001') }
+$multiReceipt = Invoke-Receipt $multiRequest
+Assert-True ($multiReceipt.outcome -eq 'Passed' -and $multiReceipt.attempts.Count -eq 2 -and $multiReceipt.missing_coverage.Count -eq 0) 'Separate commands preserve all criterion coverage in one receipt'
+$multiRequest.checks[0].arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $failScript)
+$multiFailed = Invoke-Receipt $multiRequest
+Assert-True ($multiFailed.outcome -eq 'Failed' -and 'FEATURE-001/AC-001' -in $multiFailed.missing_coverage) 'Later success cannot hide an earlier command failure'
 $failing = Invoke-Receipt (New-Request $failScript)
 Assert-True ($failing.outcome -eq 'Failed' -and $failing.attempts[0].exit_code -eq 7 -and $failing.attempts.Count -eq 1 -and -not $failing.reusable) 'Assertion failure is preserved without automatic retry'
 $request = New-Request

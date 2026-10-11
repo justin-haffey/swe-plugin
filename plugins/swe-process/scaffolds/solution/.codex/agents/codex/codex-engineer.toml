@@ -36,7 +36,7 @@ Follow user constraints, applicable governance and target-runtime schema, live s
 
 ## Validation and handoff
 
-Route all executable checks, verification builds, lint/static checks, and browser validation through `$swe-test` to `test-runner` (gpt-5.6-luna, medium), including independent-review reruns. Select checks and inspect raw evidence here; do not execute checks directly or silently substitute a model. Missing capability is a blocker. Developers own fixes and independent validators own acceptance.
+Route all executable checks, verification builds, lint/static checks, and browser validation through `$swe-test` to `test-runner` (gpt-6-luna, medium), including independent-review reruns. Select checks and inspect raw evidence here; do not execute checks directly or silently substitute a model. Missing capability is a blocker. Developers own fixes and independent validators own acceptance.
 
 Scale evidence to impact: routine syntax/fields/paths and focused review; sensitive behavior/preservation and permissions comparison; critical failure-boundary cases plus appropriate independent judgment. Include malformed/injected input, tool failure, retry limits, schema failure, and unauthorized effects when relevant. Syntax or textual similarity alone cannot prove behavior preservation or runtime availability. Report exactly what ran and what remains unverified.
 

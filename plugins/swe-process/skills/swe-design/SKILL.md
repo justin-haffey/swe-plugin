@@ -1,29 +1,19 @@
 ---
 name: swe-design
-description: Create an implementation-ready DESIGN.md in a solution repository for that repository's assigned portion of a portfolio Feature.
+description: Prepare or independently review a Feature approach or separate local Design when complexity warrants it.
 ---
+# swe-design
 
-# Design
+Apply [the delivery contract](../../references/ARTIFACT-CONTRACT.md). Human approval is default; preserve named Major human decisions, independence and the two-cycle limit.
 
-Design only the active solution repository's assignment. Do not redefine the portfolio Feature or parent architecture.
+Author with `$swe-design <feature-or-design-path>`; `-review <path>` is independent technical review. Resolve mode first.
 
-The portfolio `IMPLEMENTATION-PLAN.md` is an allocation and handoff input, not the coding phase. This skill produces the local Design only; `$swe-implement` is the following coding phase after Design acceptance.
+- Standalone: develop Approach, Change scope, Risk/prerequisites and Checks in local FEATURE.md; no separate Design by default.
+- Federated: link approved upstream Feature/allocation (Feature section or separate Plan), write local DESIGN.md at `.swe/implementations/EPIC-NNN/FEATURE-NNN/`.
+- Separate [DESIGN-TEMPLATE.md](references/DESIGN-TEMPLATE.md) is justified by substantial interface/state/security/migration or independent review needs. Link it from Feature; never duplicate intent.
 
-Apply the lifecycle, approval, locator-chain, and acceptance-ID rules in [the artifact contract](../../references/ARTIFACT-CONTRACT.md).
+Read applicable architecture and code. Address behavior, data/interfaces, failure/security/operations, boundaries, tests and reversal proportionately. Unknown dependencies stay unknown; approved contract/design and validated behavior are distinct prerequisites. Standalone has no required parent Platform. Material architecture divergence returns to swe-architect.
 
-## Workflow
+Independent review uses a qualified architect or architecture-reviewer explicitly allocated this procedure. Assess actual outcome/approach, criteria and risk; edit only decision/review record, verifying current fingerprints and preserving reviewer identity/history. Never review your authored/repaired work. Major decisions retain a named human. Any execution checks use swe-test.
 
-1. Resolve the active repository's assignment through dual locators to the authoritative `EPIC.md`, `FEATURE.md`, and `IMPLEMENTATION-PLAN.md`. Verify that the Plan assigns work to this repository. Require both the Feature and Implementation Plan to be `Accepted`.
-2. Read applicable solution, package, and module architecture plus current code and tests. Require applicable architecture to have an `Accepted` Approval Record before designing.
-3. Write `.swe/implementations/EPIC-NNN/FEATURE-NNN/DESIGN.md` from [references/DESIGN-TEMPLATE.md](references/DESIGN-TEMPLATE.md). Generate mechanical metadata/locators using [artifact generation](../../references/ARTIFACT-GENERATION.md); reference approved upstream intent and author only local choices, alternatives, risks, and concrete proof obligations.
-4. Specify behavior, components, data, interfaces, failure handling, security, migration, observability, tests, rollout, and file-level change boundaries.
-5. If implementation requires contradicting architecture or a cross-solution contract, record the divergence and stop for architecture review.
-6. Validate traceability from every assigned `AC-NNN` to concrete tests, fixtures, expected observations, actual participant/operation, and receipt locations. Preserve IDs. Record risk, dependencies by entry phase and `ApprovedContractOrDesign`/`ValidatedBehavior`, required checks/timing, and the policy locator. Verify real participants and jointly reachable limits. Missing dependency/risk information blocks eligibility. An independent reviewer must confirm Minimal isolation/reversibility and deferral; public contracts, security, persistence, concurrency, operations, and prerequisite behavior require early checks. Revoke deferral when scope or consumers change.
-
-Do not change product source, tests, or `EVIDENCE.md` as part of this workflow.
-
-## Approval
-
-Default to human approval unless an owner-adopted risk policy or explicit run authorization applies; Major decisions retain named-human approval. `-auto-approve` uses an independent architecture reviewer or appropriate architect; no self-approval. Review an immutable packet and verify correspondence before acceptance. Preserve the maximum two repair/review cycles across resumes, then require human disposition. `-force` records an explicit human bypass. Any agent-directed test, build, static, or browser execution goes through `$swe-test`; the Design reviewer still judges adequacy.
-
-Only an `Accepted` Design is ready for the ordinary `$swe-implement` handoff. Return the design path, approval state, traceability, risks, and blockers.
+Only approved outcome and approach plus applicable architecture/prerequisites permit code. Return the exact design input locator (Feature or separate Design) and decision. Do not edit source/tests/Evidence here.

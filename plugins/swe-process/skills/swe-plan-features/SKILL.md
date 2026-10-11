@@ -1,25 +1,15 @@
 ---
 name: swe-plan-features
-description: Decompose an approved Epic and canonical architecture into portfolio-owned, outcome-bounded Features without duplicating solution structure.
+description: Define local or portfolio outcome-bounded Features with stable criteria and proportionate approach.
 ---
+# swe-plan-features
 
-# Plan Features
+Apply [the delivery contract](../../references/ARTIFACT-CONTRACT.md). Human approval is default; preserve named Major human decisions, independence and the two-cycle limit.
 
-Features define delivery capabilities, not packages, modules, tasks, or implementation mechanics.
+Resolve ownership from AGENTS.md. Standalone solutions own Features without a portfolio/Epic. Federated assignments keep one canonical upstream Feature.
 
-Apply the lifecycle, approval, locator, and acceptance-ID rules in [the artifact contract](../../references/ARTIFACT-CONTRACT.md).
-
-## Workflow
-
-1. Resolve the `Accepted` `EPIC.md`, `Accepted` `CONCEPT.md`, and `Accepted` architecture-impact assessment. Require applicable canonical architecture to be `Target` with an `Accepted` Approval Record before decomposing Features.
-2. Identify independently valuable capabilities with explicit scope, dependencies, quality needs, and observable acceptance criteria. Allocate stable Feature-local IDs `AC-001`, `AC-002`, and so on.
-3. Under the Epic's `features/`, allocate the next local three-digit directory for each Feature: `NNN-short-name/`. Do not reuse IDs.
-4. Create `FEATURE.md` from [references/FEATURE-TEMPLATE.md](references/FEATURE-TEMPLATE.md), using `FEATURE-NNN`; numbering is local to the Epic. Co-author its adjacent Plan through `$swe-plan-implementation` in the same packet, retaining distinct IDs, owners, and decisions. Generate shared metadata and criterion rows through [artifact generation](../../references/ARTIFACT-GENERATION.md), leaving decisions authored.
-5. Maintain exactly one authoritative Feature in the portfolio. Child repositories receive locators and assignments, never copies.
-6. Validate that the set covers the Epic outcomes without overlapping authority. Never renumber an accepted criterion. Record risk, exact dependency requirements (`ApprovedContractOrDesign` or `ValidatedBehavior`), early proofs, and integration ownership. Unknown dependencies remain gates; unrelated approved assignments can proceed independently.
-
-## Approval
-
-Default to human approval unless an explicitly adopted risk policy or run authorization applies; Major decisions retain named-human approval. `-auto-approve` uses an independent `feature-validator`; the author cannot self-approve. Co-review Feature/Plan in one immutable packet with qualified allocation review, distinct decisions, and upstream acceptance recorded first. Verify decision fingerprints before recording approval. Preserve consumed repair cycles across packets/resumes; two repair/review cycles require human disposition. `-force` records an explicit human bypass. Route agent-directed execution checks through `$swe-test`.
-
-Return created/changed Feature paths, IDs, approval states, dependencies, and gaps.
+1. Read the requested outcome, relevant architecture and code. Read Epic/Concept/impact only when they govern this work; do not create them solely as gates.
+2. Use [FEATURE-TEMPLATE.md](references/FEATURE-TEMPLATE.md). Standalone path: `.swe/features/NNN-short-name/`; portfolio: owning Epic's `features/NNN-short-name/`. Allocate IDs in the correct namespace. Optional Epics group related capabilities.
+3. Record outcome/exclusions, stable criteria, concise approach/change scope, risk, real dependencies and checks. Use swe-design to develop/review the approach. Draft new Solution architecture alongside the Feature when necessary; approve applicable decisions before code.
+4. Portfolio uses swe-plan-implementation for a simple Allocation section or separate Plan when warranted. Every criterion has an owner/integration proof. Never copy intent into children.
+5. Review changed decisions once with a qualified independent reviewer or human. Portfolio intent maps to feature-validator; local technical review to swe-design -review. Combine compatible reviews without merging distinct authorities. Return next eligible action and actual blockers.

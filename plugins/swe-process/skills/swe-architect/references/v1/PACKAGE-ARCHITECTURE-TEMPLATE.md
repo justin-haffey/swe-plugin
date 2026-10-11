@@ -1,21 +1,10 @@
 ---
-title: "[PACKAGE_NAME] Package Architecture"
 artifact_type: "package_architecture"
 id: "ARCH-PACKAGE-[PACKAGE_ID]"
 status: "Target"
-authority: "solution"
-scope: "[PACKAGE_ID]"
-parent: "[SOLUTION_ARCHITECTURE_ID]"
-upstream:
-  repository: "[REPOSITORY_ID_OR_URL]"
-  artifact_id: "[SOLUTION_ARCHITECTURE_ID]"
-  path: "architecture/SOLUTION-ARCHITECTURE.md"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[PACKAGE_ARCHITECT]"
-created: "[YYYY_MM_DD]"
-updated: "[YYYY_MM_DD]"
-template_version: "3.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # [PACKAGE_NAME] Package Architecture
@@ -30,30 +19,9 @@ template_version: "3.0.0"
 |---|---|---|
 | [MODULE] | [RESPONSIBILITY] | [PUBLIC_SURFACE] |
 
-### Module and Dependency View
+### Optional view
 
-Use this view to show the Package boundary, Module responsibilities, and allowed dependency direction. Keep classes and method calls in Module-level documentation.
-
-```mermaid
-flowchart LR
-    Consumer["[PACKAGE_CONSUMER]"]
-    Dependency["[EXTERNAL_DEPENDENCY]"]
-
-    subgraph Package["[PACKAGE_NAME]"]
-        Public["[PUBLIC_API_MODULE]"]
-        Core["[CORE_MODULE]"]
-        Adapter["[ADAPTER_MODULE]"]
-    end
-
-    Consumer -->|"[PUBLIC_CONTRACT]"| Public
-    Public -->|"[ALLOWED_DEPENDENCY]"| Core
-    Adapter -->|"[IMPLEMENTS_PORT]"| Core
-    Adapter -->|"[USES]"| Dependency
-```
-
-- Relationship meaning: [ARROW_SEMANTICS]
-- Key dependency rule: [DEPENDENCY_RULE]
-- Scope and omissions: [DIAGRAM_SCOPE_AND_OMISSIONS]
+Add a diagram only when it clarifies a real boundary or interaction. Keep prose/tables authoritative; omit unused example views.
 
 ## Dependencies and Data
 
@@ -83,14 +51,6 @@ flowchart LR
 - Security and trust: [THREAT_BOUNDARY_AND_CONTROL]
 - Operations and compatibility: [OBSERVABILITY_DEPLOYMENT_MIGRATION_AND_REVERSAL]
 
-## Review Packet
-
-- Decision bytes or immutable snapshot: [INPUT_AND_DECISION_FINGERPRINT_LOCATORS]
-- Effective policy and named approver: [POLICY_LOCATOR_AND_APPROVER]
-- Paired decisions and order: [PAIRED_ARTIFACT_LOCATORS_OR_NONE]
-- Review cycle history: [DURABLE_HISTORY_LOCATOR]; repair cycles consumed: [COUNT]
-- Correspondence at decision time: [VERIFIED_MATCH_OR_BLOCKER]
-
 ## Approval Record
 
 | Field | Value |
@@ -102,3 +62,5 @@ flowchart LR
 | Recorded | [ISO_8601_TIMESTAMP_OR_PENDING] |
 | Evidence | [REVIEW_REFERENCE_OR_NONE] |
 | Bypass reason | [REQUIRED_FOR_FORCE_OR_NONE] |
+
+Review history: [REVIEWED_INPUT_AND_DECISION_FINGERPRINTS]; repair cycles consumed: [COUNT]. Record actual decisions and unresolved findings here; preserve history across resumes.

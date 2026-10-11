@@ -6,7 +6,7 @@ description: Execute scoped tests, verification builds, static checks, and brows
 
 Resolve the exact checkout, authorized scope, criteria, risk, prerequisites, and timing from repository policy and accepted artifacts. Ordinary users supply a scope, not a manifest. Discover existing native commands; confirm affected consumers when graph coverage is incomplete. Follow [TEST-RULES.md](references/TEST-RULES.md) for requests, receipts, and failure handling.
 
-Dispatch a bounded request to `test-runner` using `gpt-5.6-luna`, `medium`, and `execution_role: test-runner`. Verify effective host capability; unavailable routing is Blocked. When already that selected execution role, execute directly without spawning another tester. Reuse its session for related batches; independent validators control a fresh invocation.
+Dispatch a bounded request to `test-runner` using the model and reasoning effort configured in the native `test-runner` role, and `execution_role: test-runner`. Verify effective host capability; unavailable routing is Blocked. When already that selected execution role, execute directly without spawning another tester. Reuse its session for related batches; independent validators control a fresh invocation.
 
 Run the smallest command union covering required behavior and dependencies. Respect early risk gates and shared-output ownership. Capture source, tests, configuration, fixtures, runtime, and actual dependency identities before and after execution, exact commands, exits, observations, and immutable logs/receipts using the [receipt helper](../../scripts/Invoke-SweChecks.ps1).
 

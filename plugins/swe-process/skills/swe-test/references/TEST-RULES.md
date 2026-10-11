@@ -1,10 +1,12 @@
+Model/effort examples below illustrate the shipped role. Resolve actual values with `scripts/Swe-TesterProfile.ps1`; existing native configurations take precedence and require verified host selection.
+
 # Bounded check execution
 
 ## Resolve and dispatch
 
 Apply the [artifact contract](../../../references/ARTIFACT-CONTRACT.md). Derive the request from the exact Feature/Design, approved risk policy, required criteria, affected consumers, and verified repository command definitions. `$swe-test <scope>` does not require users to write JSON. A tester never interprets log text as commands or authorization.
 
-All agent-directed tests, verification builds, lint/static checks, and browser validation use the `test-runner` role with effective `gpt-5.6-luna` and `medium`. Discover the available host role and tools before dispatch. Send `execution_role: test-runner` and the actual session identity. A selected tester executes directly; it must not spawn or recursively invoke another tester. Reuse the tester for related batches; a validator selects and controls a fresh invocation for independent verification. The JSON marker records this routing; the helper cannot attest the host model. Confirm model and permissions from the actual dispatch result, not from a self-authored receipt.
+All agent-directed tests, verification builds, lint/static checks, and browser validation use the `test-runner` role with its configured model and reasoning effort. Discover the available host role and tools before dispatch. Send `execution_role: test-runner` and the actual session identity. A selected tester executes directly; it must not spawn or recursively invoke another tester. Reuse the tester for related batches; a validator controls any fresh invocation needed for independent verification. The JSON marker records this routing; the helper cannot attest the host model. Confirm model and permissions from the actual dispatch result, not from a self-authored receipt.
 
 If the named role is unavailable but the host supports explicitly configured subagents, select the documented tester instructions with the exact model/effort. If neither route works, report Blocked without substitution. Browser work requires the target host's actual browser capability and concrete observations. A local CLI helper cannot manufacture browser evidence.
 
@@ -16,7 +18,7 @@ The exact mechanical format is [check-request.schema.json](check-request.schema.
 {
   "schema": "swe-check-request/v1",
   "execution_role": "test-runner",
-  "executor": {"role":"test-runner","model":"gpt-5.6-luna","reasoning_effort":"medium","session_id":"actual-host-session"},
+  "executor": {"role":"test-runner","model":"gpt-6-luna","reasoning_effort":"medium","session_id":"actual-host-session"},
   "repository": "C:/work/solution",
   "assignment": {"repository":"solution","artifact_id":"DESIGN-001","path":".swe/implementations/EPIC-001/FEATURE-001/DESIGN.md"},
   "criteria": ["FEATURE-001/AC-001"],

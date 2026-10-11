@@ -48,18 +48,6 @@ Follow these rules in order.
 9. Keep task-planning state in memory; use only an explicitly permitted fingerprinted recovery view under a governing caller's contract.
 10. Stop when the goal is satisfied, validation is complete, or additional delegation is unlikely to improve the result.
 
-## Prototype Mode propagation
-
-Before routing work, inspect `.swe/prototype/STATE.md` when it exists. If it contains a valid `mode: "On"`, read the `$prototype` mode contract and apply these requirements:
-
-1. Preserve the state repository scope and active run ID; orchestration cannot widen either one.
-2. Put the canonical `<<<<<PROTOTYPE_MODE_ON>>>>>` sentinel, run ID, repository-relative scope, deferred-entry-gate rule, and unchanged safety boundaries in every subagent prompt.
-3. Let the explicitly requested local implementation proceed without requiring pre-existing accepted Epic, Feature, Plan, Design, or architecture artifacts. Do not treat this as permission for external, destructive, deployment, credential, dependency, or Git side effects.
-4. Require workers to return exact changed paths, checks, observed behavior, decisions, assumptions, divergences, and risks. Workers do not change Prototype Mode state or close the run.
-5. After joining the workflow, return integrated evidence to the primary agent and execute the `$prototype` backtracking process. Working code alone is not a complete prototype orchestration.
-
-The durable `PROTOTYPE.md` is evidence for the developer's workflow, not an orchestration planning file. A sentinel without a valid repository state, run ID, and matching scope cannot activate or broaden Prototype Mode.
-
 ## Discovery Pass
 
 Before spawning, perform a short routing pass in memory.
@@ -73,7 +61,6 @@ Identify:
 - required skills: available skills that should be invoked by the parent or subagents;
 - available agents: standalone `.codex/agents/**/*.toml` files merged with any `[agents.*]` registrations in `.codex/config.toml`, plus built-in `@default`, `@explorer`, and `@worker` as fallbacks;
 - side effects: whether tasks may read, edit, test, browse, call connectors, or only advise.
-- prototype state: whether Prototype Mode is `On`, plus its repository scope and active run ID when present.
 
 Ask for clarification only when a missing detail materially changes safety, destination, or output format and no safe assumption exists.
 
@@ -97,7 +84,7 @@ Choose agents by task shape.
 - If no cataloged custom agent is a clear fit, use `@worker` for bounded implementation, fixes, test updates, document generation, and production changes.
 - If no cataloged custom agent is a clear fit, use `@default` for synthesis, broad judgment, ambiguous tasks, and when no specialized role is justified.
 - Use the parent agent for orchestration, final integration, user-facing decisions, and conflict resolution.
-- For adopted SWE V3 check execution, route every agent-directed build, lint, test, security, integration and browser check through `$swe-test` to the effective `test-runner` (`gpt-5.6-luna`, `medium`). Developers own test/source authoring and repairs; independent reviewers/validators own adequacy and acceptance. The role must resolve with actual runtime permissions; do not substitute a worker pass when unavailable.
+- For adopted SWE check execution, route every agent-directed build, lint, test, security, integration and browser check through `$swe-test` to the effective `test-runner` (the model and reasoning effort configured in the native `test-runner` role). Developers own test/source authoring and repairs; independent reviewers/validators own adequacy and acceptance. The role must resolve with actual runtime permissions; do not substitute a worker pass when unavailable.
 
 For each selected subagent define:
 
@@ -257,7 +244,7 @@ Name skills explicitly so subagents can trigger them.
 - For document outputs, assign `$documents`, `$pdf`, `$Presentations`, or `$Spreadsheets` as applicable.
 - For frontend apps, websites, prototypes, or games, assign an available UI or site-building skill or specialist; do not invent a skill name.
 - For creating or revising skills, assign `$new-skill`.
-- For SWE V3 repository check execution, invoke `$swe-test` and resolve `test-runner` at Luna/medium. This is execution delegation, not another coordinator; preserve author-owned fixes and independent acceptance. If unavailable, report the required capability and block that check.
+- For SWE repository check execution, invoke `$swe-test` and resolve `test-runner` with its native configured model/effort. This is execution delegation, not another coordinator; preserve author-owned fixes and independent acceptance. If unavailable, report the required capability and block that check.
 - For OpenAI platform, Codex, Agents SDK, or API behavior, assign `$openai-docs`.
 - For GitHub PRs, issues, CI, publishing, or review comments, assign the relevant GitHub skill if available.
 - For image or audio generation, assign `$imagegen` or the appropriate speech tool only when requested.

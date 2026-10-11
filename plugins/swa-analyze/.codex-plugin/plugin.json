@@ -1,19 +1,27 @@
 {
   "name": "swa-analyze",
-  "version": "3.5.0",
+  "version": "4.0.0",
   "description": "Strategic software-architecture analysis of existing engineering artifacts and codebases.",
   "author": {
     "name": "Ghostworx.ai, LLC"
   },
-  "keywords": ["software-architecture", "analysis", "strategy", "codebase-memory"],
+  "keywords": [
+    "software-architecture",
+    "analysis",
+    "strategy",
+    "codebase-memory"
+  ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "SWA Analyze 3.5.0",
+    "displayName": "SWA Analyze 4.0.0",
     "shortDescription": "Strategic architecture analysis",
     "longDescription": "Selects and applies evidence-backed strategic thinking lenses to existing software-engineering artifacts and code, then writes an advisory ANALYSIS.md without changing the analyzed design or implementation.",
     "developerName": "Ghostworx.ai, LLC",
     "category": "Productivity",
-    "capabilities": ["Read", "Write"],
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
     "defaultPrompt": [
       "Use $swa-analyze to select the best strategic lenses for this architecture question.",
       "Use a specific $swa-* strategy when the desired analysis lens is already known."

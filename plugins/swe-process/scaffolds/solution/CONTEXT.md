@@ -1,21 +1,10 @@
 ---
-title: "[SOLUTION_NAME] Context"
 artifact_type: "context-vocabulary"
 id: "CONTEXT-[SOLUTION_ID]"
 status: "draft"
-authority: "solution"
-scope: "[SOLUTION_ID]"
-parent: "[PORTFOLIO_CONTEXT_MAP_ID_OR_NONE]"
-upstream:
-  repository: "[PORTFOLIO_REPOSITORY_ID_OR_URL]"
-  artifact_id: "[PORTFOLIO_CONTEXT_MAP_ID_OR_NONE]"
-  path: "[PORTFOLIO_CONTEXT_MAP_PATH_OR_NONE]"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[CONTEXT_OWNER]"
-created: "[YYYY-MM-DD]"
-updated: "[YYYY-MM-DD]"
-template_version: "2.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # [SOLUTION_NAME] Context

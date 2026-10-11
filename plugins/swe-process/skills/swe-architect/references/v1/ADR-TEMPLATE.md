@@ -1,21 +1,10 @@
 ---
-title: "[DECISION_TITLE]"
 artifact_type: "architecture_decision"
 id: "ADR-[NNN]"
 status: "Proposed"
-authority: "[PORTFOLIO_OR_SOLUTION]"
-scope: "[ARCHITECTURE_SCOPE_ID]"
-parent: "[CANONICAL_ARCHITECTURE_ID]"
-upstream:
-  repository: "[REPOSITORY_ID_OR_URL]"
-  artifact_id: "[SOURCE_ARTIFACT_ID]"
-  path: "[REPOSITORY_RELATIVE_PATH]"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[AUTHOR]"
-created: "[YYYY_MM_DD]"
-updated: "[YYYY_MM_DD]"
-template_version: "3.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # ADR-[NNN]: [DECISION_TITLE]
@@ -41,14 +30,6 @@ template_version: "3.0.0"
 
 [HOW_TO_VALIDATE_AND_WHEN_TO_REVISIT]
 
-## Review Packet
-
-- Decision bytes or immutable snapshot: [INPUT_AND_DECISION_FINGERPRINT_LOCATORS]
-- Effective policy and named approver: [POLICY_LOCATOR_AND_APPROVER]
-- Paired decisions and order: [PAIRED_ARTIFACT_LOCATORS_OR_NONE]
-- Review cycle history: [DURABLE_HISTORY_LOCATOR]; repair cycles consumed: [COUNT]
-- Correspondence at decision time: [VERIFIED_MATCH_OR_BLOCKER]
-
 ## Approval Record
 
 | Field | Value |
@@ -60,3 +41,5 @@ template_version: "3.0.0"
 | Recorded | [ISO_8601_TIMESTAMP_OR_PENDING] |
 | Evidence | [REVIEW_REFERENCE_OR_NONE] |
 | Bypass reason | [REQUIRED_FOR_FORCE_OR_NONE] |
+
+Review history: [REVIEWED_INPUT_AND_DECISION_FINGERPRINTS]; repair cycles consumed: [COUNT]. Record actual decisions and unresolved findings here; preserve history across resumes.

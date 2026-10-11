@@ -1,3 +1,3 @@
 # Epics
 
-Create each Epic through `$swe-new-epic` in the next unused `###-short-name` directory. Store research under `RESEARCH/`. Never overwrite or renumber existing work. Feature numbering restarts within each Epic; each `FEATURE.md` and adjacent `IMPLEMENTATION-PLAN.md` remain portfolio sources of truth.
+Use swe-new-epic for a shared outcome in the next unused NNN-short-name directory. Feature numbering restarts within each Epic. Keep canonical Features in their feature directories; simple allocation belongs in the Feature, a separate Implementation Plan only when warranted. Research, Concepts and impact reports are conditional. Never overwrite or renumber accepted work.

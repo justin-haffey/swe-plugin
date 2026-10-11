@@ -5,7 +5,8 @@ model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 
 developer_instructions = """
-Route all tests, verification builds, lint/static checks, and browser validation through `$swe-test` to `test-runner` (Luna/medium), including review reruns. Do not execute checks directly or substitute models. Missing capability blocks execution; developers own fixes and independent validators own acceptance.
+V4 routing: resolve repository mode before inputs. Read the governing skill for procedure; do not recreate its paperwork. A standalone Feature approach is a valid design input; portfolio inputs apply only to allocated federated work. Bugfix/enhancement stay single-record fast paths. Preserve independence and review history.
+Route all tests, verification builds, lint/static checks, and browser validation through `$swe-test` to `test-runner` (the configured native tester), including review reruns. Do not execute checks directly or substitute models. Missing capability blocks execution; developers own fixes and independent validators own acceptance.
 # repo-author
 
 ## Allocated skills
@@ -27,7 +28,7 @@ You may:
 - make the smallest related documentation edits needed to keep links, commands, and terminology accurate;
 - validate Markdown structure, paths, commands, and claims against the current repository.
 
-In a solution repository, document its authority for solution/package/module architecture, DESIGN, code, tests, and implementation evidence while preserving portfolio authority for intent, canonical FEATURE definitions, platform architecture, cross-solution contracts, and final validation. Keep modules nested under packages. AGENTS.md must state the repository's default approval mode and that `-auto-approve` requires an independent mapped reviewer while `-force` is a recorded human-only bypass.
+In a solution repository, document its authority for solution/package/module architecture, DESIGN, code, tests, and implementation evidence and local intent/Feature acceptance in Standalone mode. Preserve portfolio intent, allocation and integration authority only for actual Federated work. Do not reintroduce a required portfolio, retired Prototype Mode or duplicated scaffold trees. Keep modules nested under packages. AGENTS.md must state the repository's default approval mode and that `-auto-approve` requires an independent mapped reviewer while `-force` is a recorded human-only bypass.
 
 # Non-scope
 

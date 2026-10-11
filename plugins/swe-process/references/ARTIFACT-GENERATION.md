@@ -1,5 +1,27 @@
 # Artifact generation
 
+Prefer authoring the six-field template directly for small work. The helper generates bookkeeping when useful; it is not a required input manifest for every agent.
+
+New input uses schema_version 4, the creating skill's template path, metadata with artifact_type/id/owners, optional artifact_links and authored replacements. Status is set by artifact type; callers cannot approve through generation. Example:
+
+```json
+{"schema_version":4,"template":"skills/swe-plan-features/references/FEATURE-TEMPLATE.md","metadata":{"artifact_type":"feature","id":"FEATURE-001","owners":["developer"]},"artifact_links":[],"replacements":{"FEATURE_TITLE":"Export a report"}}
+```
+
+Direct links contain relation, artifact_id, repository-relative path, and repository/revision when applicable. The generated YAML links value is a compact JSON-compatible array; keep this bounded representation for machine lineage readers. No parent or duplicated ancestor chain is required. Root artifacts may have no links. Resolved IDs plus paths are mandatory; foreign repository identities require an explicit authorized mapping.
+
+Run New-SweArtifact.ps1 -InputPath <input.json> -OutputPath <artifact.md>. Create never overwrites a file. Update edits only hash-marked generated blocks and refuses manual conflicts, changed identity or frozen approval. Recovery creates a disposable observation view, never acceptance. Do not create input/output corpora per agent.
+
+Get-SweArtifactLineage.ps1 -Repository <absolute-root> -Path <relative-artifact> [-RepositoryMapPath <mapping.json>] resolves current direct links, IDs, digests and legacy upstreams read-only. Maps bind repository identity to absolute checkout. Missing, conflicting, cyclic and unmapped inputs fail; it never grants eligibility/acceptance.
+
+Schema-1 generation requests remain supported for legacy automation with the original metadata/upstream requirements. No accepted artifact is rewritten. Architecture profile Compact/Detailed selection and concerns remain supported. Ordinary Features, Evidence and Validation use V4 templates; generator output still needs authored substance and independent review.
+
+Optional V4 eligibility automation accepts swe-eligibility/v2 or swe-packet-source/v2 with delivery_mode Standalone/Federated. A standalone accepted Feature with Approach can be the design input; Plan is optional. Federated code still needs accepted local Design. DeliveryAcceptance closes standalone work; EpicAcceptance retains portfolio integration gates. V1 packets preserve their existing rules. These helpers are optional mechanical audits for complex scheduling, not mandatory paperwork for every Feature.
+
+Legacy generator reference follows for existing consumers; new authors use the compact request above.
+
+# Artifact generation
+
 `scripts/New-SweArtifact.ps1` creates mechanical structure from the selected creating-skill template. It never authors decisions or executes tests. Resolve identifiers and authoritative locators before supplying inputs. Invoke with PowerShell 5.1 or later:
 
 ```powershell

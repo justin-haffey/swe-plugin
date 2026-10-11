@@ -1,21 +1,10 @@
 ---
-title: "[MODULE_NAME] Module Architecture"
 artifact_type: "module_architecture"
 id: "ARCH-MODULE-[MODULE_ID]"
 status: "Target"
-authority: "solution"
-scope: "[PACKAGE_ID]/[MODULE_ID]"
-parent: "[PACKAGE_ARCHITECTURE_ID]"
-upstream:
-  repository: "[REPOSITORY_ID_OR_URL]"
-  artifact_id: "[PACKAGE_ARCHITECTURE_ID]"
-  path: "architecture/packages/[PACKAGE_NAME]/PACKAGE-ARCHITECTURE.md"
-  revision: "[OPTIONAL_COMMIT_OR_TAG]"
-owners:
-  - "[MODULE_ARCHITECT]"
-created: "[YYYY_MM_DD]"
-updated: "[YYYY_MM_DD]"
-template_version: "3.0.0"
+owners: ["[OWNER]"]
+schema_version: 4
+links: []
 ---
 
 # [MODULE_NAME] Module Architecture
@@ -30,30 +19,9 @@ template_version: "3.0.0"
 |---|---|---|
 | [INTERFACE] | [INBOUND_OR_OUTBOUND] | [CONTRACT] |
 
-### Building-Block View
+### Optional view
 
-Use this view to show coarse internal responsibilities and dependency direction. Avoid a class-per-box diagram; add a class or data-model view only when the model itself is architecturally significant.
-
-```mermaid
-flowchart LR
-    Caller["[CALLER_OR_CONSUMER]"]
-    Collaborator["[EXTERNAL_COLLABORATOR]"]
-
-    subgraph Module["[MODULE_NAME]"]
-        API["[PUBLIC_INTERFACE]"]
-        Core["[CORE_BEHAVIOR]"]
-        Adapter["[ADAPTER_OR_PERSISTENCE]"]
-    end
-
-    Caller -->|"[INVOCATION]"| API
-    API -->|"[DELEGATES]"| Core
-    Core -->|"[PORT_OR_CONTRACT]"| Adapter
-    Adapter -->|"[INTERACTION]"| Collaborator
-```
-
-- Relationship meaning: [ARROW_SEMANTICS]
-- Key invariant: [DIAGRAM_INVARIANT]
-- Scope and omissions: [DIAGRAM_SCOPE_AND_OMISSIONS]
+Add a diagram only when it clarifies a real boundary or interaction. Keep prose/tables authoritative; omit unused example views.
 
 ## State and Behavior
 
@@ -83,14 +51,6 @@ flowchart LR
 - Security and trust: [THREAT_BOUNDARY_AND_CONTROL]
 - Operations and compatibility: [OBSERVABILITY_DEPLOYMENT_MIGRATION_AND_REVERSAL]
 
-## Review Packet
-
-- Decision bytes or immutable snapshot: [INPUT_AND_DECISION_FINGERPRINT_LOCATORS]
-- Effective policy and named approver: [POLICY_LOCATOR_AND_APPROVER]
-- Paired decisions and order: [PAIRED_ARTIFACT_LOCATORS_OR_NONE]
-- Review cycle history: [DURABLE_HISTORY_LOCATOR]; repair cycles consumed: [COUNT]
-- Correspondence at decision time: [VERIFIED_MATCH_OR_BLOCKER]
-
 ## Approval Record
 
 | Field | Value |
@@ -102,3 +62,5 @@ flowchart LR
 | Recorded | [ISO_8601_TIMESTAMP_OR_PENDING] |
 | Evidence | [REVIEW_REFERENCE_OR_NONE] |
 | Bypass reason | [REQUIRED_FOR_FORCE_OR_NONE] |
+
+Review history: [REVIEWED_INPUT_AND_DECISION_FINGERPRINTS]; repair cycles consumed: [COUNT]. Record actual decisions and unresolved findings here; preserve history across resumes.

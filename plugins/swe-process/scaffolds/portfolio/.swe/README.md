@@ -1,22 +1,7 @@
-# Portfolio Engineering Work
+# Portfolio engineering work
 
-`.swe/context/` contains durable portfolio vocabularies routed by the root `CONTEXT-MAP.md`. `.swe/epics/` contains lifecycle-bound portfolio work records. Each Epic directory uses `###-short-name` and owns its `RESEARCH`, Concept, architecture-impact assessment, and locally numbered Features.
+`.swe/context/` contains durable vocabularies linked from CONTEXT-MAP.md. `.swe/epics/NNN-short-name/EPIC.md` groups shared outcomes; its `features/NNN-short-name/FEATURE.md` records criteria and allocation. Feature numbering is Epic-local. Preserve existing IDs and paths.
 
-```text
-context/
-  WORK-CONTEXT.md
-  STRUCTURAL-CONTEXT.md
-  ENGINEERING-CONTEXT.md
-epics/
-  001-short-name/
-    EPIC.md
-    RESEARCH/
-    CONCEPT.md
-    ARCHITECTURE-IMPACT.md
-    features/
-      001-short-name/
-        FEATURE.md
-        IMPLEMENTATION-PLAN.md
-```
+Research under RESEARCH/, Concept, architecture-impact and separate IMPLEMENTATION-PLAN.md are conditional on actual uncertainty or coordination complexity. A simple allocation remains in the Feature. Do not generate empty companion records.
 
-The canonical IDs are `EPIC-001` and `FEATURE-001`; paths are locators, not identities. The portfolio owns each `FEATURE.md` and its adjacent `IMPLEMENTATION-PLAN.md`. Allocated child solution repositories link to those artifacts and own `DESIGN.md`, source, tests, `EVIDENCE.md`, and solution-local `VALIDATION.md`.
+Children link canonical Feature/allocation/contracts and own local Design, source, tests, Evidence and independent Validation. The portfolio owns shared integration acceptance and links child decisions without duplicating unchanged checks.

@@ -88,7 +88,7 @@ $manifestPath = Join-Path $PluginRoot '.codex-plugin\plugin.json'
 try {
     $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
     if ($manifest.name -ne 'swa-analyze') { Add-Failure "Manifest name must be swa-analyze: $manifestPath" }
-    if ($manifest.version -ne '3.5.0') { Add-Failure "Manifest version must be 3.5.0: $manifestPath" }
+    if ($manifest.version -ne '4.0.0') { Add-Failure "Manifest version must be 4.0.0: $manifestPath" }
     if ($manifest.author.name -ne 'Ghostworx.ai, LLC' -or $manifest.interface.developerName -ne 'Ghostworx.ai, LLC') {
         Add-Failure "Manifest publisher must be Ghostworx.ai, LLC: $manifestPath"
     }
@@ -102,9 +102,9 @@ foreach ($pluginName in @('swe-process', 'swe-codex', 'swe-utility', 'swa-analyz
     try {
         $packageManifest = Get-Content -Raw -LiteralPath $packageManifestPath | ConvertFrom-Json
         $expectedPackageVersion = switch ($pluginName) {
-            'swe-utility' { '3.5.0' }
-            'swe-process' { '3.5.1' }
-            default { '3.5.0' }
+            'swe-utility' { '4.0.0' }
+            'swe-process' { '4.0.0' }
+            default { '4.0.0' }
         }
         if ($packageManifest.version -ne $expectedPackageVersion) {
             Add-Failure "Package manifest version must be ${expectedPackageVersion}: $packageManifestPath"
@@ -132,7 +132,7 @@ foreach ($skillName in $expectedSkills) {
     if (-not $frontMatter.Success) {
         Add-Failure "Invalid SKILL.md front matter: $skillPath"
     } else {
-        $declaredName = [regex]::Match($frontMatter.Groups[1].Value, '(?m)^name:\s*([^\r\n]+)$')
+        $declaredName = [regex]::Match($frontMatter.Groups[1].Value, '(?m)^name:\s*([^\r\n]+)\r?$')
         if (-not $declaredName.Success -or $declaredName.Groups[1].Value.Trim() -ne $skillName) {
             Add-Failure "SKILL.md name must match its directory: $skillPath"
         }

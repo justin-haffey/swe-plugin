@@ -1,24 +1,34 @@
 {
   "name": "swe-utility",
-  "version": "3.5.0",
+  "version": "4.0.0",
   "description": "Reusable utility skills for governed software engineering work.",
   "author": {
     "name": "Ghostworx.ai, LLC"
   },
-  "keywords": ["utility", "software-engineering", "orchestration", "handoff", "fork", "prototype", "review", "versioning"],
+  "keywords": [
+    "utility",
+    "software-engineering",
+    "orchestration",
+    "handoff",
+    "fork",
+    "review",
+    "versioning"
+  ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "SWE Utilities 3.5.0",
+    "displayName": "SWE Utilities 4.0.0",
     "shortDescription": "Software engineering utility skills",
-    "longDescription": "Provides reusable discovery, review, orchestration, cross-repository delivery handoff, prototype-first delivery, style, domain-modeling, Codex command repair, and versioning workflows.",
+    "longDescription": "Provides reusable discovery, review, orchestration, cross-repository delivery handoff, style, domain-modeling, Codex command repair, and versioning workflows.",
     "developerName": "Ghostworx.ai, LLC",
     "category": "Productivity",
-    "capabilities": ["Read", "Write"],
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
     "defaultPrompt": [
       "Use $grill to pressure-test a plan before implementation.",
       "Use $orchestrate to coordinate a bounded multi-agent workflow.",
       "Use $bridge to dispatch a bounded direct request to an exact child repository through a supported host transport.",
-      "Use $prototype -on or $prototype -off to control scoped prototype-first delivery.",
       "Use $codex-update to repair the PowerShell codex command after a desktop update.",
       "Use $version to version, check in, synchronize, and tag approved work."
     ],

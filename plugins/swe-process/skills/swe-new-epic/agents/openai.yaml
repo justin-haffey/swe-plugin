@@ -1,4 +1,4 @@
 interface:
   display_name: "Create SWE Epic"
-  short_description: "Create a governed portfolio Epic workspace"
-  default_prompt: "Use $swe-new-epic to create the next governed Epic for this outcome."
+  short_description: "Group related Features when needed"
+  default_prompt: "Use $swe-new-epic only for a durable outcome that needs several related Features."

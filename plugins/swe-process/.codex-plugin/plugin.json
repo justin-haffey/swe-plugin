@@ -1,19 +1,28 @@
 {
   "name": "swe-process",
-  "version": "3.5.1",
+  "version": "4.0.0",
   "description": "Governed end-to-end software engineering workflows for portfolio and solution repositories.",
   "author": {
     "name": "Ghostworx.ai, LLC"
   },
-  "keywords": ["software-engineering", "design", "adr", "planning", "governance"],
+  "keywords": [
+    "software-engineering",
+    "design",
+    "adr",
+    "planning",
+    "governance"
+  ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "SWE Process 3.5.1",
+    "displayName": "SWE Process 4.0.0",
     "shortDescription": "Governed engineering artifacts",
     "longDescription": "Turns portfolio intent into research, concepts, federated architecture, Features, implementation assignments, solution designs, code, evidence, and independent validation.",
     "developerName": "Ghostworx.ai, LLC",
     "category": "Productivity",
-    "capabilities": ["Read", "Write"],
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
     "defaultPrompt": [
       "Use $swe-max with an Epic or idea to coordinate complete governed delivery.",
       "Use $swe-test to run scoped checks or an Epic verification batch through the Luna test-runner.",
